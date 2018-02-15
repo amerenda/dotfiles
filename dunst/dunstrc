@@ -3,18 +3,18 @@
 
     monitor = 0
     follow = mouse
-    geometry = "300x5-30+20"
+    geometry = "300x200-6+30"
     indicate_hidden = yes
     shrink = no
     transparency = 0
     notification_height = 0
     separator_height = 2
     padding = 8
-    horizontal_padding = 8
-    frame_width = 3
+    horizontal_padding = 10
+    frame_width = 2
     frame_color = "#aaaaaa"
     #separator_color = frame
-    separator_color = auto
+    separator_color = foreground
     sort = yes
     idle_threshold = 120
 
@@ -22,7 +22,7 @@
 
     line_height = 0
     markup = full
-    format = "<b>%s</b>\n%b"
+    format = "<big>%s</big>\n%b"
     alignment = left
     show_age_threshold = 60
     word_wrap = yes
@@ -31,9 +31,9 @@
     hide_duplicate_count = false
     show_indicators = yes
 
-    icon_position = off
-    max_icon_size = 32
-    icon_path = /usr/share/icons/gnome/16x16/status/:/usr/share/icons/gnome/16x16/devices/
+    icon_position = left
+    max_icon_size = 24
+    icon_path = /usr/share/icons/Numix/24/status/:/usr/share/icons/gnome/16x16/status/:/usr/share/icons/gnome/16x16/devices/
 
     sticky_history = yes
     history_length = 20
@@ -74,6 +74,27 @@
     foreground = "#ffffff"
     frame_color = "#ff0000"
     timeout = 0
+
+[urgency_low]
+    # IMPORTANT: colors have to be defined in quotation marks.
+    # Otherwise the "#" and following would be interpreted as a comment.
+    background = "#65737e"
+    foreground = "#eff1f5"
+    timeout = 2
+    # Icon for notifications with low urgency, uncomment to enable
+    #icon = /path/to/icon
+
+[urgency_normal]
+    background = "#65737e"
+    foreground = "#eff1f5"
+    timeout = 2
+
+[urgency_critical]
+    background = "#bf616a"
+    foreground = "#ffffff"
+    frame_color = "#ff0000"
+    timeout = 0
+
 
 # Every section that isn't one of the above is interpreted as a rules to
 # override settings for certain messages.
