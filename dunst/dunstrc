@@ -60,22 +60,6 @@
     context = ctrl+shift+period
 
 [urgency_low]
-    background = "#222222"
-    foreground = "#888888"
-    timeout = 10
-
-[urgency_normal]
-    background = "#285577"
-    foreground = "#ffffff"
-    timeout = 10
-
-[urgency_critical]
-    background = "#900000"
-    foreground = "#ffffff"
-    frame_color = "#ff0000"
-    timeout = 0
-
-[urgency_low]
     # IMPORTANT: colors have to be defined in quotation marks.
     # Otherwise the "#" and following would be interpreted as a comment.
     background = "#65737e"
