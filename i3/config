@@ -10,9 +10,6 @@ font xft:Ubuntu Mono 11
 bindsym $mod+Delete exec --no-startup-id "~/.bin/fuzzy_lock.sh"
 exec --no-startup-id xautolock -time 10 -locker "~/.bin/fuzzy_lock.sh"
 
-# dunst notifications
-exec --no-startup-id dunst
-
 # screenshot
 bindsym Print exec scrot -e 'mv $f ~/Dropbox/Screenshots'
 bindsym --release $mod+Print exec --no-startup-id scrot -s -e 'mv $f ~/Dropbox/Screenshots'
@@ -28,7 +25,7 @@ bindsym $mod+Return exec --no-startup-id urxvt -e /usr/bin/zsh
 bindsym $mod+Shift+q kill
 
 # starts rofi (program manager)
-bindsym $mod+d exec --no-startup-id i3-dmenu-desktop --dmenu='rofi -show run -sidebar -mode-font "ubuntu mono 18" -width 30 -padding 12 -opacity "85" -eh 1 -lines 5 -padding 20 -hide-scrollbar -i'
+bindsym $mod+d exec --no-startup-id rofi -show run -sidebar -mode-font "ubuntu mono 18" -width 30 -padding 12 -opacity "85" -eh 1 -lines 5 -padding 20 -hide-scrollbar -i
 
 # ssh with rofi
 bindsym $mod+z exec --no-startup-id rofi -show ssh
@@ -156,11 +153,12 @@ bindsym $mod+r mode "resize"
 # borders
 for_window [class="^.*"] border pixel 5
 #smart_borders on
-#smart_gaps on
-#gaps inner 10
-#gaps outer 0
+smart_gaps on
+gaps inner 10
+gaps outer 0
 
 # startup items
+exec --no-startup-id dunst
 exec --no-startup-id xset s on
 exec --no-startup-id xset +dpms
 exec --no-startup-id xset s blank
