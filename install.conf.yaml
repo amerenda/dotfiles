@@ -7,13 +7,13 @@
     ~/.config/compton.conf: compton.conf
     ~/.config/dunst: dunst/
     ~/.config/i3: i3/
+    ~/.config/polybar: polybar
     ~/.config/ranger: ranger/
     ~/.config/redshift.conf: redshift.conf
     ~/.dotfiles: ''
     ~/.fonts.conf: fonts.conf
     ~/.gitconfig: gitconfig
     ~/.gitignore_global: gitignore_global
-    ~/.polybar: polybar
     ~/.scripts: scripts
     ~/.snakebiterc: snakebiterc
     ~/.ssh:
