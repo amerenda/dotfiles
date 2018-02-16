@@ -11,6 +11,7 @@ background-visible = #343d46
 foreground-right = #ffeff1f5
 background-right = #343d46
 foreground-right-alt = #88eff1f5
+background-red = #bf616a
 
 
 ; oringal colors
@@ -34,7 +35,7 @@ line-size = 2
 border-bottom-color = #4f5b66
 tray-position = center
 tray-padding = 2
-tray-offset-x = 220
+tray-offset-x = 180
 
 
 [module/i3]
@@ -126,7 +127,7 @@ label-disconnected =
 format-connected-foreground = ${colors.foreground-right-alt}
 format-connected-background = ${colors.background-right}
 format-disconnected-foreground = ${colors.foreground-right-alt}
-format-disconnected-background = ${colors.background-right}
+format-disconnected-background = ${colors.background-red}
 
 [module/volume]
 type = internal/volume
@@ -136,7 +137,7 @@ format-muted-padding = 2
 format-volume-foreground = ${colors.foreground-right-alt}
 format-volume-background = ${colors.background-right}
 format-muted-foreground = ${colors.foreground-right-alt}
-format-muted-background = ${colors.background-right}
+format-muted-background = ${colors.background-red}
 format-volume = 
 format-muted = 
 
