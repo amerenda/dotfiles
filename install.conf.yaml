@@ -13,6 +13,7 @@
     ~/.fonts.conf: fonts.conf
     ~/.gitconfig: gitconfig
     ~/.gitignore_global: gitignore_global
+    ~/.polybar: polybar
     ~/.snakebiterc: snakebiterc
     ~/.ssh:
        force: true
