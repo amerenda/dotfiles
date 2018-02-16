@@ -28,7 +28,7 @@ bindsym $mod+Return exec --no-startup-id urxvt -e /usr/bin/zsh
 bindsym $mod+Shift+q kill
 
 # starts rofi (program manager)
-bindsym $mod+d exec --no-startup-id i3-dmenu-desktop --dmenu='rofi -dmenu -sidebar -mode-font "ubuntu mono 18" -width 30 -padding 12 -opacity "85" -eh 1 -lines 5 -padding 20 -hide-scrollbar -i'
+bindsym $mod+d exec --no-startup-id i3-dmenu-desktop --dmenu='rofi -show run -sidebar -mode-font "ubuntu mono 18" -width 30 -padding 12 -opacity "85" -eh 1 -lines 5 -padding 20 -hide-scrollbar -i'
 
 # ssh with rofi
 bindsym $mod+z exec --no-startup-id rofi -show ssh
@@ -85,16 +85,16 @@ bindsym $mod+a focus parent
 
 # define workspace function
 # # Name the workspaces
-set $space1 " 1 | web "
-set $space2 " 2 | term "
-set $space3 " 3 | chat "
-set $space4 " 4 | secure "
-#set $space5 " 5 | works "
-#set $space6 " 6 | games "
-#set $space7 " 7 | photos "
-#set $space8 " 8 | medias "
-set $space9 " 9 | spotify "
-set $space10 " 10 | personal "
+set $workspace1 " 1 | web "
+set $workspace2 " 2 | term "
+set $workspace3 " 3 | chat "
+set $workspace4 " 4 | secure "
+set $workspace5 " 5 | misc "
+set $workspace6 " 6 | docs "
+set $workspace7 " 7 | misc "
+set $workspace8 " 8 | incognito "
+set $workspace9 " 9 | spotify "
+set $workspace10 " 10 | personal "
 
 
 # switch to workspace
@@ -155,10 +155,10 @@ bindsym $mod+r mode "resize"
 
 # borders
 for_window [class="^.*"] border pixel 5
-smart_borders on
-smart_gaps on
-gaps inner 10
-gaps outer 0
+#smart_borders on
+#smart_gaps on
+#gaps inner 10
+#gaps outer 0
 
 # startup items
 exec --no-startup-id xset s on
