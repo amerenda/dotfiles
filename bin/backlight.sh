@@ -11,17 +11,16 @@ function get_brightness {
 function send_notification {
     brightness=`get_brightness`
     bar=$(seq -s "──" $((${brightness%.*} / 6)) | sed 's/[0-9]//g')
-    dunstify -i /usr/share/icons/Numix/48/notifications/notification-display-brightness-full.svg -t 8 -r 2593 -u normal "  $bar"
+    dunstify -i /usr/share/icons/Numix/48/notifications/notification-display-brightness-full.svg -r 2593 -u normal "  $bar"
 }
 
 case $1 in
     up)
- # Up the volume (+ 5%)
- xbacklight -inc 10
+ xbacklight -inc 6.0
  send_notification
  ;;
     down)
- xbacklight -dec 10
+ xbacklight -dec 6.0
  send_notification
  ;;
 esac
