@@ -76,7 +76,7 @@ label-visible =
 [module/spotify]
 type = custom/script
 format-padding = 2
-interval = 3
+interval = 1
 format-foreground = ${colors.foreground-right}
 format-background = ${colors.background-right}
 exec = spotifyCurrent.sh
