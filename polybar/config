@@ -13,10 +13,8 @@ background-right = #343d46
 foreground-right-alt = #88eff1f5
 background-red = #bf616a
 
-
 ; oringal colors
 background-transparent = #44343d46
-
 
 
 [bar/default]
@@ -30,12 +28,12 @@ font-1 = FontAwesome:style=Regular:size=10;3
 fixed-center = true
 modules-left = i3 i3msg
 modules-center =
-modules-right = spotify redshift backlight wifi volume battery dateTime
+modules-right = spotify wifi vpn redshift backlight volume battery dateTime
 line-size = 2
 border-bottom-color = #4f5b66
 tray-position = center
 tray-padding = 2
-tray-offset-x = 180
+tray-offset-x = 150
 
 
 [module/i3]
@@ -86,6 +84,32 @@ exec-if = pgrep -x spotify
 tail = true
 ; vim:ft=dosini
 
+[module/wifi]
+type = internal/network
+format-connected-padding = 2
+format-disconnected-padding = 2
+interface = wlp58s0
+interval = 3.0
+format-connected =<label-connected>
+format-disconnected =<label-disconnected>
+label-connected =%{A1:WifiNotification:}%{A}
+label-disconnected =
+format-connected-foreground = ${colors.foreground-right-alt}
+format-connected-background = ${colors.background-right}
+format-disconnected-foreground = ${colors.foreground-right-alt}
+format-disconnected-background = ${colors.background-red}
+
+[module/vpn]
+type = custom/script
+exec = ovpn.sh status
+;exec-if = pgrep -x openvpn
+interval = 5
+format-underline = #268bd2
+format-prefix = "🖧 "
+format-prefix-foreground = #5b
+click-left = nmcli con up id au-03.protonvpn.com.udp1194
+click-right = nmcli con down id au-03.protonvpn.com.udp1194
+
 [module/redshift]
 type = custom/script
 interval = 20
@@ -112,22 +136,6 @@ ramp-5 =%{F#99ebcb8b}%{F-}
 ramp-6 =%{F#BBebcb8b}%{F-}
 ramp-7 =%{F#DDebcb8b}%{F-}
 ramp-8 =%{F#FFebcb8b}%{F-}
-
-[module/wifi]
-type = internal/network
-format-connected-padding = 2
-format-disconnected-padding = 2
-interface = wlp58s0
-interval = 3.0
-format-connected =<label-connected>
-format-disconnected =<label-disconnected>
-label-connected =%{A1:WifiNotification:}%{A}
-label-disconnected =
-
-format-connected-foreground = ${colors.foreground-right-alt}
-format-connected-background = ${colors.background-right}
-format-disconnected-foreground = ${colors.foreground-right-alt}
-format-disconnected-background = ${colors.background-red}
 
 [module/volume]
 type = internal/volume
