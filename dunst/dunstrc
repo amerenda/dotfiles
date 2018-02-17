@@ -1,9 +1,8 @@
 [global]
     ### Display ###
-
-    monitor = 0
+    monitor = eDP1
     follow = mouse
-    geometry = "300x200-6+30"
+    geometry = "370x200-6+30"
     indicate_hidden = yes
     shrink = no
     transparency = 0
