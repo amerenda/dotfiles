@@ -28,7 +28,7 @@ font-1 = FontAwesome:style=Regular:size=10;3
 fixed-center = true
 modules-left = i3 i3msg
 modules-center =
-modules-right = spotify wifi vpn redshift backlight volume battery dateTime
+modules-right = spotify wifi dropbox vpn redshift backlight volume battery dateTime
 line-size = 2
 border-bottom-color = #4f5b66
 tray-position = center
@@ -83,6 +83,16 @@ exec = spotifyCurrent.sh
 exec-if = pgrep -x spotify
 tail = true
 ; vim:ft=dosini
+
+[module/dropbox]
+type = custom/script
+format-padding = 2
+interval = 3
+format-foreground = ${colors.foreground-right}
+format-background = ${colors.background-right}
+exec = dropboxStatus.sh
+exec-if = pgrep -x dropbox
+tail = true
 
 [module/wifi]
 type = internal/network
