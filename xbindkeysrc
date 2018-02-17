@@ -38,23 +38,26 @@
 #keystate_scrolllock= enable
 
 # decrease brightness
-"xbacklight -dec 3"
+"backlight.sh down"
    XF86MonBrightnessDown
 
 # increase brightness
-"xbacklight -inc 3"
+"backlight.sh up"
    XF86MonBrightnessUp
 
 # increase volume
-'sh -c "pactl set-sink-mute @DEFAULT_SINK@ false ; pactl set-sink-volume @DEFAULT_SINK@ +5%"'
+#'sh -c "pactl set-sink-mute @DEFAULT_SINK@ false ; pactl set-sink-volume @DEFAULT_SINK@ +5%"'
+"vol.sh up"
    XF86AudioRaiseVolume
 
 # decrease volume
-'sh -c "pactl set-sink-mute @DEFAULT_SINK@ false ; pactl set-sink-volume @DEFAULT_SINK@ -5%"'
+#'sh -c "pactl set-sink-mute @DEFAULT_SINK@ false ; pactl set-sink-volume @DEFAULT_SINK@ -5%"'
+"vol.sh down"
    XF86AudioLowerVolume
 
 # mute volume
-"pactl set-sink-mute @DEFAULT_SINK@ toggle"
+#"pactl set-sink-mute @DEFAULT_SINK@ toggle"
+"vol.sh mute"
    XF86AudioMute
 
 # Play/Pause
