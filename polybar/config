@@ -1,3 +1,4 @@
+; vim:ft=dosini
 [colors]
 foreground = #2b303b
 background = #bf616a
@@ -33,7 +34,7 @@ line-size = 2
 border-bottom-color = #4f5b66
 tray-position = center
 tray-padding = 2
-tray-offset-x = 150
+tray-offset-x = 100
 
 
 [module/i3]
@@ -82,7 +83,6 @@ format-background = ${colors.background-right}
 exec = spotifyCurrent.sh
 exec-if = pgrep -x spotify
 tail = true
-; vim:ft=dosini
 
 [module/dropbox]
 type = custom/script
@@ -112,13 +112,11 @@ format-disconnected-background = ${colors.background-red}
 [module/vpn]
 type = custom/script
 exec = ovpn.sh status
-;exec-if = pgrep -x openvpn
+exec-if = pgrep -x openvpn
 interval = 5
 format-underline = #268bd2
-format-prefix = "🖧 "
+format-prefix = "🖧"
 format-prefix-foreground = #5b
-click-left = nmcli con up id au-03.protonvpn.com.udp1194
-click-right = nmcli con down id au-03.protonvpn.com.udp1194
 
 [module/redshift]
 type = custom/script
