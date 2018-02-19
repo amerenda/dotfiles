@@ -93,7 +93,6 @@ set $workspace8 " 8 | incognito "
 set $workspace9 " 9 | spotify "
 set $workspace10 " 10 | personal "
 
-
 # switch to workspace
 bindsym $mod+1 workspace $workspace1
 bindsym $mod+2 workspace $workspace2
@@ -120,6 +119,7 @@ bindsym $mod+Shift+0 move container to workspace $workspace10
 
 # toggle between workspaces
 bindsym $mod+Tab workspace back_and_forth
+bindsym $mod+Shift+Tab workspace prev
 
 # reload the configuration file
 bindsym $mod+Shift+c reload
