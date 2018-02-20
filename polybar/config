@@ -29,7 +29,7 @@ font-1 = FontAwesome:style=Regular:size=10;3
 fixed-center = true
 modules-left = i3 i3msg
 modules-center =
-modules-right = spotify wifi dropbox vpn redshift backlight pulseaudio-simple battery dateTime
+modules-right = spotify wifi dropbox redshift backlight volume battery dateTime
 line-size = 2
 border-bottom-color = #4f5b66
 tray-position = center
@@ -109,14 +109,14 @@ format-connected-background = ${colors.background-right}
 format-disconnected-foreground = ${colors.foreground-right-alt}
 format-disconnected-background = ${colors.background-red}
 
-[module/vpn]
-type = custom/script
-exec = ~/.scripts/ovpn.sh status
-exec-if = pgrep -x openvpn
-interval = 5
-format-underline = #268bd2
-format-prefix = "🖧"
-format-prefix-foreground = #5b
+;[module/vpn]
+;type = custom/script
+;exec = ~/.scripts/ovpn.sh status
+;exec-if = pgrep -x openvpn
+;interval = 5
+;format-underline = #268bd2
+;format-prefix = "🖧"
+;format-prefix-foreground = #5b
 
 [module/redshift]
 type = custom/script
@@ -145,21 +145,22 @@ ramp-6 =%{F#BBebcb8b}%{F-}
 ramp-7 =%{F#DDebcb8b}%{F-}
 ramp-8 =%{F#FFebcb8b}%{F-}
 
-[module/pulseaudio-simple]
-type = custom/script
-exec = ~/.scripts/pulseaudio-simple.sh
-interval = 3
-;[module/volume]
-;type = internal/volume
-;master-mixer= Master
-;format-volume-padding = 2
-;format-muted-padding = 2
-;format-volume-foreground = ${colors.foreground-right-alt}
-;format-volume-background = ${colors.background-right}
-;format-muted-foreground = ${colors.foreground-right-alt}
-;format-muted-background = ${colors.background-red}
-;format-volume = 
-;format-muted = 
+;[module/pulseaudio-simple]
+;type = custom/script
+;exec = ~/.scripts/pulseaudio-simple.sh
+;interval = 3
+
+[module/volume]
+type = internal/volume
+master-mixer= Master
+format-volume-padding = 2
+format-muted-padding = 2
+format-volume-foreground = ${colors.foreground-right-alt}
+format-volume-background = ${colors.background-right}
+format-muted-foreground = ${colors.foreground-right-alt}
+format-muted-background = ${colors.background-red}
+format-volume = 
+format-muted = 
 
 [module/battery]
 type = internal/battery
