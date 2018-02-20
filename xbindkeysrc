@@ -38,26 +38,26 @@
 #keystate_scrolllock= enable
 
 # decrease brightness
-"backlight.sh down"
+"~/.scripts/backlight.sh down"
    XF86MonBrightnessDown
 
 # increase brightness
-"backlight.sh up"
+"~/.scripts/backlight.sh up"
    XF86MonBrightnessUp
 
 # increase volume
 #'sh -c "pactl set-sink-mute @DEFAULT_SINK@ false ; pactl set-sink-volume @DEFAULT_SINK@ +5%"'
-"vol.sh up"
+"~/.scripts/vol.sh up"
    XF86AudioRaiseVolume
 
 # decrease volume
 #'sh -c "pactl set-sink-mute @DEFAULT_SINK@ false ; pactl set-sink-volume @DEFAULT_SINK@ -5%"'
-"vol.sh down"
+"~/.scripts/vol.sh down"
    XF86AudioLowerVolume
 
 # mute volume
 #"pactl set-sink-mute @DEFAULT_SINK@ toggle"
-"vol.sh mute"
+"~/.scripts/vol.sh mute"
    XF86AudioMute
 
 # Play/Pause
@@ -71,34 +71,3 @@
 # Previous
 "dbus-send --print-reply --dest=org.mpris.MediaPlayer2.spotify /org/mpris/MediaPlayer2 org.mpris.MediaPlayer2.Player.Previous"
    XF86AudioPrev
-
-
-# Examples of commands:
-
-#"xbindkeys_show"
-#  control+shift + q
-#
-## set directly keycode (here control + f with my keyboard)
-#"xterm"
-#  c:41 + m:0x4
-#
-## specify a mouse button
-#"xterm"
-#  control + b:2
-
-#"xterm -geom 50x20+20+20"
-#   Shift+Mod2+alt + s
-# ## set directly keycode (here control+alt+mod2 + f with my keyboard) #"xterm"
-#  alt + c:0x29 + m:4 + mod2
-#
-## Control+Shift+a  release event starts rxvt
-#"rxvt"
-#  release+control+shift + a
-#
-## Control + mouse button 2 release event starts rxvt
-#"rxvt"
-#  Control + b:2 + Release
-
-##################################
-# End of xbindkeys configuration #
-##################################
