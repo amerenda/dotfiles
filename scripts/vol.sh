@@ -17,23 +17,23 @@ function is_mute {
 function send_notification {
     volume=`get_volume`
     bar=$(seq -s "──" $(($volume / 6)) | sed 's/[0-9]//g')
-    dunstify -i audio-volume-high -a volume -t 1 -r 300 "  $bar"
+    dunstify -i audio-volume-high -a volume -r 300 "  $bar"
 }
 
 case $1 in
     up)
- amixer -D pulse sset Master 5%+ > /dev/null
+ amixer -D pulse set Master 1+ unmute; amixer -D pulse sset Master 5%+ > /dev/null
  send_notification
  ;;
     down)
- amixer -D pulse sset Master 5%- > /dev/null
+ amixer -D pulse set Master 1+ unmute; amixer -D pulse sset Master 5%- > /dev/null
  send_notification
  ;;
     mute)
      # Toggle mute
  amixer -D pulse set Master 1+ toggle > /dev/null
  if is_mute ; then
-     dunstify -i /usr/share/icons/Numix/24/status/audio-volume-muted-panel.svg -t 1 -r 300 -u normal "  Muted"
+     dunstify -i /usr/share/icons/Numix/24/status/audio-volume-muted-panel.svg -r 300 -u normal "  Muted"
  else
      send_notification
  fi
