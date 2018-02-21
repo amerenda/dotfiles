@@ -74,6 +74,11 @@ label-unfocused =
 label-urgent =
 label-visible =
 
+[module/weather]
+type = custom/script
+exec = weather-bar
+tail = true
+
 [module/spotify]
 type = custom/script
 format-padding = 2
