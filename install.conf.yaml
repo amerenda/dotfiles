@@ -10,6 +10,7 @@
     ~/.config/polybar: polybar
     ~/.config/ranger: ranger/
     ~/.config/redshift.conf: redshift.conf
+    ~/.config/weather-bar: weather-bar
     ~/.dotfiles: ''
     ~/.fonts.conf: fonts.conf
     ~/.gitconfig: gitconfig
