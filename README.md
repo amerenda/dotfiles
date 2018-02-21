@@ -18,3 +18,4 @@ To install, do a recursive clone and run ./install
 * dunstify
 * weather-bar
 * gcalcli
+* numix icons
