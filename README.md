@@ -16,3 +16,4 @@ To install, do a recursive clone and run ./install
 * spotify
 * urxvt
 * dunstify
+* weather-bar
