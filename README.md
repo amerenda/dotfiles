@@ -17,3 +17,4 @@ To install, do a recursive clone and run ./install
 * urxvt
 * dunstify
 * weather-bar
+* gcalcli
