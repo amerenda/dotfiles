@@ -43,7 +43,7 @@ if [ -x /usr/bin/gcalcli ]; then
     /usr/bin/gcalcli --configFolder "~/.gcalcli_placeiq" --calendar="amerenda@placeiq.com" remind 10 'notify-send -i /usr/share/icons/Numix/48/categories/preferences-calendar-and-tasks.svg -u critical -a gcalcli %s' 2> /dev/null
     /usr/bin/gcalcli --configFolder "~/.gcalcli_personal" --calendar="amerenda89@gmail.com" remind 30 'notify-send -i /usr/share/icons/Numix/48/categories/preferences-calendar-and-tasks.svg -a gcalcli %s' 2> /dev/null
     /usr/bin/gcalcli --configFolder "~/.gcalcli_personal" --calendar="amerenda89@gmail.com" remind 10 'notify-send -i /usr/share/icons/Numix/48/categories/preferences-calendar-and-tasks.svg -u critical -a gcalcli %s' 2> /dev/null
-    sleep 300
+    sleep 60
   done &
 fi
 
