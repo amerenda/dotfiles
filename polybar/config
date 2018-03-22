@@ -34,7 +34,7 @@ line-size = 2
 border-bottom-color = #4f5b66
 tray-position = center
 tray-padding = 2
-tray-offset-x = 20
+tray-offset-x = 100
 
 
 [module/i3]
@@ -130,7 +130,7 @@ exec = ~/.scripts/redshiftStatus.sh status
 format-padding = 2
 format-foreground = ${colors.foreground-right}
 format-background = ${colors.background-right}
-click-left = ~/.scripts/redshiftStatus.sh notif
+click-left = redshiftStatus.sh notif
 
 [module/backlight]
 type = internal/xbacklight
@@ -201,10 +201,9 @@ animation-charging-framerate = 750
 
 [module/dateTime]
 type = internal/date
-date =%d-%m-%y %a %I:%M %p
+date =%a %I:%M %p
 format = <label>
 format-foreground = ${colors.foreground-right}
 format-background = ${colors.background-right}
 format-padding = 2
 format-margin= 0
-click-left = ~/.script/agenda.sh

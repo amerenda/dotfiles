@@ -39,9 +39,9 @@ alias tkill="tmux kill-session"
 alias fsize="du -sh ./* | sort -h"
 
 # calendar aliass
-alias gcal='gcalcli --configFolder=~/.gcalcli_placeiq 2>/dev/null'
-alias gcalw='gcalcli --configFolder=~/.gcalcli_placeiq 2>/dev/null'
-alias gcalp='gcalcli --configFolder=~/.gcalcli_personal 2>/dev/null'
+alias gcal='gcalcli --configFolder=~/.gcalcli_placeiq'
+alias gcalw='gcalcli --configFolder=~/.gcalcli_placeiq'
+alias gcalp='gcalcli --configFolder=~/.gcalcli_personal'
 
 # Python aliases
 alias ip2='ipython2'
@@ -49,13 +49,6 @@ alias ip3='ipython'
 
 # Git aliases
 alias subup="git submodule foreach git pull origin master"
-# using a function so the shell expansion isn't run with every new terminal window
-function gitnp()
-{
-    git push --set-upstream origin $(git branch | grep \* | awk '{ print $2 }')
-}
-
-
 
 # Work aliases
 alias gfs='snakebite -n gandalf-nn.placeiq.net'

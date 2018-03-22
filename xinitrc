@@ -39,10 +39,9 @@ fi
 # calendar reminders
 if [ -x /usr/bin/gcalcli ]; then
   while true; do
-    /usr/bin/gcalcli --configFolder "~/.gcalcli_placeiq" --calendar="amerenda@placeiq.com" remind 10 'notify-send -i /usr/share/icons/Numix/48/categories/preferences-calendar-and-tasks.svg -a gcalcli %s' 2> /dev/null
-    /usr/bin/gcalcli --configFolder "~/.gcalcli_personal" --calendar="amerenda89@gmail.com" remind 10 'notify-send -i /usr/share/icons/Numix/48/categories/preferences-calendar-and-tasks.svg -a gcalcli %s' 2> /dev/null
-    echo "$(gcal agenda | head -n2 | tail -n1 | sed -r 's/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[mGK]//g')" > /tmp/agenda
-    sleep 300
+    /usr/bin/gcalcli --configFolder "~/.gcalcli_placeiq" --calendar="amerenda@placeiq.com" remind 30 'notify-send -i /usr/share/icons/Numix/48/categories/preferences-calendar-and-tasks.svg -a gcalcli %s' 2> /dev/null
+    /usr/bin/gcalcli --configFolder "~/.gcalcli_personal" --calendar="amerenda89@gmail.com" remind 30 'notify-send -i /usr/share/icons/Numix/48/categories/preferences-calendar-and-tasks.svg -a gcalcli %s' 2> /dev/null
+    sleep 60
   done &
 fi
 
