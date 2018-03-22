@@ -15,6 +15,7 @@
     ~/.fonts.conf: fonts.conf
     ~/.gitconfig: gitconfig
     ~/.gitignore_global: gitignore_global
+    ~/.pip: pip
     ~/.scripts: scripts
     ~/.snakebiterc: snakebiterc
     ~/.ssh:
