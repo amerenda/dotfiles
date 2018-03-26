@@ -5,6 +5,7 @@
 #export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
 
 # Cache pip-installed packages to avoid re-downloading
+export ANSIBLE_NOCOWS=1
 export PIP_DOWNLOAD_CACHE=$HOME/.pip/cache
 export GOROOT=/usr/local/go
 export GOBIN=/usr/bin/go
