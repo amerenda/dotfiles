@@ -39,9 +39,9 @@ alias tkill="tmux kill-session"
 alias fsize="du -sh ./* | sort -h"
 
 # calendar aliass
-alias gcal='gcalcli --configFolder=~/.gcalcli_placeiq'
-alias gcalw='gcalcli --configFolder=~/.gcalcli_placeiq'
-alias gcalp='gcalcli --configFolder=~/.gcalcli_personal'
+alias gcal='gcalcli --configFolder=~/.gcalcli_placeiq 2>/dev/null'
+alias gcalw='gcalcli --configFolder=~/.gcalcli_placeiq 2>/dev/null'
+alias gcalp='gcalcli --configFolder=~/.gcalcli_personal 2>/dev/null'
 
 # Python aliases
 alias ip2='ipython2'
