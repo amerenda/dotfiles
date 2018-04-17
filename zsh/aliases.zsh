@@ -37,6 +37,7 @@ alias tlw="clear && task list +placeiq"
 alias tlp="clear && task list +personal"
 alias tkill="tmux kill-session"
 alias fsize="du -sh ./* | sort -h"
+alias dotsize="du -sh ./.* | sort -h"
 
 # calendar aliass
 alias gcal='gcalcli --configFolder=~/.gcalcli_placeiq 2>/dev/null'
