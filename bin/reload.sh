@@ -1,9 +1,9 @@
 #!/bin/bash
 pkill polybar
-~/.bin/start_polybar.sh &
+~/.bin/start_polybar.sh & 2>/dev/null
 
 pkill dunst
-dunst &
+dunst & 2>/dev/null
 
 pkill xbindkeys
-xbindkeys &
+xbindkeys & 2>/dev/null

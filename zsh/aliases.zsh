@@ -20,8 +20,6 @@ alias lt='exa -laas=date'
 alias cp='cp -i'
 alias mv='mv -i'
 
-# git related aliases
-#alias gag='git exec ag'
 
 # Misc aliases
 alias n='terminal_velocity ~/notes'
@@ -38,6 +36,7 @@ alias tlp="clear && task list +personal"
 alias tkill="tmux kill-session"
 alias fsize="du -sh ./* | sort -h"
 alias dotsize="du -sh ./.* | sort -h"
+alias pacsearch="pacman -Ss"
 
 # calendar aliass
 alias gcal='gcalcli --configFolder=~/.gcalcli_placeiq 2>/dev/null'
@@ -55,6 +54,8 @@ alias subup="git submodule foreach git pull origin master"
 alias gfs='snakebite -n gandalf-nn.placeiq.net'
 alias pfs='snakebite -n phoenix-nn.placeiq.net'
 
+# Docker aliases (Is this the best way to do this??)
+alias influxd='docker exec -it influxd influxd'
 
 
 # Get current number of commits on current branch, or another branch, as compared to master.

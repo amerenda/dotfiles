@@ -15,3 +15,4 @@ vim/bundle/vim-colors-solarized
 vim/bundle/vim-ansible-yaml
 vim/bundle/gundo.vim
 vim/bundle/nerdtree
+bin/pip

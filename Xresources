@@ -60,7 +60,7 @@ URxvt.tintColor: #000
 URxvt.shading: 45
 URxvt.scrollBar: false
 URxvt.perl-ext-common: default,matcher,clipboard,resize-font
-URxvt.url-launcher: /usr/bin/chromium
+URxvt.url-launcher: /usr/bin/firefox --profile /home/amerenda/.mozilla/firefox/iz6fq3yp.placeiq
 URxvt.matcher.button: 1
 URxvt.font: xft:Ubuntu Mono:size=13
 URxvt.letterSpace: 0

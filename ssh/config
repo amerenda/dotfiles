@@ -33,7 +33,7 @@ host nginx-*.nym1.placeiq.net
 host nginx-*.sec.placeiq.net
   user amerenda
   ForwardAgent yes
-  proxycommand ssh -A amerenda@amerenda-167.nym1.placeiq.net nc %h %p
+  proxycommand ssh -A amerenda@amerenda-167.sec.placeiq.net nc %h %p
   identityfile ~/.ssh/id_rsa_amerenda_placeiq
 
 host apache-secure-*.nym1.placeiq.net
@@ -105,6 +105,6 @@ host rpi3-4
 
 host freenas
   user alex
-  hostname 192.168.86.29
+  hostname 192.168.86.35
   identityfile ~/.ssh/id_rsa_amerenda_personal
   ForwardAgent yes

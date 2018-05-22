@@ -10,4 +10,4 @@ export PIP_DOWNLOAD_CACHE=$HOME/.pip/cache
 export GOROOT=/usr/local/go
 export GOBIN=/usr/bin/go
 export GOPATH=~/go
-PATH=~/.bin:~/.local/bin/:/usr/local/bin:${PATH}:${GOPATH}
+export PATH=/home/amerenda/.bin/pip/bin:/home/amerenda/.bin:/home/amerenda/.local/bin/:/usr/local/bin:${PATH}:${GOPATH}
