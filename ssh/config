@@ -1,9 +1,9 @@
 Host *
   UseKeychain yes
   AddKeysToAgent yes
-  IdentityFile ~/.ssh/id_rsa_amerenda_personal
-  IdentityFile ~/.ssh/google_compute_engine
   IdentityFile ~/.ssh/id_rsa_impact
+  IdentityFile ~/.ssh/google_compute_engine
+  IdentityFile ~/.ssh/id_rsa_amerenda_personal
 
 ### Git servers
 Host github.com
@@ -20,6 +20,7 @@ Host bastion
   ControlPath ~/.ssh/bastion-%r@%h:%p.ctl
   ControlMaster auto
   ControlPersist 10m
+  ForwardAgent yes
 
 Host azkaban-prod
   Hostname azkaban-us-central1-a.int.2pth.com
@@ -82,12 +83,26 @@ host 10.29.15.228
   StrictHostKeyChecking no
 
 ## Staging
-Host bastion-stg
+host bastion-stg
   Hostname 35.199.63.95
   IdentityFile ~/.ssh/google_compute_engine
   ControlPath ~/.ssh/bastion-stg.ctl
 
-Host prom-stg
+host 10.31.*.*
+  ProxyCommand ssh bastion-stg -W %h:%p
+  StrictHostKeyChecking no
+
+host 10.25.*.*
+  ProxyCommand ssh bastion-stg -W %h:%p
+  StrictHostKeyChecking no
+
+host azkaban-dev
+  Hostname azkaban-01.forensiq.net
+  IdentityFile ~/.ssh/google_compute_engine
+  StrictHostKeyChecking no
+  
+
+host prom-stg
   Hostname 10.25.48.13
   ProxyCommand ssh bastion -W %h:%p
   StrictHostKeyChecking no
