@@ -9,6 +9,7 @@ pem
 
 .known_hosts.lock
 known_hosts
+ssh/google_compute_known_hosts
 
 vim/bundle/syntastic
 vim/bundle/vim-colors-solarized
@@ -16,3 +17,4 @@ vim/bundle/vim-ansible-yaml
 vim/bundle/gundo.vim
 vim/bundle/nerdtree
 bin/pip
+
