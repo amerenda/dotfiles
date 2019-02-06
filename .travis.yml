@@ -15,4 +15,5 @@ install:
 
 script:
   - cd dotfiles
-  - /bin/sh -c install
+  - /bin/sh -c './install'
+  - vim +PluginInstall +qall
