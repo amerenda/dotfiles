@@ -1,7 +1,7 @@
 [user]
-    email = amerenda89@gmail.com
+    email = alex.merenda@impact.com
     name = Alex Merenda
-    signingkey = 210A5303
+	signingkey = 0xB056FF8F5A307876
 
 [alias]
     st = status -sb
@@ -35,9 +35,11 @@
 [push]
     default = simple
 [gpg]
-    program = gpg2
+	program = gpg
 [filter "lfs"]
     clean = git-lfs clean -- %f
     smudge = git-lfs smudge -- %f
     process = git-lfs filter-process
     required = true
+[core]
+	excludesfile = /Users/alexmerenda/.gitignore_global

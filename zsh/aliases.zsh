@@ -1,5 +1,5 @@
 # Use colors in coreutils utilities output
-alias ls='ls --color'
+alias ls='ls -G'
 alias grep='grep --color'
 
 # ls aliases
@@ -20,28 +20,26 @@ alias lt='exa -laas=date'
 alias cp='cp -i'
 alias mv='mv -i'
 
+# Homebrew aliases
+alias brewup="brew update && brew upgrade"
+# brew commands
+# https://docs.brew.sh/FAQ
 
 # Misc aliases
-alias n='terminal_velocity ~/notes'
-alias np='terminal_velocity ~/Dropbox/Work/PlaceIQ/Notes'
-alias nd='terminal_velocity ~/Dropbox/Work/PlaceIQ/daySummary'
-alias na='terminal_velocity ~/Dropbox/Documentation/Notes'
 alias mkdir="mkdir -pv"
 alias ssh="ssh -A"
 alias myip="curl http://ipecho.net/plain; echo"
-alias clip="xclip -selection c"
+alias clip="pbcopy"
 alias tl="clear && task list"
 alias tlw="clear && task list +placeiq"
 alias tlp="clear && task list +personal"
 alias tkill="tmux kill-session"
 alias fsize="du -sh ./* | sort -h"
 alias dotsize="du -sh ./.* | sort -h"
-alias pacsearch="pacman -Ss"
+alias dircolors="gdircolors"
 
-# calendar aliass
-alias gcal='gcalcli --configFolder=~/.gcalcli_placeiq 2>/dev/null'
-alias gcalw='gcalcli --configFolder=~/.gcalcli_placeiq 2>/dev/null'
-alias gcalp='gcalcli --configFolder=~/.gcalcli_personal 2>/dev/null'
+# Kube aliases
+alias serve_kube="ssh -f -N -n -L8001:127.0.0.1:8001 rpi3-0 & disown"
 
 # Python aliases
 alias ip2='ipython2'
@@ -49,14 +47,112 @@ alias ip3='ipython'
 
 # Git aliases
 alias subup="git submodule foreach git pull origin master"
+alias gamend="git commit --amend"
+
+# gpg aliases
+alias encrypt='gpg --encrypt --armor --recipient 0xCC71AFF8D3DB2965'
+alias decrypt='gpg --decrypt --armor'
+alias sign='gpg --armor --clearsign --default-key 0x653287E9D6B049AC'
 
 # Work aliases
-alias gfs='snakebite -n gandalf-nn.placeiq.net'
-alias pfs='snakebite -n phoenix-nn.placeiq.net'
+alias bastionStgDown="ssh -O exit bastion-stg"
+alias bastionDown="ssh -O exit bastion"
+alias bastionStatus="ssh -O check bastion"
+alias httpBas="http --proxy=http:socks5://localhost:1080"
+alias hb="http --proxy=http:socks5://localhost:1080"
+alias httpStg="http --proxy=http:socks5://localhost:1180"
+alias bup="bastionUp"
+alias bdown="bastionDown"
+alias bstatus="bastionStatus"
+alias bcheck="bastionCheck"
+alias glist="gcloud compute instances list"
+alias glistdp="gcloud compute instances list --filter='labels.goog-dataproc-cluster-name:*'"
+alias gfilter="gcloud compute instances list --filter="
+alias staging-init='cd /Users/alexmerenda/projects/fq_configuration_management/terraform/accounts/forensiq-prod && terraform init -backend-config="project=nomadic-bison-143517" -backend-config="credentials=../../../packer/jenkins@nomadic-bison-143517.iam.gserviceaccount.com.json" -backend-config="bucket=fq-tf-state" -backend-config="path=preprod/terraform.tfstate"'
+alias prod-init='cd /Users/alexmerenda/projects/fq_configuration_management/terraform/accounts/forensiq-prod && terraform init --force-copy -backend-config="project=fq-platform" -backend-config="credentials=../../../packer/jenkins@fq-platform.iam.gserviceaccount.com.json" -backend-config="bucket=fq-prod-tf-state" -backend-config="path=default.tfstate"'
 
-# Docker aliases (Is this the best way to do this??)
-alias influxd='docker exec -it influxd influxd'
 
+function shuttle()
+{
+    sshuttle -D --pidfile=~/.var/sshuttle.pid --ns-hosts $(grep 'nameserver' /etc/resolv.conf | awk '{ print $2 }' | head -n1)  -r bastion 0/0
+}
+
+function shuttle-stg()
+{
+    sshuttle -D --pidfile=~/.var/sshuttle.pid --ns-hosts $(grep 'nameserver' /etc/resolv.conf | awk '{ print $2 }' | head -n1)  -r bastion-stg 0/0
+}
+
+function focus()
+{
+    echo $1
+    if [[ "${1}" == "" ]]; then
+        echo "Please specify the number of minutes to focus"
+    elif ! [[ "${1}" =~ ^[0-9]+$ ]]; then
+        echo "Error: argument must be a number"
+    else
+        (zsh -c "~/.bin/focus.sh start ${1}; sleep $(( ${1} * 60 )); ~/.bin/focus.sh stop ${1}" &)
+    fi
+}
+
+function promq()
+{
+    echo ${1}
+    if [[ "${1}" == "" ]]; then
+        echo "please specify a prometheus query"
+    else
+        httpBas "http://prometheus-us-central1-a.int.2pth.com:9090/api/v1/query?query=${1}"
+    fi
+}
+
+# connect to bastion host
+function bastionUp()
+{
+    ssh -O check bastion 2> /dev/null
+
+    retVal=$?
+
+    if [ $retVal -ne 0 ]; then
+       echo "Created socks tunnel to bastion..."
+       # forward 1080 via socks
+       ssh -fNTMn -D 1080 bastion 2> /dev/null
+    else
+       :
+    fi
+}
+
+function bastionCheck()
+{
+    ssh -O check bastion 2> /dev/null
+    retVal=$?
+
+    if [ $retVal -eq 0 ]; then
+        (lsof -nPi | grep LISTEN | grep 1080) > /dev/null
+        retVal=$?
+        if [ $retVal -eq 0 ]; then
+            echo "bastion is running"
+        fi
+    elif [ $retVal -ne 0 ]; then
+        echo "bastion is not running"
+    fi
+}
+
+
+
+
+function bastionStgUp()
+{
+    ssh -O check bastion-stg 2> /dev/null
+
+    retVal=$?
+
+    if [ $retVal -ne 0 ]; then
+       echo "Created socks tunnel to bastion..."
+       # forward 1080 via socks
+       ssh -fNTMn -D 1080 bastion-stg
+    else
+       :
+    fi
+}
 
 # Get current number of commits on current branch, or another branch, as compared to master.
 function gcommits()

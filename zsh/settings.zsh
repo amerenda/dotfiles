@@ -28,20 +28,24 @@ KEYTIMEOUT=1 # corresponds to 10ms
 export VISUAL=vim
 export EDITOR="$VISUAL"
 
+# vi key bindings
+bindkey -v
+bindkey -M viins ‘jj’ vi-cmd-mode
+
 # Movement
 bindkey -a 'gg' beginning-of-buffer-or-history
 bindkey -a 'G' end-of-buffer-or-history
+
 # Undo
 bindkey -a 'u' undo
 bindkey -a '^R' redo
 
 # Use incremental search
-bindkey "^R" history-incremental-search-backward
+#bindkey "^R" history-incremental-search-backward
 
-# key bindings
-bindkey "${terminfo[khome]}" beginning-of-line
-bindkey "${terminfo[kend]}" end-of-line
-bindkey "[D" backward-word
-bindkey "[C" forward-word
-bindkey "^[a" beginning-of-line
-bindkey "^[e" end-of-line
+#bindkey "${terminfo[khome]}" beginning-of-line
+#bindkey "${terminfo[kend]}" end-of-line
+#bindkey "[D" backward-word
+#bindkey "[C" forward-word
+#bindkey "^[a" beginning-of-line
+#bindkey "^[e" end-of-line

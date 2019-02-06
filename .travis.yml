@@ -18,5 +18,7 @@ install:
 
 script:
   - cd dotfiles
+  - echo $TRAVIS_PULL_REQUEST_BRANCH
+  - git checkout $TRAVIS_PULL_REQUEST_BRANCH
   - /bin/sh -c './install'
   - echo | vim +PluginInstall +qall

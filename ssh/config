@@ -1,73 +1,114 @@
 Host *
-   AddKeysToAgent yes
-   IdentityFile ~/.ssh/id_rsa_amerenda_placeiq
-   IdentityFile ~/.ssh/id_rsa_amerenda_personal
-
-Host *.placeiq.net
-  user amerenda
-  ForwardAgent yes
-  identityfile ~/.ssh/id_rsa_amerenda_placeiq
+  UseKeychain yes
+  AddKeysToAgent yes
+  IdentityFile ~/.ssh/id_rsa_impact
+  IdentityFile ~/.ssh/google_compute_engine
+  IdentityFile ~/.ssh/id_rsa_amerenda_personal
 
 ### Git servers
 Host github.com
-  IdentityFile ~/.ssh/github_deploy
-
-Host gitlab-122.sec.placeiq.net
-  IdentityFile ~/.ssh/github_deploy
+  IdentityFile ~/.ssh/github_deploy_impact
 
 Host bitbucket.org
   IdentityFile ~/.ssh/github_deploy
 
 #### Work Servers
-Host *.placeiq.net
-  user amerenda
+## Prod
+Host bastion
+  Hostname 35.199.17.108
+  IdentityFile ~/.ssh/google_compute_engine
+  ControlPath ~/.ssh/bastion-%r@%h:%p.ctl
+  ControlMaster auto
+  ControlPersist 10m
   ForwardAgent yes
-  identityfile ~/.ssh/id_rsa_amerenda_placeiq
 
-host nginx-*.nym1.placeiq.net
-  user amerenda
-  proxycommand ssh -A amerenda@amerenda-167.nym1.placeiq.net nc %h %p
+Host azkaban-prod
+  Hostname azkaban-us-central1-a.int.2pth.com
+  ProxyCommand ssh bastion -W %h:%p
+  StrictHostKeyChecking no
+
+#Host 10.29.*.*
+#  ProxyCommand ssh bastion -W %h:%p
+#  StrictHostKeyChecking no
+
+Host jenkins
+  Hostname deploy.2pth.com
+  ProxyCommand ssh bastion -W %h:%p
+  StrictHostKeyChecking no
+
+host jenkins-docker
+  Hostname deploy-docker-01.2pth.com
+  ProxyCommand ssh bastion -W %h:%p
+  StrictHostKeyChecking no
+
+# Monitoring
+Host prom
+  Hostname grafana.int.2pth.com
+#  ProxyCommand ssh bastion -W %h:%p
+  StrictHostKeyChecking no
+
+Host grafana
+  Hostname grafana.int.2pth.com
+#  ProxyCommand ssh bastion -W %h:%p
+  StrictHostKeyChecking no
+
+
+# Util
+host util-dal-1.2pth.com
+  Hostname util-dal-1.2pth.com
+  ProxyCommand ssh bastion -W %h:%p
+  StrictHostKeyChecking no
+
+host pix-sin-04.2pth.com
+  Hostname pix-sin-04.2pth.com
+  StrictHostKeyChecking no
+  IdentityFile ~/.ssh/id_rsa_impact
+
+# AppNexus
+host trk-appnexusbid-asia-southeast1-p236
+  Hostname 10.29.52.3
+  ProxyCommand ssh bastion -W %h:%p
+  StrictHostKeyChecking no
+
+# Tracking
+host 10.29.15.228
+  ProxyCommand ssh bastion -W %h:%p
+  StrictHostKeyChecking no
+
+## Staging
+host bastion-stg
+  Hostname 35.199.63.95
+  IdentityFile ~/.ssh/google_compute_engine
+  ControlPath ~/.ssh/bastion-stg-%r@%h:%p.ctl
+  ControlMaster auto
+  ControlPersist 10m
   ForwardAgent yes
-  identityfile ~/.ssh/id_rsa_amerenda_placeiq
 
-host nginx-*.sec.placeiq.net
-  user amerenda
-  ForwardAgent yes
-  proxycommand ssh -A amerenda@amerenda-167.sec.placeiq.net nc %h %p
-  identityfile ~/.ssh/id_rsa_amerenda_placeiq
+#host 10.31.*.*
+#  ProxyCommand ssh bastion-stg -W %h:%p
+#  StrictHostKeyChecking no
 
-host apache-secure-*.nym1.placeiq.net
-  user amerenda
-  proxycommand ssh -A amerenda@amerenda-167.nym1.placeiq.net nc %h %p
-  ForwardAgent yes
-  identityfile ~/.ssh/id_rsa_amerenda_placeiq
+host 10.25.*.*
+  ProxyCommand ssh bastion-stg -W %h:%p
+  StrictHostKeyChecking no
 
-host apache-secure-*.sec.placeiq.net
-  user amerenda
-  ForwardAgent yes
-  proxycommand ssh -A amerenda@amerenda-167.sec.placeiq.net nc %h %p
-  identityfile ~/.ssh/id_rsa_amerenda_placeiq
+host azkaban-dev
+  Hostname 10.31.0.3
+  StrictHostKeyChecking no
+  IdentityFile ~/.ssh/google_compute_engine
+  StrictHostKeyChecking no
 
-host opsui-35.nym1.placeiq.net
-  hostname opsui-35.nym1.placeiq.net
-  user amerenda
-  proxycommand ssh -A amerenda@amerenda-167.nym1.placeiq.net nc %h %p
-  ForwardAgent yes
-  identityfile ~/.ssh/id_rsa_amerenda_placeiq
 
-host opsui-35.sec.placeiq.net
-  hostname opsui-35.sec.placeiq.net
-  user amerenda
-  proxycommand ssh -a amerenda@amerenda-167.sec.placeiq.net nc %h %p
-  forwardagent yes
-  identityfile ~/.ssh/id_rsa_amerenda_placeiq
-
-host 10.32.1.247
-  hostname 10.32.1.247
-  user centos
-  identityfile ~/.ssh/piq-aws-infrastructure.pem
+host prom-stg
+  Hostname 10.31.0.4
+  ProxyCommand ssh bastion-stg -W %h:%p
+  StrictHostKeyChecking no
 
 ### Personal servers
+host sleeperservice.local
+  user root
+  identityfile ~/.ssh/id_rsa_alex_personal
+
 host tasks.stormhold.net
   hostname tasks.stormhold.net
   user alex
@@ -79,32 +120,43 @@ host alex-ubuntu
   identityfile ~/.ssh/id_rsa_amerenda_personal
   ForwardAgent yes
 
+host rpi3-0
+  user alex
+  hostname 10.100.20.200
+  identityfile ~/.ssh/id_rsa_amerenda_personal
+  ForwardAgent yes
+
 host rpi3-1
   user alex
-  hostname 192.168.86.201
+  hostname 10.100.20.201
   identityfile ~/.ssh/id_rsa_amerenda_personal
   ForwardAgent yes
 
 host rpi3-2
   user alex
-  hostname 192.168.86.202
+  hostname 10.100.20.202
   identityfile ~/.ssh/id_rsa_amerenda_personal
   ForwardAgent yes
 
 host rpi3-3
   user alex
-  hostname 192.168.86.203
-  identityfile ~/.ssh/id_rsa_amerenda_personal
-  ForwardAgent yes
-
-host rpi3-4
-  user alex
-  hostname 192.168.86.204
+  hostname 10.100.20.203
   identityfile ~/.ssh/id_rsa_amerenda_personal
   ForwardAgent yes
 
 host freenas
   user alex
   hostname 192.168.86.35
+  identityfile ~/.ssh/id_rsa_amerenda_personal
+  ForwardAgent yes
+
+host ftp
+  user alex
+  hostname ftp.stormhold.net
+  identityfile ~/.ssh/id_rsa_amerenda_personal
+  ForwardAgent yes
+
+host ftp.stormhold.net
+  user alex
   identityfile ~/.ssh/id_rsa_amerenda_personal
   ForwardAgent yes

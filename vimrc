@@ -11,11 +11,8 @@ call vundle#begin()
 " let Vundle manage Vundle, required
 Plugin 'VundleVim/Vundle.vim'
 
-" Plugin management
+" editor
 Plugin 'sjl/gundo.vim'
-
-" Pig query
-Plugin 'motus/pig.vim'
 
 " Style and syntax
 "Plugin 'altercation/vim-colors-solarized'
@@ -33,6 +30,8 @@ Plugin 'tpope/vim-fugitive'
 Plugin 'scrooloose/nerdtree'
 Plugin 'Xuyuanp/nerdtree-git-plugin'
 " https://github.com/Xuyuanp/nerdtree-git-plugin
+Plugin 'ctrlpvim/ctrlp.vim'
+" https://github.com/ctrlpvim/ctrlp.vim
 
 " Clojure
 Plugin 'guns/vim-clojure-static'
@@ -87,6 +86,8 @@ let mapleader = ","
 " plugin shortcuts
 nnoremap <leader>u :GundoToggle<CR>     " Visual undo
 noremap <leader>n :NERDTreeToggle<CR>
+let g:ctrlp_map = '<c-p>'
+let g:ctrlp_cmd = 'CtrlP'
 
 " tab Management
 nnoremap <C-h> :tabp<CR>

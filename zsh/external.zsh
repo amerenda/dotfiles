@@ -7,7 +7,6 @@
 # Cache pip-installed packages to avoid re-downloading
 export ANSIBLE_NOCOWS=1
 export PIP_DOWNLOAD_CACHE=$HOME/.pip/cache
-export GOROOT=/usr/local/go
-export GOBIN=/usr/bin/go
-export GOPATH=~/go
-export PATH=/home/amerenda/.bin/pip/bin:/home/amerenda/.bin:/home/amerenda/.local/bin/:/usr/local/bin:${PATH}:${GOPATH}
+export INVENTORY_IP_TYPE=internal
+export DEFAULT_USER=alexmerenda
+export PATH="/usr/local/opt/python/libexec/bin:/Users/alexmerenda/Library/Python/3.7/bin:/usr/local/bin:$PATH"

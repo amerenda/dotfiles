@@ -1,24 +1,19 @@
+- defaults:
+    link:
+      relink: true
+
 - clean: ['~']
 
 - link:
     ~/.bin:
        force: true
        path: bin/
-    ~/.config/compton.conf: compton.conf
-    ~/.config/dunst: dunst/
-    ~/.config/i3: i3/
-    ~/.config/polybar: polybar
-    ~/.config/ranger: ranger/
-    ~/.config/redshift.conf: redshift.conf
-    ~/.config/weather-bar: weather-bar
     ~/.dotfiles: ''
-    ~/.fonts.conf: fonts.conf
     ~/.gitconfig: gitconfig
-       force: true
     ~/.gitignore_global: gitignore_global
     ~/.pip: pip
+    ~/.pydistutils.cfg: pydistutils.cfg
     ~/.scripts: scripts
-    ~/.snakebiterc: snakebiterc
     ~/.ssh:
        force: true
        path: ssh
@@ -26,15 +21,10 @@
     ~/.tmux.conf: tmux.conf
     ~/.vim: vim/
     ~/.vimrc: vimrc
-    ~/.xbindkeysrc: xbindkeysrc
-    ~/.xinitrc: xinitrc
-    ~/.Xresources: Xresources
-    ~/.zprofile: zprofile
     ~/.zsh: zsh/
     ~/.zshrc: zshrc
-       force: true
 
 - shell:
   - [git update-submodules, updating submodules]
-  - [mkdir -p ~/.bin, Creating bin dir]
+  - [mkdir -p ~/.bin, creating bin dir]
   - [mkdir -p ~/.keychain, creating ssh-agent forward dir]
