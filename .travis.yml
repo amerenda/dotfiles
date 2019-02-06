@@ -4,7 +4,7 @@ matrix:
         - os: linux
           osx_image: xcode10.1
 install:
-  - echo | ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+  - sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
   - git clone git@github.com:amerenda/dotfiles.git --recursive
   - brew install getantibody/tap/antibody
   - brew install zsh-autosuggestions
