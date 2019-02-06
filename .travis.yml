@@ -13,10 +13,10 @@ install:
   - git clone https://github.com/amerenda/dotfiles.git --recursive
   - rm -f ~/.zshrc
   - rm -f ~/.gitconfig
-
-script:
   - cd dotfiles
   - echo $TRAVIS_PULL_REQUEST_BRANCH
   - git checkout $TRAVIS_PULL_REQUEST_BRANCH
+
+script:
   - /bin/sh -c './install'
   - echo | vim +PluginInstall +qall
