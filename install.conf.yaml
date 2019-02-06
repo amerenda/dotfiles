@@ -37,5 +37,4 @@
 - shell:
   - [git update-submodules, updating submodules]
   - [mkdir -p ~/.bin, Creating bin dir]
-  - [mecho | vim +PluginInstall +qallkdir -p ~/.keychain, creating ssh-agent forward dir]
-  - [mkdir -p ~/.config/i3, creating i3 config dir]
+  - [mkdir -p ~/.keychain, creating ssh-agent forward dir]
