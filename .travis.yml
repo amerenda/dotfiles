@@ -7,6 +7,7 @@ install:
   - sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
   - PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
   - brew install gcc
+  - brew install git
   - brew tap getantibody/tap
   - brew install getantibody/tap/antibody
   - brew install zsh-autosuggestions
@@ -16,4 +17,4 @@ install:
 script:
   - cd dotfiles
   - /bin/sh -c './install'
-  - vim +PluginInstall +qall
+  - echo | vim +PluginInstall +qall
