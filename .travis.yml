@@ -5,10 +5,12 @@ matrix:
           osx_image: xcode10.1
 install:
   - sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
-  - git clone https://github.com/amerenda/dotfiles.git --recursive
+  - PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
+  - brew install gcc
   - brew install getantibody/tap/antibody
   - brew install zsh-autosuggestions
   - brew install coreutils
+  - git clone https://github.com/amerenda/dotfiles.git --recursive
 
 script:
   - cd dotfiles
