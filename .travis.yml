@@ -10,7 +10,6 @@ install:
   - brew tap getantibody/tap
   - brew install getantibody/tap/antibody
   - brew install zsh-autosuggestions
-  - brew install coreutils
   - git clone https://github.com/amerenda/dotfiles.git --recursive
   - rm -f ~/.zshrc
   - rm -f ~/.gitconfig
