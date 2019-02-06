@@ -16,3 +16,14 @@ vim/bundle/vim-ansible-yaml
 vim/bundle/gundo.vim
 vim/bundle/nerdtree
 bin/pip
+
+
+bin/ssh2Local
+ssh/github_deploy_impact
+ssh/google_compute_engine
+ssh/google_compute_known_hosts
+ssh/id_rsa_alex_personal
+ssh/id_rsa_alex_personal.pub
+ssh/id_rsa_impact
+zsh/plugins.zsh
+
