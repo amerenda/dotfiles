@@ -27,9 +27,9 @@ Host azkaban-prod
   ProxyCommand ssh bastion -W %h:%p
   StrictHostKeyChecking no
 
-Host 10.29.*.*
-  ProxyCommand ssh bastion -W %h:%p
-  StrictHostKeyChecking no
+#Host 10.29.*.*
+#  ProxyCommand ssh bastion -W %h:%p
+#  StrictHostKeyChecking no
 
 Host jenkins
   Hostname deploy.2pth.com
@@ -43,22 +43,15 @@ host jenkins-docker
 
 # Monitoring
 Host prom
-  Hostname prometheus-us-central1-a.int.2pth.com
-  ProxyCommand ssh bastion -W %h:%p
+  Hostname grafana.int.2pth.com
+#  ProxyCommand ssh bastion -W %h:%p
   StrictHostKeyChecking no
 
-Host prometheus-us-central1-a.int.2pth.com
-  Hostname prometheus-us-central1-a.int.2pth.com
-  ProxyCommand ssh bastion -W %h:%p
+Host grafana
+  Hostname grafana.int.2pth.com
+#  ProxyCommand ssh bastion -W %h:%p
   StrictHostKeyChecking no
 
-Host prometheus-us-east1-b.int.2pth.com
-  ProxyCommand ssh bastion -W %h:%p
-  StrictHostKeyChecking no
-
-Host prometheus-us-east1-b-1.int.2pth.com
-  ProxyCommand ssh bastion -W %h:%p
-  StrictHostKeyChecking no
 
 # Util
 host util-dal-1.2pth.com
@@ -86,25 +79,29 @@ host 10.29.15.228
 host bastion-stg
   Hostname 35.199.63.95
   IdentityFile ~/.ssh/google_compute_engine
-  ControlPath ~/.ssh/bastion-stg.ctl
+  ControlPath ~/.ssh/bastion-stg-%r@%h:%p.ctl
+  ControlMaster auto
+  ControlPersist 10m
+  ForwardAgent yes
 
-host 10.31.*.*
-  ProxyCommand ssh bastion-stg -W %h:%p
-  StrictHostKeyChecking no
+#host 10.31.*.*
+#  ProxyCommand ssh bastion-stg -W %h:%p
+#  StrictHostKeyChecking no
 
 host 10.25.*.*
   ProxyCommand ssh bastion-stg -W %h:%p
   StrictHostKeyChecking no
 
 host azkaban-dev
-  Hostname azkaban-01.forensiq.net
+  Hostname 10.31.0.3
+  StrictHostKeyChecking no
   IdentityFile ~/.ssh/google_compute_engine
   StrictHostKeyChecking no
-  
+
 
 host prom-stg
-  Hostname 10.25.48.13
-  ProxyCommand ssh bastion -W %h:%p
+  Hostname 10.31.0.4
+  ProxyCommand ssh bastion-stg -W %h:%p
   StrictHostKeyChecking no
 
 ### Personal servers
@@ -150,5 +147,16 @@ host rpi3-3
 host freenas
   user alex
   hostname 192.168.86.35
+  identityfile ~/.ssh/id_rsa_amerenda_personal
+  ForwardAgent yes
+
+host ftp
+  user alex
+  hostname ftp.stormhold.net
+  identityfile ~/.ssh/id_rsa_amerenda_personal
+  ForwardAgent yes
+
+host ftp.stormhold.net
+  user alex
   identityfile ~/.ssh/id_rsa_amerenda_personal
   ForwardAgent yes

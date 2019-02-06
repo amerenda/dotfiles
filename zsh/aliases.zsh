@@ -38,6 +38,9 @@ alias fsize="du -sh ./* | sort -h"
 alias dotsize="du -sh ./.* | sort -h"
 alias dircolors="gdircolors"
 
+# Kube aliases
+alias serve_kube="ssh -f -N -n -L8001:127.0.0.1:8001 rpi3-0 & disown"
+
 # Python aliases
 alias ip2='ipython2'
 alias ip3='ipython'
@@ -62,8 +65,8 @@ alias bup="bastionUp"
 alias bdown="bastionDown"
 alias bstatus="bastionStatus"
 alias bcheck="bastionCheck"
-alias glista="gcloud compute instances list"
-alias glist="gcloud compute instances list --filter='labels.goog-dataproc-cluster-name:*'"
+alias glist="gcloud compute instances list"
+alias glistdp="gcloud compute instances list --filter='labels.goog-dataproc-cluster-name:*'"
 alias gfilter="gcloud compute instances list --filter="
 alias staging-init='cd /Users/alexmerenda/projects/fq_configuration_management/terraform/accounts/forensiq-prod && terraform init -backend-config="project=nomadic-bison-143517" -backend-config="credentials=../../../packer/jenkins@nomadic-bison-143517.iam.gserviceaccount.com.json" -backend-config="bucket=fq-tf-state" -backend-config="path=preprod/terraform.tfstate"'
 alias prod-init='cd /Users/alexmerenda/projects/fq_configuration_management/terraform/accounts/forensiq-prod && terraform init --force-copy -backend-config="project=fq-platform" -backend-config="credentials=../../../packer/jenkins@fq-platform.iam.gserviceaccount.com.json" -backend-config="bucket=fq-prod-tf-state" -backend-config="path=default.tfstate"'
