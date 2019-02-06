@@ -4,8 +4,8 @@ matrix:
         - os: osx
           osx_image: xcode10.1
 install:
-  - sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
-  - PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
+  - echo | ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
+  - PATH="/home/homebrew/.homebrew/bin:$PATH"
   - brew install gcc
   - brew install git
   - brew tap getantibody/tap
