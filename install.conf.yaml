@@ -14,7 +14,6 @@
     ~/.dotfiles: ''
     ~/.fonts.conf: fonts.conf
     ~/.gitconfig: gitconfig
-       force: true
     ~/.gitignore_global: gitignore_global
     ~/.pip: pip
     ~/.pydistutils.cfg: pydistutils.cfg
@@ -33,7 +32,6 @@
     ~/.zprofile: zprofile
     ~/.zsh: zsh/
     ~/.zshrc: zshrc
-       force: true
 
 - shell:
   - [git update-submodules, updating submodules]
