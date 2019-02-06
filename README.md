@@ -7,15 +7,3 @@ To install, do a recursive clone and run ./install
 
 
 ## Dependencies
-* polybar
-* i3-gaps
-* dunst
-* rofi
-* nmcli
-* dropbox
-* spotify
-* urxvt
-* dunstify
-* weather-bar
-* gcalcli
-* numix icons
