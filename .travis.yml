@@ -1,19 +1,22 @@
 ---
-dist: trusty
-
-branches:
-  only:
-    - master
-
-before_install:
-  - sudo apt-get update -qq
-  - sudo apt-get --yes install git
-
+matrix:
+    include:
+        - os: linux
+          osx_image: xcode10.1
 install:
-  - git clone git@github.com:amerenda/dotfiles.git --recursive
-
+  - sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
+  - PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
+  - brew install gcc
+  - brew install git
+  - brew tap getantibody/tap
+  - brew install getantibody/tap/antibody
+  - brew install zsh-autosuggestions
+  - brew install coreutils
+  - git clone https://github.com/amerenda/dotfiles.git --recursive
+  - rm -f ~/.zshrc
+  - rm -f ~/.gitconfig
 
 script:
   - cd dotfiles
-  - /bin/sh -c install
-
+  - /bin/sh -c './install'
+  - echo | vim +PluginInstall +qall
