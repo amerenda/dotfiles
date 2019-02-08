@@ -11,6 +11,7 @@
     ~/.dotfiles: ''
     ~/.gitconfig: gitconfig
     ~/.gitignore_global: gitignore_global
+    ~/.kube: kube
     ~/.pip: pip
     ~/.pydistutils.cfg: pydistutils.cfg
     ~/.scripts: scripts
