@@ -41,11 +41,7 @@ bindkey -a 'u' undo
 bindkey -a '^R' redo
 
 # Use incremental search
-#bindkey "^R" history-incremental-search-backward
+bindkey "^R" history-incremental-search-backward
 
-#bindkey "${terminfo[khome]}" beginning-of-line
-#bindkey "${terminfo[kend]}" end-of-line
-#bindkey "[D" backward-word
-#bindkey "[C" forward-word
-#bindkey "^[a" beginning-of-line
-#bindkey "^[e" end-of-line
+# kubectl autocompletion
+source <(kubectl completion zsh)
