@@ -1,9 +1,21 @@
+debug() {
+    debugOn="false"
+    sourceFile="${1}"
+    duration="${2}"
+    if [[ "${debugOn}" == "true" ]]; then
+        echo "${sourceFile}: ${duration}s"
+    else
+        ;
+    fi
+}
+
+
 # Allow local customizations in the ~/.zshrc_local_before file
 if [ -f ~/.zshrc_local_before ]; then
     SECONDS=0
     source ~/.zshrc_local_before
     duration=$SECONDS
-    echo "~/.zshrc_local_before.zsh: $(($duration % 60))s"
+    debug "false" "~/.zshrc_local_before.zsh" $(($duration % 60))
 fi
 # init plugins
 /usr/local/bin/antibody bundle < ~/.zsh/plugins.txt > ~/.zsh/plugins.zsh
@@ -12,42 +24,42 @@ fi
 SECONDS=0
 source ~/.zsh/aliases.zsh
 duration=$SECONDS
-echo "~/.zsh/aliases.zsh: $(($duration % 60))s"
+debug  "~/.zsh/aliases.zsh" "$(($duration % 60))"
 
 # Impact settings
 SECONDS=0
 source ~/.zsh/impact.zsh
 duration=$SECONDS
-echo "~/.zsh/impact.zsh: $(($duration % 60))s"
+debug "~/.zsh/impact.zsh" "$(($duration % 60))"
 
 # go settings
 SECONDS=0
 source ~/.zsh/go.zsh
 duration=$SECONDS
-echo "~/.zsh/go.zsh: $(($duration % 60))s"
+debug "~/.zsh/go.zsh" "$(($duration % 60))"
 
 # Settings
 SECONDS=0
 source ~/.zsh/settings.zsh
 duration=$SECONDS
-echo "~/.zsh/settings.zsh: $(($duration % 60))s"
+debug "~/.zsh/settings.zsh" "$(($duration % 60))"
 
 # External settings
 SECONDS=0
 source ~/.zsh/external.zsh
 duration=$SECONDS
-echo "~/.zsh/external.zsh: $(($duration % 60))s"
+debug "~/.zsh/external.zsh" "$(($duration % 60))"
 
 # Source plugins
 SECONDS=0
 source ~/.zsh/plugins.zsh
 duration=$SECONDS
-echo "~/.zsh/plugins.zsh: $(($duration % 60))s"
+debug "~/.zsh/plugins.zsh" "$(($duration % 60))"
 
 # Allow local customizations in the ~/.zshrc_local_after file
 if [ -f ~/.zshrc_local_after ]; then
     SECONDS=0
     source ~/.zshrc_local_after
     duration=$SECONDS
-    echo "~/.zshrc_local_after.zsh: $(($duration % 60))s"
+    debug "~/.zshrc_local_after.zsh" "$(($duration % 60))"
 fi

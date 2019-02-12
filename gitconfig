@@ -6,7 +6,7 @@
 [alias]
     st = status -sb
     di = diff
-    a  = add
+	A = add -A
     ca = commit --amend -m
     aa = add --update
     cm = commit --amend -m

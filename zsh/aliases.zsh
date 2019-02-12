@@ -28,7 +28,7 @@ alias brewup="brew update && brew upgrade"
 # Misc aliases
 alias mkdir="mkdir -pv"
 alias ssh="ssh -A"
-alias myip="curl http://ipecho.net/plain; echo"
+alias myip="curl -s http://ipecho.net/plain; echo"
 alias clip="pbcopy"
 alias tl="clear && task list"
 alias tlw="clear && task list +placeiq"
@@ -94,13 +94,18 @@ function focus()
     fi
 }
 
+function pushup()
+{
+    git push --set-upstream origin $(git rev-parse --abbrev-ref HEAD)
+}
+
 function promq()
 {
     echo ${1}
     if [[ "${1}" == "" ]]; then
         echo "please specify a prometheus query"
     else
-        httpBas "http://prometheus-us-central1-a.int.2pth.com:9090/api/v1/query?query=${1}"
+        http "http://prometheus.int.2pth.com:9090/api/v1/query?query=${1}"
     fi
 }
 
