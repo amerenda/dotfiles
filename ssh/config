@@ -22,7 +22,7 @@ Host bastion
   ControlPersist 10m
   ForwardAgent yes
 
-Host azkaban-prod
+Host azkaban
   Hostname azkaban-us-central1-a.int.2pth.com
   ProxyCommand ssh bastion -W %h:%p
   StrictHostKeyChecking no
@@ -30,6 +30,10 @@ Host azkaban-prod
 #Host 10.29.*.*
 #  ProxyCommand ssh bastion -W %h:%p
 #  StrictHostKeyChecking no
+Host jenkins-poc.int.2pth.com
+  Hostname jenkins-poc.int.2pth.com
+  ProxyCommand ssh bastion-stg -W %h:%p
+  IdentityFile ~/.ssh/google_compute_engine
 
 Host jenkins
   Hostname deploy.2pth.com
@@ -100,9 +104,13 @@ host azkaban-dev
 
 
 host prom-stg
-  Hostname 10.31.0.4
-  ProxyCommand ssh bastion-stg -W %h:%p
+  Hostname 10.31.0.8
   StrictHostKeyChecking no
+
+host *.phx.impactradius.net
+  user alex.merenda
+  IdentityFile ~/.ssh/id_rsa_impact
+  ForwardAgent yes
 
 ### Personal servers
 host sleeperservice.local
@@ -117,6 +125,12 @@ host tasks.stormhold.net
 
 host alex-ubuntu
   user alex
+  identityfile ~/.ssh/id_rsa_amerenda_personal
+  ForwardAgent yes
+
+host picar-0
+  user alex
+  hostname 10.100.20.97
   identityfile ~/.ssh/id_rsa_amerenda_personal
   ForwardAgent yes
 
@@ -144,11 +158,16 @@ host rpi3-3
   identityfile ~/.ssh/id_rsa_amerenda_personal
   ForwardAgent yes
 
-host freenas
+host rpi3-dev
   user alex
-  hostname 192.168.86.35
+  hostname 10.100.20.40
   identityfile ~/.ssh/id_rsa_amerenda_personal
   ForwardAgent yes
+
+host edgemax
+  user amerenda
+  hostname 10.100.20.1
+  identityfile ~/.ssh/id_rsa_amerenda_personal
 
 host ftp
   user alex
