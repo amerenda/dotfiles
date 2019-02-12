@@ -1,0 +1,5 @@
+config
+cache
+http-cache
+*
+!.gitignore
