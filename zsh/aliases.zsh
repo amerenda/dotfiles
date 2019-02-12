@@ -48,6 +48,7 @@ alias ip3='ipython'
 # Git aliases
 alias subup="git submodule foreach git pull origin master"
 alias gamend="git commit --amend"
+alias pushup="git push --set-upstream origin $(git rev-parse --abbrev-ref HEAD)"
 
 # gpg aliases
 alias encrypt='gpg --encrypt --armor --recipient 0xCC71AFF8D3DB2965'
@@ -94,13 +95,18 @@ function focus()
     fi
 }
 
+function pushup()
+{
+    git push --set-upstream origin $(git rev-parse --abbrev-ref HEAD)
+}
+
 function promq()
 {
     echo ${1}
     if [[ "${1}" == "" ]]; then
         echo "please specify a prometheus query"
     else
-        httpBas "http://prometheus-us-central1-a.int.2pth.com:9090/api/v1/query?query=${1}"
+        http "http://prometheus.int.2pth.com:9090/api/v1/query?query=${1}"
     fi
 }
 

@@ -104,6 +104,11 @@ host prom-stg
   ProxyCommand ssh bastion-stg -W %h:%p
   StrictHostKeyChecking no
 
+host *.phx.impactradius.net
+  user alex.merenda
+  IdentityFile ~/.ssh/id_rsa_impact
+  ForwardAgent yes
+
 ### Personal servers
 host sleeperservice.local
   user root
@@ -144,11 +149,10 @@ host rpi3-3
   identityfile ~/.ssh/id_rsa_amerenda_personal
   ForwardAgent yes
 
-host freenas
-  user alex
-  hostname 192.168.86.35
+host edgemax
+  user amerenda
+  hostname 10.100.20.1
   identityfile ~/.ssh/id_rsa_amerenda_personal
-  ForwardAgent yes
 
 host ftp
   user alex
