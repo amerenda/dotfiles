@@ -1,20 +1,22 @@
 [user]
     email = alex.merenda@impact.com
     name = Alex Merenda
-	signingkey = 0xB056FF8F5A307876
+    signingkey = 0xB056FF8F5A307876
 
 [alias]
     st = status -sb
     di = diff
-    aa = add -A
     a  = add
+    ca = commit --amend -m
+    aa = add --update
+    cm = commit --amend -m
     l = log --pretty=oneline --abbrev-commit
     s = status
+    pish = push
+    commend = commit --amend --no-edit
     pullff = pull --ff-only
     update-submodules = submodule update --init --recursive
     upgrade-submodules = submodule update --init --remote
-    pish = push
-    commend = commit --amend --no-edit
     grog = log --graph --abbrev-commit --decorate --all --format=format:\"%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(dim white) - %an%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n %C(white)%s%C(reset)\"
 
 [color]
@@ -35,11 +37,13 @@
 [push]
     default = simple
 [gpg]
-	program = gpg
+    program = gpg
 [filter "lfs"]
     clean = git-lfs clean -- %f
     smudge = git-lfs smudge -- %f
     process = git-lfs filter-process
     required = true
 [core]
-	excludesfile = /Users/alexmerenda/.gitignore_global
+    excludesfile = /Users/alexmerenda/.gitignore_global
+[pull]
+    rebase = true
