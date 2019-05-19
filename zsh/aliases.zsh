@@ -28,7 +28,7 @@ alias brewup="brew update && brew upgrade"
 # Misc aliases
 alias mkdir="mkdir -pv"
 alias ssh="ssh -A"
-alias myip="curl http://ipecho.net/plain; echo"
+alias myip="curl -s http://ipecho.net/plain; echo"
 alias clip="pbcopy"
 alias tl="clear && task list"
 alias tlw="clear && task list +placeiq"
