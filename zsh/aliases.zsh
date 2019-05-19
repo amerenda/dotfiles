@@ -48,6 +48,7 @@ alias ip3='ipython'
 # Git aliases
 alias subup="git submodule foreach git pull origin master"
 alias gamend="git commit --amend"
+alias pushup="git push --set-upstream origin $(git rev-parse --abbrev-ref HEAD)"
 
 # gpg aliases
 alias encrypt='gpg --encrypt --armor --recipient 0xCC71AFF8D3DB2965'
