@@ -176,8 +176,6 @@ host rpi3-3
 host rpi3-dev
   user alex
   hostname 10.100.20.40
-  identityfile ~/.ssh/id_rsa_amerenda_personal
-  ForwardAgent yes
 
 host edgemax
   user amerenda
