@@ -14,6 +14,21 @@ Host bitbucket.org
 
 #### Work Servers
 ## Prod
+Host alex-vm1
+  Hostname 10.29.8.131
+  ForwardAgent yes
+
+# Jenkins
+Host jenkins.inf-impact.net
+  user alex.merenda
+  IdentityFile ~/.ssh/google_compute_engine
+  ForwardAgent yes
+
+Host 34.*.*.*
+  user alex.merenda
+  IdentityFile ~/.ssh/google_compute_engine
+  ForwardAgent yes
+
 Host bastion
   Hostname 35.199.17.108
   IdentityFile ~/.ssh/google_compute_engine
@@ -47,7 +62,7 @@ host jenkins-docker
 
 # Monitoring
 Host prom
-  Hostname grafana.int.2pth.com
+  Hostname prometheus.int.2pth.com
 #  ProxyCommand ssh bastion -W %h:%p
   StrictHostKeyChecking no
 
