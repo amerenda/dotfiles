@@ -18,14 +18,13 @@ Host alex-vm1
   Hostname 10.29.8.131
   ForwardAgent yes
 
-Host 34.73.237.77
-  Hostname 34.73.237.77
+# Jenkins
+Host jenkins.inf-impact.net
   user alex.merenda
   IdentityFile ~/.ssh/google_compute_engine
   ForwardAgent yes
 
-Host 34.74.176.220
-  Hostname 34.74.176.220
+Host 34.*.*.*
   user alex.merenda
   IdentityFile ~/.ssh/google_compute_engine
   ForwardAgent yes
