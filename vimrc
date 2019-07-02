@@ -78,7 +78,6 @@ set fillchars+=stl:\ ,stlnc:\
 set term=xterm-256color
 set termencoding=utf-8
 let g:airline#extensions#tabline#enabled = 1
-set diffopt+=iwhiteall
 
 " ************** shortcuts **************
 " leader Shortcuts
@@ -181,7 +180,7 @@ autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isT
 
 " ************** syntax **************
 " syntax Checker
-
+set diffopt+=iwhiteall
 set statusline+=%#warningmsg#
 set statusline+=%{SyntasticStatuslineFlag()}
 set statusline+=%{fugitive#statusline()}

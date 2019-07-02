@@ -1,8 +1,11 @@
+# binary aliases
+alias vim='/usr/local/opt/vim/bin/vim'
 # Use colors in coreutils utilities output
 alias ls='ls -G'
 alias grep='grep --color'
 
 # ls aliases
+# in case exa isn't available
 #alias ll='ls -lah'
 #alias la='ls -A'
 #alias l='ls'
