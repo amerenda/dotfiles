@@ -56,6 +56,13 @@ source ~/.zsh/plugins.zsh
 duration=$SECONDS
 debug "~/.zsh/plugins.zsh" "$(($duration % 60))"
 
+# Source spaceship prompt
+SECONDS=0
+source ~/.zsh/spaceship.zsh
+duration=$SECONDS
+debug "~/.zsh/spaceship.zsh" "$(($duration % 60))"
+
+
 # Allow local customizations in the ~/.zshrc_local_after file
 if [ -f ~/.zshrc_local_after ]; then
     SECONDS=0
