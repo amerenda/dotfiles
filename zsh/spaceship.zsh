@@ -1,14 +1,14 @@
 SPACESHIP_PROMPT_ORDER=(
   dir           # Current directory section
   git           # Git section (git_branch + git_status)
-#  xcode         # Xcode section
-#  golang        # Go section
-#  docker        # Docker section
-#  venv          # virtualenv section
-#  kubecontext   # Kubectl context section
-#  terraform     # Terraform workspace section
-#  jobs          # Background jobs indicator
-#  exit_code     # Exit code section
+  xcode         # Xcode section
+  golang        # Go section
+  docker        # Docker section
+  venv          # virtualenv section
+  kubecontext   # Kubectl context section
+  terraform     # Terraform workspace section
+  jobs          # Background jobs indicator
+  exit_code     # Exit code section
   char          # Prompt character
 )
 
