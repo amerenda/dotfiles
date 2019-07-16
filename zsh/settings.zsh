@@ -30,7 +30,7 @@ export EDITOR="$VISUAL"
 
 # vi key bindings
 bindkey -v
-bindkey -M viins ‘jj’ vi-cmd-mode
+bindkey -M viins 'jj' vi-cmd-mode
 
 # Movement
 bindkey -a 'gg' beginning-of-buffer-or-history
