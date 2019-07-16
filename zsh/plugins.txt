@@ -2,7 +2,3 @@ denysdovhan/spaceship-prompt
 zsh-users/zsh-autosuggestions
 zsh-users/zsh-syntax-highlighting
 zsh-users/zsh-history-substring-search
-djui/alias-tips
-joel-porquet/zsh-dircolors-solarized
-zsh-users/zsh-completions
-caarlos0/zsh-open-github-pr

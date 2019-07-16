@@ -22,31 +22,31 @@ fi
 
 # Aliases (must be sourced before plugins)
 SECONDS=0
-source ~/.zsh/aliases.zsh
+#source ~/.zsh/aliases.zsh
 duration=$SECONDS
 debug  "~/.zsh/aliases.zsh" "$(($duration % 60))"
 
 # Impact settings
 SECONDS=0
-source ~/.zsh/impact.zsh
+#source ~/.zsh/impact.zsh
 duration=$SECONDS
 debug "~/.zsh/impact.zsh" "$(($duration % 60))"
 
 # go settings
 SECONDS=0
-source ~/.zsh/go.zsh
+#source ~/.zsh/go.zsh
 duration=$SECONDS
 debug "~/.zsh/go.zsh" "$(($duration % 60))"
 
 # Settings
 SECONDS=0
-source ~/.zsh/settings.zsh
+#source ~/.zsh/settings.zsh
 duration=$SECONDS
 debug "~/.zsh/settings.zsh" "$(($duration % 60))"
 
 # External settings
 SECONDS=0
-source ~/.zsh/external.zsh
+#source ~/.zsh/external.zsh
 duration=$SECONDS
 debug "~/.zsh/external.zsh" "$(($duration % 60))"
 
