@@ -12,6 +12,7 @@
     ~/.dotfiles: ''
     ~/.gitconfig: gitconfig
     ~/.gitignore_global: gitignore_global
+    ~/.gnupg/gpg.conf: gpg.conf
     ~/.hyper.js: hyper.js
     ~/.kube: kube
     ~/.pip: pip
