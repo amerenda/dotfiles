@@ -37,9 +37,9 @@ alias gamend="git commit --amend"
 #alias pushup="git push --set-upstream origin $(git rev-parse --abbrev-ref HEAD)"
 
 # gpg aliases
-alias encrypt='gpg --encrypt --armor --recipient 0xCC71AFF8D3DB2965'
+alias encrypt='gpg --encrypt --armor --recipient 0xC0368B9FDB8E23F0'
 alias decrypt='gpg --decrypt --armor'
-alias sign='gpg --armor --clearsign --default-key 0x653287E9D6B049AC'
+alias sign='gpg --armor --clearsign --default-key 0xB056FF8F5A307876'
 
 # Work aliases
 alias glist="gcloud compute instances list"
