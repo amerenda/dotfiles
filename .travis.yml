@@ -4,13 +4,7 @@ matrix:
         - os: osx
           osx_image: xcode10.1
 install:
-  - echo | ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
-  - PATH="/home/homebrew/.homebrew/bin:$PATH"
-  - brew install gcc
-  - brew tap getantibody/tap
-  - brew install getantibody/tap/antibody
-  - brew install zsh-autosuggestions
-  - git clone https://github.com/amerenda/dotfiles.git --recursive
+  - git clone --recurse-submodules https://github.com/amerenda/dotfiles.git
   - rm -f ~/.zshrc
   - rm -f ~/.gitconfig
   - cd dotfiles
