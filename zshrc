@@ -4,8 +4,6 @@ debug() {
     duration="${2}"
     if [[ "${debugOn}" == "true" ]]; then
         echo "${sourceFile}: ${duration}s"
-    else
-        ;
     fi
 }
 
