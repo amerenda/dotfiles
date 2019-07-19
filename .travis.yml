@@ -5,14 +5,15 @@ os:
 install:
   - rm -f ~/.zshrc
   - rm -f ~/.gitconfig
-  - pwd
-  - ls
-  - cd amerenda/dotfiles
+  - git clone --depth=50 --branch=zsh_changes https://github.com/amerenda/dotfiles.git
+  - cd dotfiles
   - echo $TRAVIS_PULL_REQUEST_BRANCH
   - git checkout $TRAVIS_PULL_REQUEST_BRANCH
 
 script:
   - /bin/sh -c './install'
+  - source ~/.zshrc
+  - subup
   - echo | vim +PluginInstall +qall
   - vim -s test/vimscript
   - ls test/vim.out 2>/dev/null || echo FAIL
