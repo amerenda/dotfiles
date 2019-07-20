@@ -18,14 +18,7 @@ if [ -f ~/.zshrc_local_before ]; then
     debug "false" "~/.zshrc_local_before.zsh" $(($duration % 60))
 fi
 # init plugins
-#/usr/local/bin/antibody bundle < ~/.zsh/plugins.txt > ~/.zsh/plugins.zsh
-
-# Activate Plugins via antigent
-SECONDS=0
-source ~/.zsh/plugins.zsh
-duration=$SECONDS
-debug  "~/.zsh/plugins.zsh" "$(($duration % 60))"
-
+/usr/local/bin/antibody bundle < ~/.zsh/plugins.txt > ~/.zsh/plugins.zsh
 
 # Aliases (must be sourced before plugins)
 SECONDS=0
