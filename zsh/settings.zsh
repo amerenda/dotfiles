@@ -8,7 +8,7 @@ autoload -U edit-command-line && zle -N edit-command-line
 #setopt autocd
 
 # Enable interactive comments (# on the command line)
-setopt interactivecomments
+#setopt interactivecomments
 
 # Show menu
 zstyle ':completion:*' menu select
@@ -30,7 +30,7 @@ export EDITOR="$VISUAL"
 
 # vi key bindings
 bindkey -v
-bindkey -M viins 'jj' vi-cmd-mode
+bindkey -M viins ‘jj’ vi-cmd-mode
 
 # Movement
 bindkey -a 'gg' beginning-of-buffer-or-history
@@ -44,7 +44,4 @@ bindkey -a '^R' redo
 bindkey "^R" history-incremental-search-backward
 
 # kubectl autocompletion
-if kubectl &> /dev/null; then
-  source <(kubectl completion zsh)
-fi
-
+source <(kubectl completion zsh)
