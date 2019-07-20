@@ -5,7 +5,6 @@
 - clean: ['~']
 
 - link:
-    ~/.antigen: antigen/
     ~/.bin:
        force: true
        path: bin/
@@ -14,6 +13,7 @@
     ~/.gitignore_global: gitignore_global
     ~/.kube: kube
     ~/.pip: pip
+    ~/.pydistutils.cfg: pydistutils.cfg
     ~/.scripts: scripts
     ~/.ssh:
        force: true
@@ -26,5 +26,6 @@
     ~/.zshrc: zshrc
 
 - shell:
-  - [git submodule foreach git pull origin master, updating submodules]
+  - [git update-submodules, updating submodules]
   - [mkdir -p ~/.bin, creating bin dir]
+  - [mkdir -p ~/.keychain, creating ssh-agent forward dir]
