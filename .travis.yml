@@ -1,8 +1,10 @@
 ---
-os:
-  - osx
-
+matrix:
+    include:
+        - os: osx
+          osx_image: xcode10.1
 install:
+  - git clone --recurse-submodules https://github.com/amerenda/dotfiles.git
   - rm -f ~/.zshrc
   - rm -f ~/.gitconfig
   - cd dotfiles
@@ -12,5 +14,3 @@ install:
 script:
   - /bin/sh -c './install'
   - echo | vim +PluginInstall +qall
-  - vim -s test/vimscript
-  - ls test/vim.out 2>/dev/null || echo FAIL
