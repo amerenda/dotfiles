@@ -19,11 +19,13 @@ Plugin 'sjl/gundo.vim'
 Plugin 'crusoexia/vim-monokai'
 Plugin 'vim-syntastic/syntastic'
 Plugin 'chase/vim-ansible-yaml'
+Plugin 'joshdick/onedark.vim'
 Plugin 'ltlollo/diokai'
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
 Plugin 'hdima/python-syntax'
 Plugin 'tmux-plugins/vim-tmux'
+Plugin 'sheerun/vim-polyglot'
 
 " File management
 Plugin 'tpope/vim-fugitive'
@@ -57,12 +59,14 @@ filetype plugin indent on    " required
 
 " ************** visual **************
 syntax enable
+"syntax on
 "set background=dark
 "set background=grey
 "colorscheme solarized
 "colorscheme spacegray
 "colorscheme monokai
 colorscheme diokai
+"colorscheme onedark
 
 "*** vim-airline
 set laststatus=2
