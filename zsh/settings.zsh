@@ -8,7 +8,7 @@ autoload -U edit-command-line && zle -N edit-command-line
 #setopt autocd
 
 # Enable interactive comments (# on the command line)
-setopt interactivecomments
+#setopt interactivecomments
 
 # Show menu
 zstyle ':completion:*' menu select

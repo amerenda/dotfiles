@@ -30,6 +30,7 @@ source ~/.zsh/plugins.zsh
 duration=$SECONDS
 debug  "~/.zsh/plugins.zsh" "$(($duration % 60))"
 
+
 # Aliases (must be sourced before plugins)
 SECONDS=0
 source ~/.zsh/aliases.zsh
