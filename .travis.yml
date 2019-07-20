@@ -5,7 +5,7 @@ os:
 install:
   - rm -f ~/.zshrc
   - rm -f ~/.gitconfig
-  - cd amerenda/dotfiles
+  - cd dotfiles
   - echo $TRAVIS_PULL_REQUEST_BRANCH
   - git checkout $TRAVIS_PULL_REQUEST_BRANCH
 
