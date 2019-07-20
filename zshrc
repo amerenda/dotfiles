@@ -4,11 +4,8 @@ debug() {
     duration="${2}"
     if [[ "${debugOn}" == "true" ]]; then
         echo "${sourceFile}: ${duration}s"
-    else
-        ;
     fi
 }
-
 
 # Allow local customizations in the ~/.zshrc_local_before file
 if [ -f ~/.zshrc_local_before ]; then
@@ -18,7 +15,18 @@ if [ -f ~/.zshrc_local_before ]; then
     debug "false" "~/.zshrc_local_before.zsh" $(($duration % 60))
 fi
 # init plugins
-/usr/local/bin/antibody bundle < ~/.zsh/plugins.txt > ~/.zsh/plugins.zsh
+#/usr/local/bin/antibody bundle < ~/.zsh/plugins.txt > ~/.zsh/plugins.zsh
+
+SECONDS=0
+source ~/.antigen/antigen.zsh
+duration=$SECONDS
+debug "~/.antigen/antigen.zsh" "$(($duration % 60))"
+
+## Activate Plugins via antigent
+SECONDS=0
+source ~/.zsh/plugins.zsh
+duration=$SECONDS
+debug  "~/.zsh/plugins.zsh" "$(($duration % 60))"
 
 # Aliases (must be sourced before plugins)
 SECONDS=0
@@ -50,11 +58,12 @@ source ~/.zsh/external.zsh
 duration=$SECONDS
 debug "~/.zsh/external.zsh" "$(($duration % 60))"
 
-# Source plugins
+# Source spaceship prompt
 SECONDS=0
-source ~/.zsh/plugins.zsh
+source ~/.zsh/spaceship.zsh
 duration=$SECONDS
-debug "~/.zsh/plugins.zsh" "$(($duration % 60))"
+debug "~/.zsh/spaceship.zsh" "$(($duration % 60))"
+
 
 # Allow local customizations in the ~/.zshrc_local_after file
 if [ -f ~/.zshrc_local_after ]; then

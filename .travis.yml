@@ -1,22 +1,17 @@
 ---
-matrix:
-    include:
-        - os: osx
-          osx_image: xcode10.1
+os:
+  - osx
+
 install:
-  - echo | ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
-  - PATH="/home/homebrew/.homebrew/bin:$PATH"
-  - brew install gcc
-  - brew tap getantibody/tap
-  - brew install getantibody/tap/antibody
-  - brew install zsh-autosuggestions
-  - git clone https://github.com/amerenda/dotfiles.git --recursive
+  - /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
   - rm -f ~/.zshrc
   - rm -f ~/.gitconfig
-  - cd dotfiles
-  - echo $TRAVIS_PULL_REQUEST_BRANCH
-  - git checkout $TRAVIS_PULL_REQUEST_BRANCH
 
 script:
-  - /bin/sh -c './install'
-  - echo | vim +PluginInstall +qall
+  - brew install zsh || echo FAIL
+  - /bin/sh -c './install' || echo FAIL
+  - source ~/.zshrc || echo FAIL
+  - subup || echo FAIL
+  - echo | vim +PluginInstall +qall || echo FAIL
+  - vim -s test/vimscript
+  - ls test/vim.out 2>/dev/null || echo FAIL
