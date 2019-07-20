@@ -44,4 +44,7 @@ bindkey -a '^R' redo
 bindkey "^R" history-incremental-search-backward
 
 # kubectl autocompletion
-source <(kubectl completion zsh)
+if kubectl &> /dev/null; then
+  source <(kubectl completion zsh)
+fi
+
