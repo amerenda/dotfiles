@@ -1,5 +1,4 @@
 SPACESHIP_PROMPT_ORDER=(
-#  time
   dir           # Current directory section
   git           # Git section (git_branch + git_status)
   xcode         # Xcode section
@@ -10,15 +9,9 @@ SPACESHIP_PROMPT_ORDER=(
   terraform     # Terraform workspace section
   jobs          # Background jobs indicator
   exit_code     # Exit code section
-#  exec_time
   char          # Prompt character
 )
 SPACESHIP_RPROMPT_ORDER=()
-
-# Execution Time Settings
-SPACESHIP_EXEC_TIME_SHOW=true
-SPACESHIP_EXEC_TIME_PREFIX="took"
-SPACESHIP_EXEC_TIME_ELAPSED=0
 
 # Prompt View Settings
 SPACESHIP_PROMPT_ADD_NEWLINE=false
@@ -34,5 +27,6 @@ SPACESHIP_KUBECONTEXT_SYMBOL=$'\u23881'
 # Git Settings
 SPACESHIP_GIT_SHOW=true
 SPACESHIP_GIT_BRANCH_SHOW=true
+SPACESHIP_GIT_BRANCH_PREFIX=$SPACESHIP_GIT_SYMBOL
 SPACESHIP_GIT_STATUS_SHOW=true
 
