@@ -3,19 +3,15 @@ os:
   - osx
 
 install:
+  - /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
   - rm -f ~/.zshrc
   - rm -f ~/.gitconfig
-  - /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-  - echo $(ls)
-  - echo $(pwd)
-  - echo $TRAVIS_PULL_REQUEST_BRANCH
-  - git checkout $TRAVIS_PULL_REQUEST_BRANCH
 
 script:
-  - brew install zsh
-  - /bin/sh -c './install'
-  - source ~/.zshrc
-  - subup
-  - echo | vim +PluginInstall +qall
+  - brew install zsh || echo FAIL
+  - /bin/sh -c './install' || echo FAIL
+  - source ~/.zshrc || echo FAIL
+  - subup || echo FAIL
+  - echo | vim +PluginInstall +qall || echo FAIL
   - vim -s test/vimscript
   - ls test/vim.out 2>/dev/null || echo FAIL
