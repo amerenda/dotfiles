@@ -60,6 +60,7 @@ filetype plugin indent on    " required
 " ************** visual **************
 syntax enable
 "syntax on
+"set background=dark
 "set background=grey
 "colorscheme solarized
 "colorscheme spacegray
@@ -152,28 +153,10 @@ else
         let &t_EI = "\<Esc>]50;CursorShape=0\x7"
 endif
 
-" moves the backup dir to tmp
-set backup
-set backupdir=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
-set backupskip=/tmp/*,/private/tmp/*
-set directory=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
-set writebackup
-
-" " Ensure private editing.
-" Usage - VIM_PRIVATE=1 vim
-if $VIM_PRIVATE
-  set nobackup
-  set nowritebackup
-  set noundofile
-  set noswapfile
-  set viminfo=""
-  set noshelltemp
-  set history=0
-  set nomodeline
-  set secure
-  colorscheme onedark
-endif
-
+" disable tmp backups
+set nobackup
+set noswapfile
+set noundofile
 
 " ************** fixes **************
 " back space
