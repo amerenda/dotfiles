@@ -36,15 +36,26 @@ alias subup="git submodule foreach git pull origin master"
 alias gamend="git commit --amend"
 #alias pushup="git push --set-upstream origin $(git rev-parse --abbrev-ref HEAD)"
 
+## Security aliases
 # gpg aliases
 alias encrypt='gpg --encrypt --armor --recipient 0xC0368B9FDB8E23F0'
 alias decrypt='gpg --decrypt --armor'
 alias sign='gpg --armor --clearsign --default-key 0xB056FF8F5A307876'
+alias svim='VIM_PRIVATE=1 vim'
 
 # Work aliases
 alias glist="gcloud compute instances list"
 alias glistdp="gcloud compute instances list --filter='labels.goog-dataproc-cluster-name:*'"
 alias gfilter="gcloud compute instances list --filter="
+
+function sslinfo()
+{
+    if [[ "${1}" == "" ]]; then
+        echo "Please specify the hostname to check"
+    else
+        echo | openssl s_client -showcerts -servername ${1} -connect ${1}:443 2>/dev/null | openssl x509 -inform pem -noout -text
+    fi
+}
 
 function focus()
 {

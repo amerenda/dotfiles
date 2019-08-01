@@ -26,6 +26,7 @@ Plugin 'vim-airline/vim-airline-themes'
 Plugin 'hdima/python-syntax'
 Plugin 'tmux-plugins/vim-tmux'
 Plugin 'sheerun/vim-polyglot'
+Plugin 'segeljakt/vim-silicon'
 
 " File management
 Plugin 'tpope/vim-fugitive'
