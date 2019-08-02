@@ -119,7 +119,7 @@ host azkaban-dev
 
 
 host prom-stg
-  Hostname 10.31.0.8
+  Hostname prometheus-stg.int.2pth.com
   StrictHostKeyChecking no
 
 host *.phx.impactradius.net
