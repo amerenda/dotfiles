@@ -1,20 +1,9 @@
 id_rsa_amerenda_personal
-id_rsa_amerenda_placeiq
-id_rsa_amerenda_placeiq_M
 github_deploy
 id_rsa
 id_rsa1
 pem
 *.pem
 
-.known_hosts.lock
-known_hosts
-ssh/google_compute_known_hosts
 
-vim/bundle/syntastic
-vim/bundle/vim-colors-solarized
-vim/bundle/vim-ansible-yaml
-vim/bundle/gundo.vim
-vim/bundle/nerdtree
-bin/pip
 
