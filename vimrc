@@ -18,7 +18,7 @@ Plugin 'sjl/gundo.vim'
 "Plugin 'altercation/vim-colors-solarized'
 Plugin 'crusoexia/vim-monokai'
 Plugin 'vim-syntastic/syntastic'
-Plugin 'chase/vim-ansible-yaml'
+Plugin 'pearofducks/ansible-vim'
 Plugin 'joshdick/onedark.vim'
 Plugin 'ltlollo/diokai'
 Plugin 'vim-airline/vim-airline'
@@ -206,6 +206,9 @@ set statusline+=%#warningmsg#
 set statusline+=%{SyntasticStatuslineFlag()}
 set statusline+=%{fugitive#statusline()}
 set statusline+=%*
+
+" ansible
+let g:ansible_name_highlight = 'd'
 
 let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 1
