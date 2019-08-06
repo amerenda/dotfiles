@@ -12,3 +12,4 @@ export DEFAULT_USER=alexmerenda
 export PATH="/Users/alexmerenda/.bin:/usr/local/opt/python/libexec/bin:/Users/alexmerenda/Library/Python/3.7/bin:/usr/local/bin:/usr/local/opt/openvpn/sbin:/Users/alexmerenda/.cargo/bin:$PATH"
 export GOSS_PATH=~/bin/goss-linux-amd64
 export PATH="$PATH:$CARGO_HOME/bin"
+eval "$(direnv hook zsh)"

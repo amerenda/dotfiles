@@ -16,7 +16,6 @@
     ~/.hyper.js:
        force: true
        path: hyper.js
-    ~/.kube: kube
     ~/.pip: pip
     ~/.scripts: scripts
     ~/.ssh:
