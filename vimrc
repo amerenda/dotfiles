@@ -1,65 +1,62 @@
 set nocompatible              " be iMproved, required
-filetype off                  " required
 
-" set the runtime path to include Vundle and initialize
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
-" alternatively, pass a path where Vundle should install plugins
-"call vundle#begin('~/some/path/here')
+if empty(glob('~/.vim/autoload/plug.vim'))
+  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
+call plug#begin('~/.vim/plugged')
 
 " ************** plugins **************
-" let Vundle manage Vundle, required
-Plugin 'VundleVim/Vundle.vim'
 
 " editor
-Plugin 'sjl/gundo.vim'
+Plug 'sjl/gundo.vim'
 
 " Style and syntax
-"Plugin 'altercation/vim-colors-solarized'
-Plugin 'crusoexia/vim-monokai'
-Plugin 'vim-syntastic/syntastic'
-Plugin 'pearofducks/ansible-vim'
-Plugin 'joshdick/onedark.vim'
-Plugin 'ltlollo/diokai'
-Plugin 'vim-airline/vim-airline'
-Plugin 'vim-airline/vim-airline-themes'
-Plugin 'hdima/python-syntax'
-Plugin 'tmux-plugins/vim-tmux'
-Plugin 'sheerun/vim-polyglot'
-Plugin 'segeljakt/vim-silicon'
+"Plug 'altercation/vim-colors-solarized'
+Plug 'crusoexia/vim-monokai'
+Plug 'vim-syntastic/syntastic'
+Plug 'pearofducks/ansible-vim'
+Plug 'joshdick/onedark.vim'
+Plug 'ltlollo/diokai'
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+Plug 'hdima/python-syntax'
+Plug 'tmux-plugins/vim-tmux'
+Plug 'sheerun/vim-polyglot'
+Plug 'segeljakt/vim-silicon'
 
 " File management
-Plugin 'tpope/vim-fugitive'
-Plugin 'scrooloose/nerdtree'
-Plugin 'Xuyuanp/nerdtree-git-plugin'
+Plug 'tpope/vim-fugitive'
+Plug 'scrooloose/nerdtree'
+Plug 'Xuyuanp/nerdtree-git-plugin'
 " https://github.com/Xuyuanp/nerdtree-git-plugin
-Plugin 'ctrlpvim/ctrlp.vim'
+Plug 'ctrlpvim/ctrlp.vim'
 " https://github.com/ctrlpvim/ctrlp.vim
 
 " Clojure
-Plugin 'guns/vim-clojure-static'
-Plugin 'kien/rainbow_parentheses.vim'
-Plugin 'tpope/vim-fireplace'
-Plugin 'vim-scripts/paredit.vim'
+Plug 'guns/vim-clojure-static'
+Plug 'kien/rainbow_parentheses.vim'
+Plug 'tpope/vim-fireplace'
+Plug 'vim-scripts/paredit.vim'
 " https://github.com/vim-scripts/paredit.vim/blob/master/doc/paredit.txt
-Plugin 'tpope/vim-surround'
+Plug 'tpope/vim-surround'
 " https://github.com/tpope/vim-surround
 
-call vundle#end()            " required
-filetype plugin indent on    " required
+call plug#end()
 " To ignore plugin indent changes, instead use:
 "filetype plugin on
 
 " Brief help
-" :PluginList       - lists configured plugins
-" :PluginInstall    - installs plugins; append `!` to update or just :PluginUpdate
-" :PluginSearch foo - searches for foo; append `!` to refresh local cache
-" :PluginClean      - confirms removal of unused plugins; append `!` to auto-approve removal
+" :PlugList       - lists configured plugins
+" :PlugInstall    - installs plugins; append `!` to update or just :PluginUpdate
+" :PlugSearch foo - searches for foo; append `!` to refresh local cache
+" :PlugClean      - confirms removal of unused plugins; append `!` to auto-approve removal
 
 " see :h vundle for more details or wiki for FAQ
 
 " ************** visual **************
-syntax enable
 "syntax on
 "set background=grey
 "colorscheme solarized
