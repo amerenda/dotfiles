@@ -27,6 +27,7 @@ Plugin 'hdima/python-syntax'
 Plugin 'tmux-plugins/vim-tmux'
 Plugin 'sheerun/vim-polyglot'
 Plugin 'segeljakt/vim-silicon'
+Plugin 'junegunn/goyo.vim'
 
 " File management
 Plugin 'tpope/vim-fugitive'
