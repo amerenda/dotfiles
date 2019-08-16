@@ -44,6 +44,7 @@ alias glist="gcloud compute instances list"
 alias glistdp="gcloud compute instances list --filter='labels.goog-dataproc-cluster-name:*'"
 alias gfilter="gcloud compute instances list --filter="
 
+
 function man() {
     LESS_TERMCAP_md=$'\e[01;31m' \
     LESS_TERMCAP_me=$'\e[0m' \
@@ -56,6 +57,7 @@ function man() {
 
 
 function sslinfo()
+
 {
     if [[ "${1}" == "" ]]; then
         echo "Please specify the hostname to check"
@@ -75,7 +77,7 @@ function promq()
     fi
 }
 
-# connect to bastion host
+
 function bastionUp()
 {
     ssh -O check bastion 2> /dev/null
@@ -90,6 +92,7 @@ function bastionUp()
        :
     fi
 }
+
 
 function bastionCheck()
 {
@@ -107,19 +110,19 @@ function bastionCheck()
     fi
 }
 
-# Update dotfiles
+
 function dfu() {
     (
         cd ~/.dotfiles && git pullff && ./install -q
     )
 }
 
-# Create a directory and cd into it
+
 function mcd() {
     mkdir "${1}" && cd "${1}"
 }
 
-# Go up [n] directories
+
 function up()
 {
     local cdir="$(pwd)"
@@ -142,10 +145,12 @@ function up()
     cd "${cdir}"
 }
 
+
 # Check if a file contains non-ascii characters
 function nonascii() {
     LC_ALL=C grep -n '[^[:print:][:space:]]' ${1}
 }
+
 
 # Serve current directory
 function serve() {
