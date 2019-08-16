@@ -1,6 +1,7 @@
 # Use colors in coreutils utilities output
-alias ls='ls -G'
-alias grep='grep --color'
+alias ls='ls --color=auto'
+alias grep='grep --color=auto'
+alias diff='diff --color=auto'
 
 # ls aliases
 alias ll='exa -laa'
@@ -14,19 +15,15 @@ alias lt='exa -laas=date'
 alias cp='cp -i'
 alias mv='mv -i'
 
-# Homebrew aliases
-alias brewup="brew update && brew upgrade"
-# https://docs.brew.sh/FAQ
 
 # Misc aliases
 alias mkdir="mkdir -pv"
 alias ssh="ssh -A"
 alias myip="curl -s http://ipecho.net/plain; echo"
-alias clip="pbcopy"
+alias clip="xclip -selection clipboard"
 alias tkill="tmux kill-session"
 alias fsize="du -sh ./* | sort -h"
 alias dotsize="du -sh ./.* | sort -h"
-alias dircolors="gdircolors"
 
 # Python aliases
 alias ip3='ipython'
@@ -57,22 +54,6 @@ function sslinfo()
     fi
 }
 
-function focus()
-{
-    echo $1
-    if [[ "${1}" == "" ]]; then
-        echo "Please specify the number of minutes to focus"
-    elif ! [[ "${1}" =~ ^[0-9]+$ ]]; then
-        echo "Error: argument must be a number"
-    else
-        (zsh -c "~/.bin/focus.sh start ${1}; sleep $(( ${1} * 60 )); ~/.bin/focus.sh stop ${1}" &)
-    fi
-}
-
-#function pushup()
-#{
-#    git push --set-upstream origin $(git rev-parse --abbrev-ref HEAD)
-#}
 
 function promq()
 {
@@ -116,23 +97,12 @@ function bastionCheck()
     fi
 }
 
-# Get current number of commits on current branch, or another branch, as compared to master.
-#function gcommits()
-#{
-#    if [[ "${1}" == "" ]]; then
-#        git rev-list master..$(git rev-parse --abbrev-ref HEAD) | wc -l
-#    else
-#        git rev-list master..${1} | wc -l
-#    fi
-#}
-
 # Update dotfiles
 function dfu() {
     (
         cd ~/.dotfiles && git pullff && ./install -q
     )
 }
-
 
 # Create a directory and cd into it
 function mcd() {

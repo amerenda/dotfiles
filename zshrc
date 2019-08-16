@@ -72,3 +72,17 @@ if [ -f ~/.zshrc_local_after ]; then
     duration=$SECONDS
     debug "~/.zshrc_local_after.zsh" "$(($duration % 60))"
 fi
+
+if uname | grep -q Darwin; then
+    SECONDS=0
+    source ~/.zsh/macos.zsh
+    duration=$SECONDS
+    debug "~/.zsh/macos.zsh" "$(($duration % 60))"
+fi
+
+if uname | grep -q Linux; then
+    SECONDS=0
+    source ~/.zsh/linux.zsh
+    duration=$SECONDS
+    debug "~/.zsh/linux.zsh" "$(($duration % 60))"
+fi
