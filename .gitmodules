@@ -1,26 +1,9 @@
-[submodule "lib/pyyaml"]
-    path = lib/pyyaml
-    url = https://github.com/anishathalye/pyyaml
-    ignore = dirty
-[submodule "dotbot"]
-    path = dotbot
-    url = https://github.com/anishathalye/dotbot
-    ignore = dirty
-[submodule "zsh/plugins/zsh-syntax-highlighting"]
-    path = zsh/plugins/zsh-syntax-highlighting
-    url = git@github.com:zsh-users/zsh-syntax-highlighting.git
-[submodule "vim/bundle/Vundle.vim"]
-    path = vim/bundle/Vundle.vim
-    url = https://github.com/VundleVim/Vundle.vim.git
-[submodule "zsh/plugins/zsh-dircolors-solarized"]
-    path = zsh/plugins/zsh-dircolors-solarized
-    url = https://github.com/joel-porquet/zsh-dircolors-solarized.git
-[submodule "zsh/plugins/dircolors-solarized"]
-    path = zsh/plugins/dircolors-solarized
-    url = https://github.com/seebi/dircolors-solarized.git
 [submodule "antigen"]
-    path = antigen
-    url = https://github.com/zsh-users/antigen.git
+	path = antigen
+	url = https://github.com/zsh-users/antigen.git
+[submodule "dotbot"]
+	path = dotbot
+	url = https://github.com/anishathalye/dotbot
 [submodule "tmux/plugins/tpm"]
 	path = tmux/plugins/tpm
 	url = https://github.com/tmux-plugins/tpm

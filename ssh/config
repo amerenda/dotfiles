@@ -1,6 +1,4 @@
 Host *
-  UseKeychain yes
-  AddKeysToAgent yes
   IdentityFile ~/.ssh/id_rsa_impact
   IdentityFile ~/.ssh/google_compute_engine
   IdentityFile ~/.ssh/id_rsa_amerenda_personal

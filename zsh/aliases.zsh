@@ -1,6 +1,7 @@
 # Use colors in coreutils utilities output
-alias ls='ls -G'
-alias grep='grep --color'
+alias ls='ls --color=auto'
+alias grep='grep --color=auto'
+alias diff='diff --color=auto'
 
 # ls aliases
 alias ll='exa -laa'
@@ -14,19 +15,14 @@ alias lt='exa -laas=date'
 alias cp='cp -i'
 alias mv='mv -i'
 
-# Homebrew aliases
-alias brewup="brew update && brew upgrade"
-# https://docs.brew.sh/FAQ
-
 # Misc aliases
 alias mkdir="mkdir -pv"
 alias ssh="ssh -A"
 alias myip="curl -s http://ipecho.net/plain; echo"
-alias clip="pbcopy"
+alias clip="xclip -selection clipboard"
 alias tkill="tmux kill-session"
 alias fsize="du -sh ./* | sort -h"
 alias dotsize="du -sh ./.* | sort -h"
-alias dircolors="gdircolors"
 
 # Python aliases
 alias ip3='ipython'
@@ -48,7 +44,20 @@ alias glist="gcloud compute instances list"
 alias glistdp="gcloud compute instances list --filter='labels.goog-dataproc-cluster-name:*'"
 alias gfilter="gcloud compute instances list --filter="
 
+
+function man() {
+    LESS_TERMCAP_md=$'\e[01;31m' \
+    LESS_TERMCAP_me=$'\e[0m' \
+    LESS_TERMCAP_se=$'\e[0m' \
+    LESS_TERMCAP_so=$'\e[01;44;33m' \
+    LESS_TERMCAP_ue=$'\e[0m' \
+    LESS_TERMCAP_us=$'\e[01;32m' \
+    command man "$@"
+}
+
+
 function sslinfo()
+
 {
     if [[ "${1}" == "" ]]; then
         echo "Please specify the hostname to check"
@@ -57,22 +66,6 @@ function sslinfo()
     fi
 }
 
-function focus()
-{
-    echo $1
-    if [[ "${1}" == "" ]]; then
-        echo "Please specify the number of minutes to focus"
-    elif ! [[ "${1}" =~ ^[0-9]+$ ]]; then
-        echo "Error: argument must be a number"
-    else
-        (zsh -c "~/.bin/focus.sh start ${1}; sleep $(( ${1} * 60 )); ~/.bin/focus.sh stop ${1}" &)
-    fi
-}
-
-#function pushup()
-#{
-#    git push --set-upstream origin $(git rev-parse --abbrev-ref HEAD)
-#}
 
 function promq()
 {
@@ -84,7 +77,7 @@ function promq()
     fi
 }
 
-# connect to bastion host
+
 function bastionUp()
 {
     ssh -O check bastion 2> /dev/null
@@ -99,6 +92,7 @@ function bastionUp()
        :
     fi
 }
+
 
 function bastionCheck()
 {
@@ -116,17 +110,7 @@ function bastionCheck()
     fi
 }
 
-# Get current number of commits on current branch, or another branch, as compared to master.
-#function gcommits()
-#{
-#    if [[ "${1}" == "" ]]; then
-#        git rev-list master..$(git rev-parse --abbrev-ref HEAD) | wc -l
-#    else
-#        git rev-list master..${1} | wc -l
-#    fi
-#}
 
-# Update dotfiles
 function dfu() {
     (
         cd ~/.dotfiles && git pullff && ./install -q
@@ -134,12 +118,11 @@ function dfu() {
 }
 
 
-# Create a directory and cd into it
 function mcd() {
     mkdir "${1}" && cd "${1}"
 }
 
-# Go up [n] directories
+
 function up()
 {
     local cdir="$(pwd)"
@@ -162,10 +145,12 @@ function up()
     cd "${cdir}"
 }
 
+
 # Check if a file contains non-ascii characters
 function nonascii() {
     LC_ALL=C grep -n '[^[:print:][:space:]]' ${1}
 }
+
 
 # Serve current directory
 function serve() {
