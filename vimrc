@@ -18,7 +18,7 @@ Plugin 'sjl/gundo.vim'
 "Plugin 'altercation/vim-colors-solarized'
 Plugin 'crusoexia/vim-monokai'
 Plugin 'vim-syntastic/syntastic'
-Plugin 'chase/vim-ansible-yaml'
+Plugin 'pearofducks/ansible-vim'
 Plugin 'joshdick/onedark.vim'
 Plugin 'ltlollo/diokai'
 Plugin 'vim-airline/vim-airline'
@@ -26,6 +26,8 @@ Plugin 'vim-airline/vim-airline-themes'
 Plugin 'hdima/python-syntax'
 Plugin 'tmux-plugins/vim-tmux'
 Plugin 'sheerun/vim-polyglot'
+Plugin 'segeljakt/vim-silicon'
+Plugin 'junegunn/goyo.vim'
 
 " File management
 Plugin 'tpope/vim-fugitive'
@@ -60,7 +62,6 @@ filetype plugin indent on    " required
 " ************** visual **************
 syntax enable
 "syntax on
-"set background=dark
 "set background=grey
 "colorscheme solarized
 "colorscheme spacegray
@@ -160,6 +161,22 @@ set backupskip=/tmp/*,/private/tmp/*
 set directory=~/.vim-tmp,~/.tmp,~/tmp,/var/tmp,/tmp
 set writebackup
 
+" " Ensure private editing.
+" Usage - VIM_PRIVATE=1 vim
+if $VIM_PRIVATE
+  set nobackup
+  set nowritebackup
+  set noundofile
+  set noswapfile
+  set viminfo=""
+  set noshelltemp
+  set history=0
+  set nomodeline
+  set secure
+  colorscheme onedark
+endif
+
+
 " ************** fixes **************
 " back space
 set backspace=indent,eol,start
@@ -190,6 +207,9 @@ set statusline+=%#warningmsg#
 set statusline+=%{SyntasticStatuslineFlag()}
 set statusline+=%{fugitive#statusline()}
 set statusline+=%*
+
+" ansible
+let g:ansible_name_highlight = 'd'
 
 let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_auto_loc_list = 1
