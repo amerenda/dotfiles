@@ -15,7 +15,6 @@ alias lt='exa -laas=date'
 alias cp='cp -i'
 alias mv='mv -i'
 
-
 # Misc aliases
 alias mkdir="mkdir -pv"
 alias ssh="ssh -A"
@@ -44,6 +43,17 @@ alias svim='VIM_PRIVATE=1 vim'
 alias glist="gcloud compute instances list"
 alias glistdp="gcloud compute instances list --filter='labels.goog-dataproc-cluster-name:*'"
 alias gfilter="gcloud compute instances list --filter="
+
+function man() {
+    LESS_TERMCAP_md=$'\e[01;31m' \
+    LESS_TERMCAP_me=$'\e[0m' \
+    LESS_TERMCAP_se=$'\e[0m' \
+    LESS_TERMCAP_so=$'\e[01;44;33m' \
+    LESS_TERMCAP_ue=$'\e[0m' \
+    LESS_TERMCAP_us=$'\e[01;32m' \
+    command man "$@"
+}
+
 
 function sslinfo()
 {
