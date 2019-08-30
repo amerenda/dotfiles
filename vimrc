@@ -31,9 +31,7 @@ Plug 'segeljakt/vim-silicon'
 Plug 'tpope/vim-fugitive'
 Plug 'scrooloose/nerdtree'
 Plug 'Xuyuanp/nerdtree-git-plugin'
-" https://github.com/Xuyuanp/nerdtree-git-plugin
 Plug 'ctrlpvim/ctrlp.vim'
-" https://github.com/ctrlpvim/ctrlp.vim
 
 " Clojure
 Plug 'guns/vim-clojure-static'
