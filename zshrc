@@ -64,7 +64,6 @@ source ~/.zsh/spaceship.zsh
 duration=$SECONDS
 debug "~/.zsh/spaceship.zsh" "$(($duration % 60))"
 
-
 # Allow local customizations in the ~/.zshrc_local_after file
 if [ -f ~/.zshrc_local_after ]; then
     SECONDS=0
@@ -78,6 +77,13 @@ if uname | grep -q Darwin; then
     source ~/.zsh/macos.zsh
     duration=$SECONDS
     debug "~/.zsh/macos.zsh" "$(($duration % 60))"
+fi
+
+if uname -a | grep -q penguin; then
+    SECONDS=0
+    source ~/.zsh/chromeos.zsh
+    duration=$SECONDS
+    debug "~/.zsh/chromeos.zsh" "$(($duration % 60))"
 fi
 
 if uname | grep -q Linux; then
