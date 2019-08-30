@@ -18,9 +18,7 @@
        path: hyper.js
     ~/.pip: pip
     ~/.scripts: scripts
-    ~/.ssh:
-       force: true
-       path: ssh
+    ~/.ssh: ssh
     ~/.tmux: tmux/
     ~/.tmux.conf: tmux.conf
     ~/.vim: vim/

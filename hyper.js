@@ -43,8 +43,6 @@ module.exports = {
       lightWhite: '#FFFFFF',
     },
 
-    shell: '/usr/local/bin/zsh',
-    shellArgs: ['--login'],
     env: {},
     bell: false,
     copyOnSelect: false,
