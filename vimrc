@@ -79,7 +79,7 @@ set fillchars+=stl:\ ,stlnc:\
 set term=xterm-256color
 set termencoding=utf-8
 let g:airline#extensions#tabline#enabled = 1
-set diffopt+=iwhiteall
+"set diffopt+=iwhiteall
 
 " ************** shortcuts **************
 " leader Shortcuts
