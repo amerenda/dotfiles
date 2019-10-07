@@ -9,15 +9,15 @@ containsElement () {
   return 1
 }
 
-for job in $(curl --user amerenda:$JENKINS_TOKEN -sg "$JENKINS_URL/api/json?tree=jobs[name,url]" | jq '.jobs[].name' -r); 
-do 
+for job in $(curl --user amerenda:$JENKINS_TOKEN -sg "$JENKINS_URL/api/json?tree=jobs[name,url]" | jq '.jobs[].name' -r);
+do
     if containsElement "$job" "${jobs_to_display[@]}"; then
         echo "Job Name : $job"
         echo -e "Build Number\tTimestamp"
-        for build in $(curl --user amerenda:$JENKINS_TOKEN -sg "$JENKINS_URL/job/$job/api/json?tree=allBuilds[number]" | jq '.allBuilds[].number' -r); 
-        do 
+        for build in $(curl --user amerenda:$JENKINS_TOKEN -sg "$JENKINS_URL/job/$job/api/json?tree=allBuilds[number]" | jq '.allBuilds[].number' -r);
+        do
             curl --user amerenda:$JENKINS_TOKEN -sg "$JENKINS_URL/job/$job/$build/api/json" | jq '(.number|tostring) + "\t\t" + (.timestamp|tostring)' -r
-        done 
+        done
         echo "================"
     fi
 done
