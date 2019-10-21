@@ -10,3 +10,5 @@ To install, do a recursive clone and run ./install
 
 ## Dependencies
 * brew install zsh-autosuggestions exa coreutils
+* brew update
+* brew cask install hyper
