@@ -1,3 +1,4 @@
+alias ls='ls -G' 
 alias dircolors="gdircolors"
 alias brewup="brew update && brew upgrade"
 alias clip="pbcopy"

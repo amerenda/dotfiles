@@ -8,7 +8,7 @@ module.exports = {
     fontSize: 11,
     fontFamily: '"Fira Code", Menlo, "DejaVu Sans Mono", "Lucida Console", monospace',
     fontWeight: 'normal',
-    fontWeightBold: 'normal',
+    fontWeightBold: 'bold',
     lineHeight: 1,
     letterSpacing: 0,
     cursorColor: 'rgba(248,28,229,0.8)',

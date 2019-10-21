@@ -29,3 +29,4 @@
 - shell:
   - [git submodule foreach git pull origin master, updating submodules]
   - [mkdir -p ~/.bin, creating bin dir]
+  - [bash ~/.scripts/selectSshConfig.sh]
