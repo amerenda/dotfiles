@@ -9,5 +9,4 @@ To install, do a recursive clone and run ./install
 * None
 
 ## Dependencies
-* brew install zsh-autosuggestions
-* brew install coreutils
+* brew install zsh-autosuggestions exa coreutils
