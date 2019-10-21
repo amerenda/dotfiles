@@ -29,3 +29,5 @@
 - shell:
   - [git submodule foreach git pull origin master, updating submodules]
   - [mkdir -p ~/.bin, creating bin dir]
+  - [if $(uname | grep -q Darwin); then ln -s ~/.ssh/config_macos ssh/config.d/macos; fi]
+  - [if $(uname | grep -q linux); then ln -s ~/.ssh/config_linux ssh/config.d/linux; fi]
