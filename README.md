@@ -3,12 +3,22 @@
 
 To install, do a recursive clone and run ./install
 
+These dotfiles will work equally well on linux and macOS, it will detect the OS and load the correct config for each application.
 
-`$ git clone git@github.com:amerenda/dotfiles.git --recursive`
+`git clone git@github.com:amerenda/dotfiles.git --recursive`
+
 ## Docs
 * None
 
 ## Dependencies
-* brew install zsh-autosuggestions exa coreutils
-* brew update
-* brew cask install hyper
+* zsh
+* tmux
+* zsh-autosuggestions 
+* coreutils
+* hyper terminal
+
+`brew install zsh-autosuggestions exa coreutils zsh tmux`
+
+`brew update`
+
+`brew cask install hyper`
