@@ -22,6 +22,7 @@ alias clip="xclip -selection clipboard"
 alias tkill="tmux kill-session"
 alias fsize="du -sh ./* | sort -h"
 alias dotsize="du -sh ./.* | sort -h"
+alias ip="ifconfig"
 
 # Python aliases
 alias ip3='ipython'
