@@ -13,3 +13,4 @@ export PATH="/Users/alexmerenda/.bin:/usr/local/opt/python/libexec/bin:/Users/al
 export GOSS_PATH=~/bin/goss-linux-amd64
 export PATH="$PATH:$CARGO_HOME/bin"
 eval "$(direnv hook zsh)"
+export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_181.jdk/Contents/Home
