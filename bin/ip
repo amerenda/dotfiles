@@ -4,5 +4,5 @@ echo "alex's custom ip script!"
 if "$(uname | grep -q Darwin)"; then
     ifconfig "$@"
 else
-    ip "$@"
+    /usr/bin/ip "$@"
 fi

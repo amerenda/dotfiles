@@ -12,5 +12,6 @@ export PIP_DOWNLOAD_CACHE=$HOME/.pip/cache
 export INVENTORY_IP_TYPE=internal
 export DEFAULT_USER=alexmerenda
 export GOSS_PATH=~/bin/goss-linux-amd64
+export PATH="$HOME/.bin/:$PATH"
 export PATH="$PATH:$CARGO_HOME/bin"
 eval "$(direnv hook zsh)"
