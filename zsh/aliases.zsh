@@ -27,6 +27,8 @@ alias ip="ifconfig"
 # Python aliases
 alias ip3='ipython'
 
+alias b2="backblaze-b2"
+
 # Git aliases
 alias subup="git submodule foreach git pull origin master"
 alias gamend="git commit --amend"
