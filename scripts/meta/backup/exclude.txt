@@ -1,0 +1,2 @@
+/mnt/data
+/var/lib/libvirt/images/isos
