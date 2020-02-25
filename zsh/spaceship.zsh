@@ -6,7 +6,7 @@ SPACESHIP_PROMPT_ORDER=(
   golang        # Go section
   docker        # Docker section
   venv          # virtualenv section
-  kubecontext   # Kubectl context section
+#  kubecontext   # Kubectl context section
   terraform     # Terraform workspace section
   jobs          # Background jobs indicator
   exit_code     # Exit code section
