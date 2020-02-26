@@ -6,11 +6,11 @@ elif [ -L ~/.ssh/config.d/linux ]; then
 fi
 
 if `uname | grep -q Darwin`; then
-    TMUX_OPTIONS="set-option -g default-command \"reattach-to-user-namespace -l zsh\""
+    TMUX_OPTIONS="set-option -g default-command "reattach-to-user-namespace -l zsh""
     ln -s ~/.ssh/config_macos ~/.ssh/config.d/macos;
-    sed -e "s/#STRING_REPLACE_CAKE/${TMUX_OPTIONS}/ tmux.conf"
+    sed -i "s/#STRING_REPLACE_CAKE/${TMUX_OPTIONS}/g" ~/.tmux.conf
 elif `uname | grep -q linux`; then
     TMUX_OPTIONS="#Linux Options"
-    sed -e "s/#STRING_REPLACE_CAKE/${TMUX_OPTIONS}/ tmux.conf"
+    sed -i "s/#STRING_REPLACE_CAKE/${TMUX_OPTIONS}/g" ~/.tmux.conf
     ln -s ~/.ssh/config_linux ~/.ssh/config.d/linux;
 fi
