@@ -6,7 +6,8 @@ module.exports = {
   config: {
     updateChannel: 'stable',
     fontSize: 11,
-    fontFamily: '"Fira Code", Menlo, "DejaVu Sans Mono", "Lucida Console", monospace',
+    fontFamily: '"Fira Mono for Powerline", Menlo, "DejaVu Sans Mono", "Lucida Console", monospace',
+//    fontFamily: '"Fira Mono Powerline", "Anonymice Powerline", "Roboto Mono for Powerline", "Meslo LG S for Powerline", "DejaVu Sans Mono", "Lucida Console", monospace',
     fontWeight: 'normal',
     fontWeightBold: 'bold',
     lineHeight: 1,
