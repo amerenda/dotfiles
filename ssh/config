@@ -56,3 +56,25 @@ host ftp.stormhold.net
   user alex
   identityfile ~/.ssh/id_rsa_amerenda_personal
   ForwardAgent yes
+
+host 10.100.20.173
+  user alex
+  identityfile ~/.ssh/id_ed25519_amerenda_personal
+  ForwardAgent yes
+  
+host rpi3-d
+  hostname 10.100.20.173
+  user alex
+  identityfile ~/.ssh/id_ed25519_amerenda_personal
+  ForwardAgent yes
+
+
+host bastion
+  Hostname 34.68.225.32
+  User alexm
+  IdentityFile ~/.ssh/google_compute_engine
+
+#Host 10.*.*.*
+#  IdentityFile ~/.ssh/google_compute_engine
+#  User alexm
+#  ProxyCommand ssh -W %h:%p  alexm@bastion
