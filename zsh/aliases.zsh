@@ -33,6 +33,10 @@ alias b2="backblaze-b2"
 alias subup="git submodule foreach git pull origin master"
 alias gamend="git commit --amend"
 #alias pushup="git push --set-upstream origin $(git rev-parse --abbrev-ref HEAD)"
+alias wow="git add -A"
+alias such="git"
+alias very="git"
+
 
 ## Security aliases
 # gpg aliases
