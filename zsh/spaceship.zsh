@@ -37,6 +37,8 @@ SPACESHIP_GOLANG_SHOW=true
 
 # docker settings
 SPACESHIP_DOCKER_SHOW=true
+SPACESHIP_DOCKER_SYMBOL=''
+#SPACESHIP_DOCKER_SYMBOL='🐳'
 
 # virtualenv settings
 SPACESHIP_VENV_SHOW=true
