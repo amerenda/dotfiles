@@ -56,3 +56,15 @@ host ftp.stormhold.net
   user alex
   identityfile ~/.ssh/id_rsa_amerenda_personal
   ForwardAgent yes
+
+host rpi3-d
+  user alex
+  hostname 10.100.20.173
+  identityfile ~/.ssh/id_ed25519_amerenda_personal
+  ForwardAgent yes
+
+host 10.100.20.173
+  user alex
+  identityfile ~/.ssh/id_ed25519_amerenda_personal
+  ForwardAgent yes
+

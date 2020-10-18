@@ -54,7 +54,7 @@ module.exports = {
   },
 
   plugins: [
-    'hyperterm-atom-dark'
+    'hyperterm-atom-dark',
   ],
 
   localPlugins: [],
