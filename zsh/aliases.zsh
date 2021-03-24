@@ -51,6 +51,50 @@ alias glistdp="gcloud compute instances list --filter='labels.goog-dataproc-clus
 alias gfilter="gcloud compute instances list --filter="
 alias gcloud_ssh_update="gcloud compute config-ssh --ssh-config-file=/Users/alexm/.ssh/config.d/gcloud_instances"
 
+# GKE Aliases
+function kill-proxy() {
+    kill $(ps aux | grep ssh | grep 8888 | awk '{ print $2 }')
+}
+
+function gke-proxy() {
+    CLUSTER=$1
+    case $CLUSTER in 
+
+        mgmt)   
+            kill-proxy 2>/dev/null
+            gcloud --project moove-systems compute ssh gke-proxy-mgmt -- -f -N -n -L 8888:localhost:8888 2> /dev/null
+            kubectx gke_moove-systems_us-central1_mgmt-us-central1 > /dev/null
+            ;;
+
+        staging) 
+            kill-proxy 2>/dev/null
+            gcloud --project moove-platform-staging compute ssh gke-proxy-staging -- -f -N -n -L 8888:localhost:8888 > /dev/null
+            kubectx gke_moove-platform-staging_us-central1_staging-private > /dev/null
+            ;;
+
+        prod | production) 
+            kill-proxy 2>/dev/null
+            gcloud --project moove-platform-production compute ssh gke-proxy-production -- -f -N -n -L 8888:localhost:8888
+            kubectx gke_moove-platform-production_us-central1_production-private
+            ;;
+
+        dev) 
+            kill-proxy 2>/dev/null
+            gcloud --project moove-platform-test-iffp compute ssh gke-proxy-test-iff[ -- -f -N -n -L 8888:localhost:8888
+            kubectx gke_moove-platform-test-iffp_us-central1_test-iffp-private
+            ;;
+
+        *)
+            echo "invalid cluster"
+            echo "please use one of the following:"
+            echo "mgmt"
+            echo "staging"
+            echo "prod"
+            echo "production"
+            echo "dev (test-iffp)"
+            ;;
+    esac
+}
 
 function man() {
     LESS_TERMCAP_md=$'\e[01;31m' \

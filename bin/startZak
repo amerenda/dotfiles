@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-
-sudo bash ~/.scripts/activateIommu.sh
-sudo cpupower frequency-set -g performance
-sudo virsh start win10-lg

@@ -12,7 +12,55 @@ host bastion
   User alexm
   IdentityFile ~/.ssh/google_compute_engine
 
+# Moove Hosts
 Host 10.*.*.*
   IdentityFile ~/.ssh/google_compute_engine
   User alexm
   ProxyCommand ssh -W %h:%p  alexm@bastion
+
+Host 172.*.*.*
+  IdentityFile ~/.ssh/google_compute_engine
+  User alexm
+  ProxyCommand ssh -W %h:%p  alexm@bastion-host.moove.ai
+
+Host 192.168.*.*
+  IdentityFile ~/.ssh/google_compute_engine
+  User alexm
+  ProxyCommand ssh -W %h:%p  alexm@bastion-host.moove.ai
+
+# Personal Hosts
+Host mirror
+  HostName 10.100.20.15
+  User pi
+  IdentityFile ~/.ssh/id_ed25519_amerenda_personal
+
+Host remarkable
+  HostName 10.100.20.11
+  User root
+  IdentityFile ~/.ssh/id_rsa_remarkable
+
+Host rpi3-0
+  HostName 10.100.20.20
+  User alex
+  IdentityFile ~/.ssh/id_ed25519_amerenda_personal
+  
+Host rpi3-1
+  HostName 10.100.20.21
+  User alex
+  IdentityFile ~/.ssh/id_ed25519_amerenda_personal
+  
+Host rpi3-2
+  HostName 10.100.20.22
+  User alex
+  IdentityFile ~/.ssh/id_ed25519_amerenda_personal
+  
+Host rpi3-3
+  HostName 10.100.20.23
+  User alex
+  IdentityFile ~/.ssh/id_ed25519_amerenda_personal
+
+Host criterion
+  HostName 10.100.20.10
+  User alex
+  IdentityFile ~/.ssh/id_ed25519_amerenda_personal
+
