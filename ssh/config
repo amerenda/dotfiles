@@ -2,10 +2,7 @@ Include config.d/*
 
 ### Git servers
 Host github.com
-  IdentityFile ~/.ssh/github_deploy
-
-Host bitbucket.org
-  IdentityFile ~/.ssh/github_deploy
+  IdentityFile ~/.ssh/github
 
 host picar-0
   user alex
