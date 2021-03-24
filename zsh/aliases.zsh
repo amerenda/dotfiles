@@ -51,7 +51,6 @@ alias glistdp="gcloud compute instances list --filter='labels.goog-dataproc-clus
 alias gfilter="gcloud compute instances list --filter="
 alias gcloud_ssh_update="gcloud compute config-ssh --ssh-config-file=/Users/alexm/.ssh/config.d/gcloud_instances"
 
-
 # GKE Aliases
 function kill-proxy() {
     kill $(ps aux | grep ssh | grep 8888 | awk '{ print $2 }')
@@ -96,8 +95,6 @@ function gke-proxy() {
             ;;
     esac
 }
-
-
 
 function man() {
     LESS_TERMCAP_md=$'\e[01;31m' \
