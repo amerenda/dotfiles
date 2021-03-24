@@ -64,6 +64,8 @@ source ~/.zsh/spaceship.zsh
 duration=$SECONDS
 debug "~/.zsh/spaceship.zsh" "$(($duration % 60))"
 
+source ~/.zsh/yq.zsh
+
 
 # Allow local customizations in the ~/.zshrc_local_after file
 if [ -f ~/.zshrc_local_after ]; then

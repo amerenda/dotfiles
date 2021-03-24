@@ -1,6 +1,6 @@
-alias ls='ls -G' 
+alias ls='exa' 
 alias dircolors="gdircolors"
-alias brewup="brew update && brew upgrade"
+alias brewup="brew update && brew upgrade && brew cask upgrade --greedy"
 alias clip="pbcopy"
 
 export GOPATH=$HOME/projects/go # don't forget to change your path correctly!

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+PROM_HOST=10.100.16.3
+
+ssh -f -N -n -L 9090:127.0.0.1:9090 ${PROM_HOST}
+ssh -f -N -n -L 9091:127.0.0.1:9091 ${PROM_HOST}
+ssh -f -N -n -L 9093:127.0.0.1:9093 ${PROM_HOST}
+

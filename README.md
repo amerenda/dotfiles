@@ -13,12 +13,17 @@ These dotfiles will work equally well on linux and macOS, it will detect the OS 
 ## Dependencies
 * zsh
 * tmux
-* zsh-autosuggestions 
+* zsh-autosuggestions
 * coreutils
 * hyper terminal
 
-`brew install zsh-autosuggestions exa coreutils zsh tmux`
+`brew install zsh-autosuggestions exa coreutils zsh tmux reattach-to-user-namespace`
 
 `brew update`
 
 `brew cask install hyper`
+
+
+## Tweaks
+Disable accented characters
+`defaults write -g ApplePressAndHoldEnabled -bool false`

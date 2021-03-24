@@ -1,8 +1,0 @@
-#!/bin/bash
-while true
-do
-    xautolock -disable
-    xset -dpms
-    sleep 30
-done
-
