@@ -1,3 +1,5 @@
 Host *
   UseKeychain yes
-  IdentityFile ~/.ssh/id_rsa_amerenda_personal
+  IdentityFile ~/.ssh/ed25519_alex_personal
+  IdentityFile ~/.ssh/google_compute_engine
+  IdentityFile ~/.ssh/github_deploy

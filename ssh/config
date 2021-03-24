@@ -7,105 +7,69 @@ Host github.com
 Host bitbucket.org
   IdentityFile ~/.ssh/github_deploy
 
-Host rpi3-display
-  Hostname 10.100.20.173
-  User pi
-
-host picar-0
-  user alex
-  hostname 10.100.20.97
-  identityfile ~/.ssh/id_rsa_amerenda_personal
-  ForwardAgent yes
-
-host rpi3-0
-  user alex
-  hostname 10.100.20.200
-  identityfile ~/.ssh/id_rsa_amerenda_personal
-  ForwardAgent yes
-
-host rpi3-1
-  user alex
-  hostname 10.100.20.201
-  identityfile ~/.ssh/id_rsa_amerenda_personal
-  ForwardAgent yes
-
-host rpi3-2
-  user alex
-  hostname 10.100.20.202
-  identityfile ~/.ssh/id_rsa_amerenda_personal
-  ForwardAgent yes
-
-host rpi3-3
-  user alex
-  hostname 10.100.20.203
-  identityfile ~/.ssh/id_rsa_amerenda_personal
-  ForwardAgent yes
-
-host rpi3-dev
-  user alex
-  hostname 10.100.20.40
-
-host edgemax
-  user amerenda
-  hostname 10.100.20.1
-  identityfile ~/.ssh/id_rsa_amerenda_personal
-
-host ftp
-  user alex
-  hostname ftp.stormhold.net
-  identityfile ~/.ssh/id_rsa_amerenda_personal
-  ForwardAgent yes
-
-host ftp.stormhold.net
-  user alex
-  identityfile ~/.ssh/id_rsa_amerenda_personal
-  ForwardAgent yes
-
-host 10.100.20.173
-  user alex
-  identityfile ~/.ssh/id_ed25519_amerenda_personal
-  ForwardAgent yes
-
-host rpi3-d
-  hostname 10.100.20.173
-  user alex
-  identityfile ~/.ssh/id_ed25519_amerenda_personal
-  ForwardAgent yes
-
-host 35.226.135.82
-  User alexm
-  IdentityFile ~/.ssh/google_compute_engine
-
-host scoring-ui-staging
-  hostname 34.71.32.78
-  User alexm
-  IdentityFile ~/.ssh/google_compute_engine
-
-host 34.71.32.78
-  hostname 34.71.32.78
-  User alexm
-  IdentityFile ~/.ssh/google_compute_engine
-
-host 35.192.58.152
-  hostname 35.192.58.152
-  User alexm
-  IdentityFile ~/.ssh/google_compute_engine
-
 host bastion
   Hostname bastion-host.moove.ai
   User alexm
   IdentityFile ~/.ssh/google_compute_engine
 
-#Host 10.*.*.*
-#  IdentityFile ~/.ssh/google_compute_engine
-#  User alexm
-#  ProxyCommand ssh -W %h:%p  alexm@bastion
+host bastion-host.moove.ai
+  Hostname 130.211.121.224
+  User alexm
+  IdentityFile ~/.ssh/google_compute_engine
 
-Host 192.168.*.*
+Host mirror
+  HostName 10.100.20.15
+  User pi
+  IdentityFile ~/.ssh/id_ed25519_amerenda_personal
+
+Host remarkable
+  HostName 10.100.20.11
+  User root
+  IdentityFile ~/.ssh/id_rsa_remarkable
+
+Host 10.*.*.*
   IdentityFile ~/.ssh/google_compute_engine
   User alexm
   ProxyCommand ssh -W %h:%p  alexm@bastion
 
-Host rpi0-0
-  hostname 10.100.20.206
+Host 172.*.*.*
+  IdentityFile ~/.ssh/google_compute_engine
+  User alexm
+  ProxyCommand ssh -W %h:%p  alexm@bastion-host.moove.ai
+
+Host 192.168.*.*
+  IdentityFile ~/.ssh/google_compute_engine
+  User alexm
+  ProxyCommand ssh -W %h:%p  alexm@bastion-host.moove.ai
+
+Host rpi3-0
+  HostName 10.100.20.20
+  User alex
+  IdentityFile ~/.ssh/id_ed25519_amerenda_personal
+  
+Host rpi3-1
+  HostName 10.100.20.21
+  User alex
+  IdentityFile ~/.ssh/id_ed25519_amerenda_personal
+  
+Host rpi3-2
+  HostName 10.100.20.22
+  User alex
+  IdentityFile ~/.ssh/id_ed25519_amerenda_personal
+  
+Host rpi3-3
+  HostName 10.100.20.23
+  User alex
+  IdentityFile ~/.ssh/id_ed25519_amerenda_personal
+
+Host criterion
+  HostName 10.100.20.10
+  User alex
+  IdentityFile ~/.ssh/id_ed25519_amerenda_personal
+  
+Host gke-staging-proxy
+  User alexm
+  Hostname 10.40.64.11
+  IdentityFile ~/.ssh/google_compute_engine
+  ProxyCommand ssh -W %h:%p  alexm@bastion-host.moove.ai
 
