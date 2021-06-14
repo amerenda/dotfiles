@@ -1,6 +1,6 @@
 [user]
 	email = alexm@moove.ai
-	name = Alex Merenda
+	name = amerenda
     signingkey = 0xB056FF8F5A307876
 
 [alias]
@@ -47,3 +47,5 @@
     excludesfile = /Users/alexmerenda/.gitignore_global
 [pull]
     rebase = true
+[rebase]
+    autosquash = true
