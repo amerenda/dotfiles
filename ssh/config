@@ -2,6 +2,7 @@ Include config.d/*
 
 ### Git servers
 Host github.com
+        #IdentityFile /Users/alexm/sandbox/git/ssh_key
   IdentityFile ~/.ssh/github
 
 host bastion

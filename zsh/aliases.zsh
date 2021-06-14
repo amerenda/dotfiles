@@ -61,9 +61,9 @@ function gke-proxy() {
     case $CLUSTER in 
 
         mgmt)   
-            kill-proxy 2>/dev/null
-            gcloud --project moove-systems compute ssh gke-proxy-mgmt -- -f -N -n -L 8888:localhost:8888 2> /dev/null
-            kubectx gke_moove-systems_us-central1_mgmt-us-central1 > /dev/null
+            kill-proxy 
+            gcloud --project moove-systems compute ssh gke-proxy-mgmt -- -f -N -n -L 8888:localhost:8888 
+            kubectx gke_moove-systems_us-central1_mgmt-us-central1 
             ;;
 
         staging) 
@@ -78,10 +78,22 @@ function gke-proxy() {
             kubectx gke_moove-platform-production_us-central1_production-private
             ;;
 
-        dev) 
+        dev | lineate-dev)
             kill-proxy 2>/dev/null
-            gcloud --project moove-platform-test-iffp compute ssh gke-proxy-test-iff[ -- -f -N -n -L 8888:localhost:8888
+            gcloud --project moove-platform-lineate-dev compute ssh gke-proxy-lineate-dev -- -f -N -n -L 8888:localhost:8888
+            kubectx gke_moove-platform-lineate-dev_us-central1_lineate-dev-private 
+            ;;
+
+        test-iffp) 
+            kill-proxy 2>/dev/null
+            gcloud --project moove-platform-test-iffp compute ssh gke-proxy-test-iffp -- -f -N -n -L 8888:localhost:8888
             kubectx gke_moove-platform-test-iffp_us-central1_test-iffp-private
+            ;;
+
+        panasonic) 
+            kill-proxy 2>/dev/null
+            gcloud --project panasonic-road-iq-x13q compute ssh gke-proxy -- -f -N -n -L 8888:localhost:8888
+            kubectx  gke_panasonic-road-iq-x13q_us-central1-c_panasonic-jupyterhub
             ;;
 
         *)
@@ -92,6 +104,7 @@ function gke-proxy() {
             echo "prod"
             echo "production"
             echo "dev (test-iffp)"
+            echo "panasonic"
             ;;
     esac
 }
@@ -214,3 +227,14 @@ alias mirrorsite='wget -m -k -K -E -e robots=off'
 # send a file somewhere
 transfer() { if [ $# -eq 0 ]; then echo "No arguments specified. Usage:\necho transfer /tmp/test.md\ncat /tmp/test.md | transfer test.md"; return 1; fi
 tmpfile=$( mktemp -t transferXXX ); if tty -s; then basefile=$(basename "$1" | sed -e 's/[^a-zA-Z0-9._-]/-/g'); curl --progress-bar --upload-file "$1" "https://transfer.sh/$basefile" >> $tmpfile; else curl --progress-bar --upload-file "-" "https://transfer.sh/$1" >> $tmpfile ; fi; cat $tmpfile; rm -f $tmpfile; }
+
+# Send macos notification
+function notify() {
+  if [ $? -eq 0 ]; then
+    osascript -e "display notification \"${1:-notify-command} has finished\" with title \"Your command is done!\""
+  else
+    osascript -e "display notification \"${1:-notify-command} has failed\" with title \"Your command failed\""
+  fi
+}
+
+

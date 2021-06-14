@@ -34,12 +34,6 @@ source ~/.zsh/aliases.zsh
 duration=$SECONDS
 debug  "~/.zsh/aliases.zsh" "$(($duration % 60))"
 
-# Impact settings
-SECONDS=0
-source ~/.zsh/impact.zsh
-duration=$SECONDS
-debug "~/.zsh/impact.zsh" "$(($duration % 60))"
-
 # go settings
 SECONDS=0
 source ~/.zsh/go.zsh
