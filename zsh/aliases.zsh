@@ -1,4 +1,5 @@
-# Use colors in coreutils utilities output
+# Us
+# colors in coreutils utilities output
 alias grep='grep --color=auto'
 alias diff='diff --color=auto'
 
@@ -50,8 +51,15 @@ alias glist="gcloud compute instances list"
 alias glistdp="gcloud compute instances list --filter='labels.goog-dataproc-cluster-name:*'"
 alias gfilter="gcloud compute instances list --filter="
 alias gcloud_ssh_update="gcloud compute config-ssh --ssh-config-file=/Users/alexm/.ssh/config.d/gcloud_instances"
+alias docker="podman"
+alias python="python3"
 
 # GKE Aliases
+alias k="kubectl"
+alias ktx="kubectx"
+alias kns="kubens"
+
+
 function kill-proxy() {
     kill $(ps aux | grep ssh | grep 8888 | awk '{ print $2 }')
 }

@@ -5,26 +5,6 @@ Host github.com
         #IdentityFile /Users/alexm/sandbox/git/ssh_key
   IdentityFile ~/.ssh/github
 
-host bastion
-  Hostname bastion-host.moove.ai
-  User alexm
-  IdentityFile ~/.ssh/google_compute_engine
-
-# Moove Hosts
-Host 10.*.*.*
-  IdentityFile ~/.ssh/google_compute_engine
-  User alexm
-  ProxyCommand ssh -W %h:%p  alexm@bastion
-
-Host 172.*.*.*
-  IdentityFile ~/.ssh/google_compute_engine
-  User alexm
-  ProxyCommand ssh -W %h:%p  alexm@bastion-host.moove.ai
-
-Host 192.168.*.*
-  IdentityFile ~/.ssh/google_compute_engine
-  User alexm
-  ProxyCommand ssh -W %h:%p  alexm@bastion-host.moove.ai
 
 # Personal Hosts
 Host mirror

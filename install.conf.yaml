@@ -5,6 +5,7 @@
 - clean: ['~']
 
 - link:
+    ~/.alacritty.yml: alacritty.yml
     ~/.antigen: antigen/
     ~/.bin:
        force: true
