@@ -22,6 +22,7 @@
     ~/.ssh: ssh
     ~/.tmux: tmux/
     ~/.tmux.conf: tmux.conf
+    ~/.utility: utility
     ~/.vim: vim/
     ~/.vimrc: vimrc
     ~/.zsh: zsh/
