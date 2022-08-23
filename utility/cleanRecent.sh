@@ -1,20 +1,20 @@
 #!/bin/bash
 
-file="/home/alex/.local/share/recently-used.xbel"
+# Variables
+recent="$HOME/.local/share/recently-used.xbel"
 verbot="dngr"
-cache="./.cache.txt"
+cache=".cache.txt"
 
-# clear cache
-echo > $cache
+# create cache
+touch $cache
 
 # get list of files matching
-grep -i $verbot $file >> $cache
+grep -i $verbot $recent | awk '{ print $2 }' >> $cache
 
 while read -r line
 do
   if [[ $line != "" ]]; then
-    match=$(echo $line | awk '{ print $2 }')
-    xmlstarlet ed --inplace --delete "//bookmark[@$match]" $file
+    xmlstarlet ed --inplace --delete "//bookmark[@$line]" $recent
   fi
 done < $cache
 

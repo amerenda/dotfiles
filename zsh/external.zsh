@@ -20,3 +20,4 @@ eval "$(direnv hook zsh)"
 export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_181.jdk/Contents/Home
 export GOOGLE_APPLICATION_CREDENTIALS=~/.gcloud_creds/terraform-serviceaccount.json
 export USE_GKE_GCLOUD_AUTH_PLUGIN=True
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
