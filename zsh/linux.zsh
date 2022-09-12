@@ -6,5 +6,5 @@ export PATH=$PATH:$GOPATH/bin
 export PATH=$PATH:$GOROOT/bin
 
 # transparent arm execution with qemu
-export QEMU_LD_PREFIX=/usr/arm-linux-gnueabihf
+# export QEMU_LD_PREFIX=/usr/arm-linux-gnueabihf
 

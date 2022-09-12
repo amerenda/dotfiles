@@ -14,9 +14,6 @@
     ~/.gitconfig: gitconfig
     ~/.gitignore_global: gitignore_global
     ~/.gnupg/gpg.conf: gpg.conf
-    ~/.hyper.js:
-       force: true
-       path: hyper.js
     ~/.pip: pip
     ~/.scripts: scripts
     ~/.ssh: ssh

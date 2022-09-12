@@ -23,7 +23,6 @@ alias clip="xclip -selection clipboard"
 alias tkill="tmux kill-session"
 alias fsize="du -sh ./* | sort -h"
 alias dotsize="du -sh ./.* | sort -h"
-alias ip="ifconfig"
 
 # Python aliases
 alias ip3='ipython'
@@ -51,7 +50,7 @@ alias glist="gcloud compute instances list"
 alias glistdp="gcloud compute instances list --filter='labels.goog-dataproc-cluster-name:*'"
 alias gfilter="gcloud compute instances list --filter="
 alias gcloud_ssh_update="gcloud compute config-ssh --ssh-config-file=/Users/alexm/.ssh/config.d/gcloud_instances"
-alias docker="podman"
+#alias docker="podman"
 alias python="python3"
 
 # GKE Aliases
