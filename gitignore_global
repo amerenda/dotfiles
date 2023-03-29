@@ -24,8 +24,9 @@ Thumbs.db
 
 # Virtualev #
 #############
-app/
+#app/
 bin/
+__pycache__
 lib64/
 lib64
 include/
