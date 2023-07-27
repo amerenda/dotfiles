@@ -11,7 +11,7 @@ export PATH="$PATH:/opt/aerospike/bin"
 export PATH="$HOME/.local/bin:$PATH"
 
 # Google variables
-export GOOGLE_APPLICATION_CREDENTIALS=~/.gcloud_creds/terraform-serviceaccount.json
+export GOOGLE_APPLICATION_CREDENTIALS="/var/secrets/terraform/key.json"
 export USE_GKE_GCLOUD_AUTH_PLUGIN=True
 
 # Terraform

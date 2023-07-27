@@ -1,3 +1,7 @@
+[credential]
+        helper = store
+[url "https://moove-devopsbot@github.com"]
+        insteadOf = ssh://git@github.com
 [user]
 	email = alexm@moove.ai
 	name = amerenda
