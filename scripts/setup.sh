@@ -57,6 +57,9 @@ decrypt_ssh_keys() {
   gpg -d ${DOTFILES_PATH}/ssh/github.gpg > ${DOTFILES_PATH}/ssh/github
   gpg -d ${DOTFILES_PATH}/ssh/alexm_moove.gpg > ${DOTFILES_PATH}/ssh/alexm_moove
   gpg -d ${DOTFILES_PATH}/ssh/alex_personal.gpg > ${DOTFILES_PATH}/ssh/alex_personal
+  chmod 0400 ${DOTFILES_PATH}/ssh/github
+  chmod 0400 ${DOTFILES_PATH}/ssh/alexm_moove
+  chmod 0400 ${DOTFILES_PATH}/ssh/alex_personal
   touch ${DOTFILES_PATH}/ssh/decrypted
 }
 
