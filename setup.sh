@@ -59,6 +59,18 @@ install_cargo() {
   curl https://sh.rustup.rs -sSf | sh
 }
 
+decrypt_ssh_keys() {
+  gpg -d ${DOTFILES_PATH}/ssh/github.gpg > ${DOTFILES_PATH}/ssh/github
+  gpg -d ${DOTFILES_PATH}/ssh/alexm_moove.gpg > ${DOTFILES_PATH}/ssh/alexm_moove
+  gpg -d ${DOTFILES_PATH}/ssh/alex_personal.gpg > ${DOTFILES_PATH}/ssh/alex_personal
+  touch ${DOTFILES_PATH}/ssh/decrypted
+}
+
+dot_files_to_git() {
+  cd ${DOTFILES_PATH}
+  git remote set-url origin git@github.com:amerenda/dotfiles.git
+}
+
 # Init check & install
 if ! [ -f $INIT_PATH/init ]; then
   init
@@ -85,3 +97,12 @@ then
     install_cargo
 fi
 
+# Decrypt ssh key
+if ! [ -f ${DOTFILES_PATH}/ssh/decrypted ]
+then
+  echo "decrypting ssh keys"
+  decrypt_ssh_keys
+fi
+
+# Change dotfiles to use git
+dot_files_to_git
