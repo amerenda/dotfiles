@@ -12,9 +12,10 @@ then
   exit 1
 fi
 
-if ! sudo dmesg | grep VT-d &> /dev/null
+if ! sudo kvm-ok  &> /dev/null
 then
   echo "Please reboot and enable VT-d in your BIOS settings"
+  echo "You may also need to add kvm_intel to modprobe"
   fail=true
 fi
 
@@ -28,3 +29,8 @@ if $fail
 then
   exit 1
 fi
+
+echo "Adding intel_iommu to kernel parameters"
+sudo kernelstub --add-options "intel_iommu=on"
+
+echo "creating vm directory"
