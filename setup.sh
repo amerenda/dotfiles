@@ -85,4 +85,3 @@ then
     install_cargo
 fi
 
-install_cargo

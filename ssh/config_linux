@@ -1,4 +1,4 @@
 Host *
-  IdentityFile ~/.ssh/id_rsa_impact
-  IdentityFile ~/.ssh/id_rsa_amerenda_personal
-  IdentityFile ~/.ssh/id_ed25519_moove
+  IdentityFile ~/.ssh/alex_personal
+  IdentityFile ~/.ssh/github
+  IdentityFile ~/.ssh/alexm_moove

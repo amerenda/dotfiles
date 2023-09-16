@@ -4,6 +4,12 @@
 
 - clean: ['~']
 
+- shell:
+  - [git submodule foreach git pull origin master, updating submodules]
+  - [mkdir -p ~/.bin, creating bin dir]
+  - [mkdir -p ~/.gnupg, creating gnupg dir]
+  - [bash ~/.scripts/selectOsConfig.sh]
+
 - link:
     ~/.alacritty.yml: alacritty.yml
     ~/.antigen.zsh: antigen/antigen.zsh
@@ -27,7 +33,3 @@
     ~/.zsh: zsh/
     ~/.zshrc: zshrc
 
-- shell:
-  - [git submodule foreach git pull origin master, updating submodules]
-  - [mkdir -p ~/.bin, creating bin dir]
-  - [bash ~/.scripts/selectOsConfig.sh]
