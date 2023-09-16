@@ -23,6 +23,8 @@ INIT_PATH="$HOME/misc/scripts/install"
 APT_PACKAGES="zsh tmux exa direnv git openvpn vim"
 
 
+############################### Define Functions ###############################
+
 init() {
   mkdir -p $INIT_PATH 2&>/dev/null
   mkdir -p $HOME/tmp 2&>/dev/null
@@ -70,6 +72,9 @@ dot_files_to_git() {
   cd ${DOTFILES_PATH}
   git remote set-url origin git@github.com:amerenda/dotfiles.git
 }
+
+
+############################### Install components ###############################
 
 # Init check & install
 if ! [ -f $INIT_PATH/init ]; then

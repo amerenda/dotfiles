@@ -8,6 +8,7 @@
   - [git submodule foreach git pull origin master, updating submodules]
   - [mkdir -p ~/.bin, creating bin dir]
   - [mkdir -p ~/.gnupg, creating gnupg dir]
+  - [chmod -R 0700 ~/.gnupg, setting permissions on gnupg folder]
 
 - link:
     ~/.alacritty.yml: alacritty.yml
@@ -20,6 +21,7 @@
     ~/.gitconfig: gitconfig
     ~/.gitignore_global: gitignore_global
     ~/.gnupg/gpg.conf: gpg.conf
+    ~/.gpg: gpg
     ~/.pip: pip
     ~/.scripts: scripts
     ~/.ssh: ssh
