@@ -1,26 +1,18 @@
 #!/bin/bash
 
 ### TO ADD
-# gcloud cli -deb
 # Alacritty -deb
-# vscode - deb
-# gh cli - brew
-# spotify - flatpak
-# helm - brew
 # kubectl - curl
 # kubectx - brew
 # install terraform - https://learn.hashicorp.com/tutorials/terraform/install-cli
 # nordvpn
-# xpadneo - https://atar-axis.github.io/xpadneo/
-
-
-
 
 # Set variables
 USER=$(whoami)
 DOTFILES_PATH="$HOME/projects/dotfiles"
 INIT_PATH="$HOME/misc/scripts/install"
-APT_PACKAGES="zsh tmux exa direnv git openvpn vim"
+APT_PACKAGES="xclip zsh tmux exa direnv git openvpn vim snapd apt-transport-https ca-certificates gnupg curl"
+FLATPAKS="com.visualstudio.code-oss org.cryptomator.Cryptomator org.signal.Signal org.signal.Signal"
 
 
 ############################### Define Functions ###############################
@@ -73,6 +65,19 @@ dot_files_to_git() {
   git remote set-url origin git@github.com:amerenda/dotfiles.git
 }
 
+install_gcloud() {
+  echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+  curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+  sudo apt-get update && sudo apt-get install google-cloud-cli
+}
+
+install_flatpaks(){
+  flatpak install ${FLATPAKS}
+}
+
+install_nordvpn() {
+  sh <(curl -sSf https://downloads.nordcdn.com/apps/linux/install.sh)
+}
 
 ############################### Install components ###############################
 
@@ -110,4 +115,47 @@ then
 fi
 
 # Change dotfiles to use git
+echo "***** Changing dotfiles repo to use git *****"
 dot_files_to_git
+
+# Install tmux plugins
+echo "***** Installing tmux plugins *****"
+bash ${DOTFILES_PATH}/tmux/plugins/tpm/scripts/install_plugins.sh
+
+# Install glcoud
+if ! command -v gcloud &> /dev/null
+then
+  echo "***** Installing gcloud *****"
+  install_gcloud
+fi
+
+# Install nordpass
+if ! command -v nordpass &> /dev/null
+then
+  echo "***** Installing nordpass *****"
+  snap install nordpass
+fi
+
+# Install github command line
+if ! command -v gh &> /dev/null
+then
+  echo "***** Installing gh *****"
+  brew install gh
+fi
+
+# install flatpaks
+echo "***** Installing flatpaks  *****"
+install_flatpaks
+
+# Install github command line
+if ! command -v helm &> /dev/null
+then
+  echo "***** Installing helm *****"
+  brew install helm
+fi
+
+if ! command -v nordvpn &> /dev/null
+then
+  echo "***** Installing nordvpn *****"
+  install_nordvpn
+fi
