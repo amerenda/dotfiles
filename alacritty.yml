@@ -1,11 +1,12 @@
 window:
+  opacity: 1
   padding:
     x: 10
     y: 10
 
   dynamic_padding: true
 
-  decorations: None
+    #decorations: None
 
   dynamic_title: true
 

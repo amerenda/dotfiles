@@ -4,6 +4,7 @@ export GOROOT=/usr/lib/go
 export GOBIN=$HOME/projects/go/bin
 export PATH=$PATH:$GOPATH/bin
 export PATH=$PATH:$GOROOT/bin
+xmodmap ~/.xmodmap.custom
 
 # transparent arm execution with qemu
 # export QEMU_LD_PREFIX=/usr/arm-linux-gnueabihf

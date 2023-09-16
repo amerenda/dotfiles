@@ -6,6 +6,7 @@
 
 - link:
     ~/.alacritty.yml: alacritty.yml
+    ~/.antigen.zsh: antigen/antigen.zsh
     ~/.antigen: antigen/
     ~/.bin:
        force: true
@@ -22,6 +23,7 @@
     ~/.utility: utility
     ~/.vim: vim/
     ~/.vimrc: vimrc
+    ~/.xmodmap.custom: xmodmap.custom
     ~/.zsh: zsh/
     ~/.zshrc: zshrc
 

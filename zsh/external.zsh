@@ -9,6 +9,7 @@ export PIP_DOWNLOAD_CACHE=$HOME/.pip/cache
 export PATH="/usr/local/opt/openjdk/bin:$PATH"
 export PATH="$PATH:/opt/aerospike/bin"
 export PATH="$HOME/.local/bin:$PATH"
+export PATH="$HOME/.cargo/env:$PATH"
 
 # Google variables
 export GOOGLE_APPLICATION_CREDENTIALS="/var/secrets/terraform/key.json"
