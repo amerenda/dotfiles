@@ -8,7 +8,6 @@
   - [git submodule foreach git pull origin master, updating submodules]
   - [mkdir -p ~/.bin, creating bin dir]
   - [mkdir -p ~/.gnupg, creating gnupg dir]
-  - [bash ~/.scripts/selectOsConfig.sh]
 
 - link:
     ~/.alacritty.yml: alacritty.yml
@@ -33,3 +32,7 @@
     ~/.zsh: zsh/
     ~/.zshrc: zshrc
 
+- shell:
+  - [mkdir -p ~/.ssh/config.d, creating ssh config dir]
+  - [bash ~/.scripts/setup.sh, installing os components]
+  - [bash ~/.scripts/selectOsConfig.sh]

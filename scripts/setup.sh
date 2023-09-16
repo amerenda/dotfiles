@@ -20,7 +20,7 @@
 USER=$(whoami)
 DOTFILES_PATH="$HOME/projects/dotfiles"
 INIT_PATH="$HOME/misc/scripts/install"
-APT_PACKAGES="zsh tmux exa direnv git openvpn"
+APT_PACKAGES="zsh tmux exa direnv git openvpn vim"
 
 
 init() {
