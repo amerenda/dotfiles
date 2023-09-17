@@ -59,62 +59,6 @@ alias ktx="kubectx"
 alias kns="kubens"
 
 
-function kill-proxy() {
-    kill $(ps aux | grep ssh | grep 8888 | awk '{ print $2 }')
-}
-
-function gke-proxy() {
-    CLUSTER=$1
-    case $CLUSTER in 
-
-        mgmt)   
-            kill-proxy 
-            gcloud --project moove-systems compute ssh gke-proxy-mgmt -- -f -N -n -L 8888:localhost:8888 
-            kubectx gke_moove-systems_us-central1_mgmt-us-central1 
-            ;;
-
-        staging) 
-            kill-proxy 2>/dev/null
-            gcloud --project moove-platform-staging compute ssh gke-proxy-staging -- -f -N -n -L 8888:localhost:8888 > /dev/null
-            kubectx gke_moove-platform-staging_us-central1_staging-private > /dev/null
-            ;;
-
-        prod | production) 
-            kill-proxy 2>/dev/null
-            gcloud --project moove-platform-production compute ssh gke-proxy-production -- -f -N -n -L 8888:localhost:8888
-            kubectx gke_moove-platform-production_us-central1_production-private
-            ;;
-
-        dev | lineate-dev)
-            kill-proxy 2>/dev/null
-            gcloud --project moove-platform-lineate-dev compute ssh gke-proxy-lineate-dev -- -f -N -n -L 8888:localhost:8888
-            kubectx gke_moove-platform-lineate-dev_us-central1_lineate-dev-private 
-            ;;
-
-        test-iffp) 
-            kill-proxy 2>/dev/null
-            gcloud --project moove-platform-test-iffp compute ssh gke-proxy-test-iffp -- -f -N -n -L 8888:localhost:8888
-            kubectx gke_moove-platform-test-iffp_us-central1_test-iffp-private
-            ;;
-
-        panasonic) 
-            kill-proxy 2>/dev/null
-            gcloud --project panasonic-road-iq-x13q compute ssh gke-proxy -- -f -N -n -L 8888:localhost:8888
-            kubectx  gke_panasonic-road-iq-x13q_us-central1-c_panasonic-jupyterhub
-            ;;
-
-        *)
-            echo "invalid cluster"
-            echo "please use one of the following:"
-            echo "mgmt"
-            echo "staging"
-            echo "prod"
-            echo "production"
-            echo "dev (test-iffp)"
-            echo "panasonic"
-            ;;
-    esac
-}
 
 function man() {
     LESS_TERMCAP_md=$'\e[01;31m' \
@@ -144,40 +88,7 @@ function promq()
     if [[ "${1}" == "" ]]; then
         echo "please specify a prometheus query"
     else
-        http "http://prometheus.int.2pth.com:9090/api/v1/query?query=${1}"
-    fi
-}
-
-
-function bastionUp()
-{
-    ssh -O check bastion 2> /dev/null
-
-    retVal=$?
-
-    if [ $retVal -ne 0 ]; then
-       echo "Created socks tunnel to bastion..."
-       # forward 1080 via socks
-       ssh -fNTMn -D 1080 bastion 2> /dev/null
-    else
-       :
-    fi
-}
-
-
-function bastionCheck()
-{
-    ssh -O check bastion 2> /dev/null
-    retVal=$?
-
-    if [ $retVal -eq 0 ]; then
-        (lsof -nPi | grep LISTEN | grep 1080) > /dev/null
-        retVal=$?
-        if [ $retVal -eq 0 ]; then
-            echo "bastion is running"
-        fi
-    elif [ $retVal -ne 0 ]; then
-        echo "bastion is not running"
+        http "http://thanos.moove.co.in:9090/api/v1/query?query=${1}"
     fi
 }
 
@@ -245,3 +156,14 @@ function notify() {
 }
 
 
+function nvpn(){
+    if value=$(nordvpn status | grep Disconnected)
+    then
+        echo "NordVPN Disconnected. Connecting now."
+        nordvpn connect
+    elif value=$(nordvpn status | grep Connected)
+    then
+        echo "NordVPN Connected. Disconnecting now."
+        nordvpn disconnect
+    fi
+}
