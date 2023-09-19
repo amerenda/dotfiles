@@ -24,7 +24,12 @@ Thumbs.db
 
 # Virtualev #
 #############
+#app/
 bin/
+__pycache__
+lib64/
+lib64
 include/
 lib/
 pip-selfcheck.json
+pyvenv.cfg

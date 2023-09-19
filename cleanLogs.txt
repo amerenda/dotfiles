@@ -1,0 +1,2 @@
+# Runs the cleanLogs.sh script every day
+0 10 * * * $HOME/.scripts/cleanLogs.sh

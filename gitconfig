@@ -1,3 +1,7 @@
+[credential]
+        helper = store
+[url "https://moove-devopsbot@github.com"]
+        insteadOf = ssh://git@github.com
 [user]
 	email = alexm@moove.ai
 	name = amerenda
@@ -44,7 +48,7 @@
     process = git-lfs filter-process
     required = true
 [core]
-    excludesfile = /Users/alexmerenda/.gitignore_global
+	excludesfile = /home/alex/.gitignore_global
 [pull]
     rebase = true
 [rebase]

@@ -4,7 +4,15 @@
 
 - clean: ['~']
 
+- shell:
+  - [git submodule foreach git pull origin master, updating submodules]
+  - [mkdir -p ~/.bin, creating bin dir]
+  - [mkdir -p ~/.gnupg, creating gnupg dir]
+  - [chmod -R 0700 ~/.gnupg, setting permissions on gnupg folder]
+
 - link:
+    ~/.alacritty.yml: alacritty.yml
+    ~/.antigen.zsh: antigen/antigen.zsh
     ~/.antigen: antigen/
     ~/.bin:
        force: true
@@ -13,20 +21,21 @@
     ~/.gitconfig: gitconfig
     ~/.gitignore_global: gitignore_global
     ~/.gnupg/gpg.conf: gpg.conf
-    ~/.hyper.js:
-       force: true
-       path: hyper.js
+    ~/.gpg: gpg
+    ~/.logs: logs
     ~/.pip: pip
     ~/.scripts: scripts
     ~/.ssh: ssh
     ~/.tmux: tmux/
     ~/.tmux.conf: tmux.conf
+    ~/.utility: utility
     ~/.vim: vim/
     ~/.vimrc: vimrc
+    ~/.xmodmap.custom: xmodmap.custom
     ~/.zsh: zsh/
     ~/.zshrc: zshrc
 
 - shell:
-  - [git submodule foreach git pull origin master, updating submodules]
-  - [mkdir -p ~/.bin, creating bin dir]
+  - [mkdir -p ~/.ssh/config.d, creating ssh config dir]
+  - [bash ~/.scripts/setup.sh, installing os components]
   - [bash ~/.scripts/selectOsConfig.sh]
