@@ -11,8 +11,14 @@
 USER=$(whoami)
 DOTFILES_PATH="$HOME/projects/dotfiles"
 INIT_PATH="$HOME/misc/scripts/install"
-APT_PACKAGES="xclip zsh tmux exa direnv git openvpn vim snapd apt-transport-https ca-certificates gnupg curl"
-FLATPAKS="com.visualstudio.code-oss org.cryptomator.Cryptomator org.signal.Signal org.signal.Signal app/org.cryptomator.Cryptomator/x86_64/stable"
+APT_PACKAGES="\
+  xclip zsh tmux exa direnv git openvpn vim snapd \
+  apt-transport-https ca-certificates gnupg curl"
+FLATPAKS="com.visualstudio.code-oss \
+  org.cryptomator.Cryptomator \
+  org.signal.Signal org.signal.Signal \
+  app/org.cryptomator.Cryptomator/x86_64/stable"
+
 # cronjob definitions are located in the $HOME/.scripts/cronJobDefinitions dir. See 'example.txt' for help
 # You just need to add the name of the file, not the file path to this list
 CRON_JOBS=(
