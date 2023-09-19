@@ -22,6 +22,7 @@
     ~/.gitignore_global: gitignore_global
     ~/.gnupg/gpg.conf: gpg.conf
     ~/.gpg: gpg
+    ~/.logs: logs
     ~/.pip: pip
     ~/.scripts: scripts
     ~/.ssh: ssh

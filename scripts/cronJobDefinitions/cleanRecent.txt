@@ -1,0 +1,2 @@
+# Removes files from the recent folder that match a list of strings
+* * * * * $HOME/.scripts/cleanRecent.sh
