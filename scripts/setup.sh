@@ -63,10 +63,23 @@ install_cargo() {
   sh /tmp/rustup.rs -y
 }
 
+check_result() {
+  local exit_status=$?
+  if [ $exit_status -eq 0 ]; then
+    return 0
+  else
+    echo "Command returned error: $2"
+    exit 1
+  fi
+}
+
 decrypt_ssh_keys() {
-  gpg -d ${DOTFILES_PATH}/ssh/github.gpg > ${DOTFILES_PATH}/ssh/github
-  gpg -d ${DOTFILES_PATH}/ssh/alexm_moove.gpg > ${DOTFILES_PATH}/ssh/alexm_moove
-  gpg -d ${DOTFILES_PATH}/ssh/alex_personal.gpg > ${DOTFILES_PATH}/ssh/alex_personal
+  gpg --pinentry-mode loopback -d ${DOTFILES_PATH}/ssh/github.gpg > ${DOTFILES_PATH}/ssh/github
+  check_result $? "decrypting github key"
+  gpg --pinentry-mode loopback -d ${DOTFILES_PATH}/ssh/alexm_moove.gpg > ${DOTFILES_PATH}/ssh/alexm_moove
+  check_result $? "decrypting moove key"
+  gpg --pinentry-mode loopback -d ${DOTFILES_PATH}/ssh/alex_personal.gpg > ${DOTFILES_PATH}/ssh/alex_personal
+  check_result $? "decrypting personal key"
   chmod 0400 ${DOTFILES_PATH}/ssh/github
   chmod 0400 ${DOTFILES_PATH}/ssh/alexm_moove
   chmod 0400 ${DOTFILES_PATH}/ssh/alex_personal
@@ -92,34 +105,6 @@ install_nordvpn() {
   sh <(curl -sSf https://downloads.nordcdn.com/apps/linux/install.sh)
 }
  
-
-test_cron_jobs() {
-  cron_job_dir="$HOME/.scripts/cronJobDefinitions"
-
-  for cron in "${CRON_JOBS[@]}"; do
-    def="$cron_job_dir/$cron"
-    job="$(cat "$def" | grep -v \#)"
-    script="$(awk '{print $6}' <<< "$job")"
-
-    if [ -e "$script" ]; then
-      echo "Script $script exists."
-    else
-      echo "Script $script does not exist."
-      echo "Script referenced in $def is missing."
-      echo "Please ensure the file $script exists"
-      exit 2
-    fi
-
-    if ! (crontab -l 2>/dev/null | grep -Fq "$job"); then
-      echo "Adding: $job"
-      (crontab -l 2>/dev/null; echo "$job") | crontab -
-    else
-      echo "Cron job already exists: $job"
-    fi
-  done
-}
-
-
 add_cron_jobs() {
   cron_job_dir=$HOME/.scripts/cronJobDefinitions
   for cron in "${CRON_JOBS[@]}"; do
