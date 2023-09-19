@@ -6,7 +6,7 @@ window:
 
   dynamic_padding: true
 
-    #decorations: None
+  decorations: None
 
   dynamic_title: true
 
