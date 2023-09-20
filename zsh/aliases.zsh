@@ -167,3 +167,28 @@ function nvpn(){
         nordvpn disconnect
     fi
 }
+
+function tfdebug() {
+    if [ $# -eq 0 ]; then
+        echo "No argument specified."
+        echo "Usage:"
+        echo "enable: enables terraform debug output"
+        echo "disable: disables terraform debug output"
+    elif [ "$1" != "enable" ] && [ "$1" != "disable" ]; then
+        echo "Incorrect argument specified."
+        echo "Usage:"
+        echo "enable: enables terraform debug output"
+        echo "disable: disables terraform debug output"
+    fi
+
+    if [ "$1" = "disable" ]; then
+        echo "Disabling Terraform debug log mode"
+        echo "logs can be found: $HOME/tmp/terraform-debug.log"
+        unset TF_LOG
+    elif [ "$1" = "enable" ]; then
+        echo "Setting Terraform to debug log mode"
+        echo "logs can be found: $HOME/tmp/terraform-debug.log"
+        export TF_LOG=DEBUG
+    fi
+}
+

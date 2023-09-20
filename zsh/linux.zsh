@@ -4,7 +4,7 @@ export GOROOT=/usr/lib/go
 export GOBIN=$HOME/projects/go/bin
 export PATH=$PATH:$GOPATH/bin
 export PATH=$PATH:$GOROOT/bin
-xmodmap $HOME/.xmodmap.custom
+#xmodmap $HOME/.xmodmap.custom
 if [ $? -ne 0 ]
 then
   exho "Error loading xmodmap"
