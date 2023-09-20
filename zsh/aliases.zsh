@@ -183,7 +183,6 @@ function tfdebug() {
 
     if [ "$1" = "disable" ]; then
         echo "Disabling Terraform debug log mode"
-        echo "logs can be found: $HOME/tmp/terraform-debug.log"
         unset TF_LOG
     elif [ "$1" = "enable" ]; then
         echo "Setting Terraform to debug log mode"
