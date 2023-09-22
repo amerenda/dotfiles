@@ -110,13 +110,13 @@ install_flatpaks(){
 install_nordvpn() {
   sh <(curl -sSf https://downloads.nordcdn.com/apps/linux/install.sh)
 }
- 
+
 add_cron_jobs() {
   cron_job_dir=$HOME/.scripts/cronJobDefinitions
   for cron in "${CRON_JOBS[@]}"; do
     def="${cron_job_dir}/${cron}"
     job="$(cat $def 2>/dev/null)"
-    job_no_comment="$(cat $def 2>/dev/null | grep -v \#)" 
+    job_no_comment="$(cat $def 2>/dev/null | grep -v \#)"
     script="$(awk '{print $6}' <<< "$job_no_comment")"
     script="$(eval echo "$script")"
 
@@ -280,7 +280,7 @@ install_flatpaks
       exit 1
   fi
 
-# Install github command line
+# Install helm
 if ! command -v helm &> /dev/null
 then
   echo "***** Installing helm *****"
@@ -288,6 +288,18 @@ then
   brew install helm
   if [ $? -ne 0 ]; then
       echo "The command brew install failed."
+      exit 1
+  fi
+fi
+
+# install tflint
+if ! command -v tflint &> /dev/null
+then
+  echo "***** Installing helm *****"
+  printf "\n"
+  brew install tflint
+  if [ $? -ne 0 ]; then
+      echo "The command brew install tflint."
       exit 1
   fi
 fi
