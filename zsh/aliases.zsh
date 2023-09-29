@@ -191,3 +191,10 @@ function tfdebug() {
     fi
 }
 
+
+
+function tfws() {
+  unset TF_CLI_ARGS
+  terraform workspace select "$@"
+  direnv allow
+}
