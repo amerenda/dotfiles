@@ -316,3 +316,15 @@ then
   fi
 fi
 
+if ! command -v d2 &> /dev/null
+then
+  echo "***** Installing dw *****"
+  printf "\n"
+  curl -fsSL https://d2lang.com/install.sh | sh -s --
+  if [ $? -ne 0 ]; then
+      echo "Install d2 command failed"
+      exit 1
+  fi
+fi
+
+

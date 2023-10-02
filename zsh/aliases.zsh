@@ -168,6 +168,20 @@ function nvpn(){
     fi
 }
 
+function de() {
+    if [[ $(direnv status 2>/dev/null | grep 'Found RC allowed' | awk '{ print $4 }') == "true" ]]; then
+        echo "direnv is active."
+        echo "Deactivating"
+        direnv deny
+    elif [[ $(direnv status 2>/dev/null | grep 'Found RC allowed' | awk '{ print $4 }') == "false" ]]; then
+        echo "direnv is not active."
+        echo "Activating"
+        direnv allow
+    else
+        echo "Unable to determine direnv status."
+    fi
+}
+
 function tfdebug() {
     if [ $# -eq 0 ]; then
         echo "No argument specified."
