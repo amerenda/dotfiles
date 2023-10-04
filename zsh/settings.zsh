@@ -48,3 +48,10 @@ if kubectl &> /dev/null; then
   source <(kubectl completion zsh)
 fi
 
+# Mute shitty system76 microphone on mute
+if [[ $(hostname) == *"moove"* ]]; then
+  pactl set-source-mute 47 1
+else
+  ;
+fi
+

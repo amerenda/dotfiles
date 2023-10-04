@@ -17,6 +17,7 @@
     ~/.bin:
        force: true
        path: bin/
+    ~/.cbtrc: cbtrc
     ~/.dotfiles: ''
     ~/.gitconfig: gitconfig
     ~/.gitignore_global: gitignore_global

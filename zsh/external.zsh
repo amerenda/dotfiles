@@ -7,7 +7,6 @@ export PIP_DOWNLOAD_CACHE=$HOME/.pip/cache
 
 # Path settings
 export PATH="/usr/local/opt/openjdk/bin:$PATH"
-export PATH="$PATH:/opt/aerospike/bin"
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="$HOME/.cargo/env:$PATH"
 

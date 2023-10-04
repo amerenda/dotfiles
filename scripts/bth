@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+function bytes_to_human() {
+    local bytes=$1
+    if [ "$bytes" -lt 1024 ]; then
+        echo "${bytes}B"
+    elif [ "$bytes" -lt 1048576 ]; then
+        echo $(bc <<< "scale=2; $bytes/1024")KB
+    elif [ "$bytes" -lt 1073741824 ]; then
+        echo $(bc <<< "scale=2; $bytes/1048576")MB
+    else
+        echo $(bc <<< "scale=2; $bytes/1073741824")GB
+    fi
+}
+
+bytes_to_human $1

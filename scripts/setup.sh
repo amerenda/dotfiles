@@ -13,7 +13,7 @@ DOTFILES_PATH="$HOME/projects/dotfiles"
 INIT_PATH="$HOME/misc/scripts/install"
 APT_PACKAGES="\
   xclip zsh tmux exa direnv git openvpn vim snapd \
-  apt-transport-https ca-certificates gnupg curl"
+  apt-transport-https ca-certificates gnupg curl google-cloud-sdk-cbt"
 FLATPAKS="com.visualstudio.code-oss \
   org.cryptomator.Cryptomator \
   org.signal.Signal org.signal.Signal \
@@ -318,7 +318,7 @@ fi
 
 if ! command -v d2 &> /dev/null
 then
-  echo "***** Installing dw *****"
+  echo "***** Installing d2 *****"
   printf "\n"
   curl -fsSL https://d2lang.com/install.sh | sh -s --
   if [ $? -ne 0 ]; then
@@ -327,4 +327,16 @@ then
   fi
 fi
 
+
+# install pyenv
+if ! command -v pyenv &> /dev/null
+then
+  echo "***** Installing pyenv *****"
+  printf "\n"
+  brew install pyenv
+  if [ $? -ne 0 ]; then
+    echo "Install pyenv (brew) command failed"
+      exit 1
+  fi
+fi
 
