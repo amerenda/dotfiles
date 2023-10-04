@@ -11,7 +11,6 @@ export PATH="$HOME/.local/bin:$PATH"
 export PATH="$HOME/.cargo/env:$PATH"
 
 # Google variables
-export GOOGLE_APPLICATION_CREDENTIALS="/var/secrets/terraform/key.json"
 export USE_GKE_GCLOUD_AUTH_PLUGIN=True
 
 # Terraform
