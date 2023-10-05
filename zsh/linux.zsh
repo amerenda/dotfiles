@@ -4,7 +4,7 @@ export GOROOT=/usr/lib/go
 export GOBIN=$HOME/projects/go/bin
 export PATH=$PATH:$GOPATH/bin
 export PATH=$PATH:$GOROOT/bin
-xmodmap $HOME/.xmodmap.custom
+#xmodmap $HOME/.xmodmap.custom
 if [ $? -ne 0 ]
 then
   exho "Error loading xmodmap"
@@ -16,15 +16,10 @@ if [ -n "$XDG_CURRENT_DESKTOP" ]; then
     # Check if the value contains "GNOME" (case insensitive)
     if [[ "$XDG_CURRENT_DESKTOP" =~ [Gg][Nn][Oo][Mm][Ee] ]]; then
         gsettings set org.gnome.desktop.input-sources xkb-options "['caps:escape']"
-
     else
         exit 0
     fi
 else
     exit 0
 fi
-
-
-# transparent arm execution with qemu
-# export QEMU_LD_PREFIX=/usr/arm-linux-gnueabihf
 

@@ -167,3 +167,48 @@ function nvpn(){
         nordvpn disconnect
     fi
 }
+
+function de() {
+    if [[ $(direnv status 2>/dev/null | grep 'Found RC allowed' | awk '{ print $4 }') == "true" ]]; then
+        echo "direnv is active."
+        echo "Deactivating"
+        direnv deny
+    elif [[ $(direnv status 2>/dev/null | grep 'Found RC allowed' | awk '{ print $4 }') == "false" ]]; then
+        echo "direnv is not active."
+        echo "Activating"
+        direnv allow
+    else
+        echo "Unable to determine direnv status."
+    fi
+}
+
+function tfdebug() {
+    if [ $# -eq 0 ]; then
+        echo "No argument specified."
+        echo "Usage:"
+        echo "enable: enables terraform debug output"
+        echo "disable: disables terraform debug output"
+    elif [ "$1" != "enable" ] && [ "$1" != "disable" ]; then
+        echo "Incorrect argument specified."
+        echo "Usage:"
+        echo "enable: enables terraform debug output"
+        echo "disable: disables terraform debug output"
+    fi
+
+    if [ "$1" = "disable" ]; then
+        echo "Disabling Terraform debug log mode"
+        unset TF_LOG
+    elif [ "$1" = "enable" ]; then
+        echo "Setting Terraform to debug log mode"
+        echo "logs can be found: $HOME/tmp/terraform-debug.log"
+        export TF_LOG=DEBUG
+    fi
+}
+
+
+
+function tfws() {
+  unset TF_CLI_ARGS
+  terraform workspace select "$@"
+  direnv allow
+}

@@ -7,4 +7,4 @@ scripts/pyvenv.cfg
 ssh/alex_personal
 ssh/github
 ssh/alexm_moove
-
+*logs/*

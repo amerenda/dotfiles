@@ -17,6 +17,7 @@
     ~/.bin:
        force: true
        path: bin/
+    ~/.cbtrc: cbtrc
     ~/.dotfiles: ''
     ~/.gitconfig: gitconfig
     ~/.gitignore_global: gitignore_global
@@ -39,3 +40,4 @@
   - [mkdir -p ~/.ssh/config.d, creating ssh config dir]
   - [bash ~/.scripts/setup.sh, installing os components]
   - [bash ~/.scripts/selectOsConfig.sh]
+  - [zsh source ~/.zshrc]

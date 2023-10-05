@@ -1,4 +1,5 @@
 keycode 65 = space
 keycode 66 = Escape
 keycode 9 = grave asciitilde
-
+keycode 112 = NoSymbol
+keycode 117 = NoSymbol
