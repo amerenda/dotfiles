@@ -207,17 +207,6 @@ then
   fi
 fi
 
-# Decrypt ssh key
-if ! [ -f ${DOTFILES_PATH}/ssh/decrypted ]
-then
-  echo "decrypting ssh keys"
-  decrypt_ssh_keys
-  if [ $? -ne 0 ]; then
-      echo "The decrypt_ssh_keys function failed."
-      exit 1
-  fi
-fi
-
 # Change dotfiles to use git
 echo "***** Changing dotfiles repo to use git *****"
 printf "\n"
@@ -327,7 +316,6 @@ then
   fi
 fi
 
-
 # install pyenv
 if ! command -v pyenv &> /dev/null
 then
@@ -340,3 +328,13 @@ then
   fi
 fi
 
+# Decrypt ssh key
+if ! [ -f ${DOTFILES_PATH}/ssh/decrypted ]
+then
+  echo "decrypting ssh keys"
+  decrypt_ssh_keys
+  if [ $? -ne 0 ]; then
+      echo "The decrypt_ssh_keys function failed."
+      exit 1
+  fi
+fi
