@@ -163,7 +163,11 @@ init_backup() {
   sudo passwd -d backup # Remove the password for user 'backup'
   sudo mkdir /etc/backup-keys
   gpg --pinentry-mode loopback -d ${DOTFILES_PATH}/credentials/backup-amerenda.json.gpg > /etc/backup-keys/backup-amerenda.json
-
+  gpg --pinentry-mode loopback -d ${DOTFILES_PATH}/credentials/restic_password.txt.gpg > /etc/backup-keys/restic_password.txt
+  sudo chown backup:backup /etc/backup-keys/backup-amerenda.json
+  sudo chmod 0600 /etc/backup-keys/backup-amerenda.json
+  sudo chmod 0600 /etc/backup-keys/restic_password.txt
+  sudo setfacl -Rm u:backup:rx ${HOME}
 }
 
 ############################### Install components ###############################
@@ -370,6 +374,16 @@ if ! [ -f ${DOTFILES_PATH}/ssh/decrypted ]
 then
   echo "decrypting ssh keys"
   decrypt_ssh_keys
+  if [ $? -ne 0 ]; then
+      echo "The decrypt_ssh_keys function failed."
+      exit 1
+  fi
+fi
+
+if ! [ -f /etc/backup-keys/backup-amerenda.json ]
+then
+  echo "decrypting ssh keys"
+  init_backup
   if [ $? -ne 0 ]; then
       echo "The decrypt_ssh_keys function failed."
       exit 1
