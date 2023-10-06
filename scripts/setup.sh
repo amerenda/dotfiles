@@ -28,7 +28,6 @@ CRON_JOBS=(
   "cleanRecent.txt"
 )
 
-
 ############################### Define Functions ###############################
 
 init() {
@@ -159,7 +158,19 @@ add_cron_jobs() {
   done
 }
 
+init_backup() {
+  sudo useradd -m -s /bin/bash backup
+  sudo passwd -d backup # Remove the password for user 'backup'
+  sudo mkdir /etc/backup-keys
+  gpg --pinentry-mode loopback -d ${DOTFILES_PATH}/credentials/backup-amerenda.json.gpg > /etc/backup-keys/backup-amerenda.json
+
+}
+
 ############################### Install components ###############################
+
+echo "Enter sudo password to continue with the script:"
+printf "\n"
+sudo -v
 
 add_cron_jobs
 if [ $? -ne 0 ]; then
