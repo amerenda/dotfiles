@@ -28,6 +28,7 @@ FLATPAKS="com.visualstudio.code-oss \
 CRON_JOBS=(
   "cleanLogs.txt"
   "cleanRecent.txt"
+  "resticBackup.txt"
 )
 
 ############################### Define Functions ###############################
@@ -115,6 +116,7 @@ install_nordvpn() {
 }
 
 add_cron_jobs() {
+  echo "updating cronjobs"
   cron_job_dir=$HOME/.scripts/cronJobDefinitions
   for cron in "${CRON_JOBS[@]}"; do
     def="${cron_job_dir}/${cron}"
@@ -162,18 +164,14 @@ add_cron_jobs() {
 
 ############################### Sets up Restic Backups  ##########################
 init_backup() {
-  sudo useradd -m -s /bin/bash backup
-  sudo passwd -d backup # Remove the password for user 'backup'
   sudo mkdir /etc/backup-keys
   gpg --pinentry-mode loopback -d ${DOTFILES_PATH}/credentials/backup-amerenda.json.gpg > /etc/backup-keys/backup-amerenda.json
   gpg --pinentry-mode loopback -d ${DOTFILES_PATH}/credentials/restic_password.txt.gpg > /etc/backup-keys/restic_password.txt
-  sudo chown backup:backup /etc/backup-keys/backup-amerenda.json
-  sudo chown backup:backup /etc/backup-keys/restic_password.txt
+  sudo chown $USER:$USER /etc/backup-keys/backup-amerenda.json
+  sudo chown $USER:$USER /etc/backup-keys/restic_password.txt
   sudo chmod 0600 /etc/backup-keys/backup-amerenda.json
   sudo chmod 0600 /etc/backup-keys/restic_password.txt
-  sudo usermod -aG backup alexm
-  sudo setfacl -Rm u:backup:rx ${USER_HOME}
-  cat ${DOTFILES_PATH}/scripts/meta/backup/resticBackup.txt | sudo tee /etc/cron.d/backup > /dev/null
+  sudo chown -R $USER:$USER /etc/backup-keys
 }
 
 ############################### Install components ###############################
@@ -386,20 +384,17 @@ then
   fi
 fi
 
-if ! [ -f /etc/backup-keys/backup-amerenda.json ] || [[ -f restic_password.txt ]]
-then
+if ! [ -f /etc/backup-keys/backup-amerenda.json ] || ! [ -f /etc/backup-keys/restic_password.txt ]; then
   echo "backing up"
   init_backup
   if [ $? -ne 0 ]; then
-      echo "The decrypt_ssh_keys function failed."
+      echo "The init_backup function failed."
       exit 1
   fi
 fi
 
-if ! [ -d /usr/share/X11/xkb/symbols/customKeys ]
-then
+if ! [ -f /usr/share/X11/xkb/symbols/customKeys ]; then
   sudo -E ln -s ${DOTFILES_PATH}/customKeys /usr/share/X11/xkb/symbols/customKeys
-
 fi
 
 

@@ -1,2 +1,0 @@
-# Backs up files deined in dotfiles/scripts/meta/backup/include.txt as the backup user
-* * * * * backup $HOME/.scripts/backup.sh

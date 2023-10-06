@@ -1,3 +1,2 @@
 /home/alexm
-home/alexm/.zsh_history
 

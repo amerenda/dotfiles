@@ -1,22 +1,21 @@
 #!/usr/bin/env bash
 
-
-export DOTFILES_DIR=${HOME}/projects/dotfiles
-export INCLUDE_FILE="./meta/backup/include.txt"
-export EXCLUDE_FILE="./meta/backup/exclude.txt"
-
-export OUTPUT_LOG="${DOTFILES_DIR}/logs"
+export DOTFILES_PATH="${HOME}/projects/dotfiles"
+export INCLUDE_FILE="${DOTFILES_PATH}/scripts/meta/backup/include.txt"
+export EXCLUDE_FILE="${DOTFILES_PATH}/scripts/meta/backup/exclude.txt"
 
 export GOOGLE_APPLICATION_CREDENTIALS=/etc/backup-keys/backup-amerenda.json
 export RESTIC_PASSWORD=$(cat /etc/backup-keys/restic_password.txt)
-echo $REESTIC_PASSWORD
+export RESTIC_REPO="gs:amerenda-backups:/alexm-moove"
 
-if restic snapshots &>/dev/null; then
-    : 
+if restic snapshots -r gs:amerenda-backups:/alexm-moove &>/dev/null; then
+    restic backup -r ${RESTIC_REPO} --files-from ${INCLUDE_FILE} --exclude-file ${EXCLUDE_FILE} --exclude-file <(find $HOME -type l) 
 else
     echo "Restic repository is not initialized. Initializing now..."
-    restic -r gs:amerenda-backups:/alexm-moove init
+    restic -r ${RESTIC_REPO} init
 fi
 
-#restic backup --files-from ${INCLUDE_FILE} --exclude-file ${EXCLUDE_FILE} > ${OUTPUT_LOG}/restic.log 2> ${OUTPUT_LOG}/restic-error.log
+unset GOOGLE_APPLICATION_CREDENTIALS
+unset RESTIC_PASSWORD
+unset RESTIC_REPO
 
