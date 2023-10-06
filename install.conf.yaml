@@ -14,9 +14,7 @@
     ~/.alacritty.yml: alacritty.yml
     ~/.antigen.zsh: antigen/antigen.zsh
     ~/.antigen: antigen/
-    ~/.bin:
-       force: true
-       path: bin/
+    ~/.bin: bin
     ~/.cbtrc: cbtrc
     ~/.dotfiles: ''
     ~/.gitconfig: gitconfig
@@ -32,7 +30,6 @@
     ~/.utility: utility
     ~/.vim: vim/
     ~/.vimrc: vimrc
-    ~/.xmodmap.custom: xmodmap.custom
     ~/.zsh: zsh/
     ~/.zshrc: zshrc
 

@@ -14,6 +14,7 @@ INIT_PATH="$HOME/misc/scripts/install"
 APT_PACKAGES="\
   xclip zsh tmux exa direnv git openvpn vim snapd \
   apt-transport-https ca-certificates gnupg curl google-cloud-sdk-cbt"
+  
 FLATPAKS="com.visualstudio.code-oss \
   org.cryptomator.Cryptomator \
   org.signal.Signal org.signal.Signal \
@@ -324,6 +325,30 @@ then
   brew install pyenv
   if [ $? -ne 0 ]; then
     echo "Install pyenv (brew) command failed"
+      exit 1
+  fi
+fi
+
+# install kubectl 
+if ! command -v kubectl &> /dev/null
+then
+  echo "***** Installing pyenv *****"
+  printf "\n"
+  brew install kubectl
+  if [ $? -ne 0 ]; then
+    echo "Install kubectl (brew) command failed"
+      exit 1
+  fi
+fi
+
+# install  kubectx
+if ! command -v kubectl &> /dev/null
+then
+  echo "***** Installing pyenv *****"
+  printf "\n"
+  brew install kubectx
+  if [ $? -ne 0 ]; then
+    echo "Install kubectx (brew) command failed"
       exit 1
   fi
 fi
