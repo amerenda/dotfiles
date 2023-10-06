@@ -396,4 +396,10 @@ then
   fi
 fi
 
+if ! [ -d /usr/share/X11/xkb/symbols/customKeys ]
+then
+  sudo -E ln -s ${DOTFILES_PATH}/customKeys /usr/share/X11/xkb/symbols/customKeys
+
+fi
+
 

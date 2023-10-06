@@ -20,3 +20,6 @@ export TF_LOG_PATH=$HOME/tmp/terraform-debug.log
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 eval "$(direnv hook zsh)"
 
+# Dotfiles helper
+export DOTFILES_PATH=$HOME/projects/dotfiles
+
