@@ -11,11 +11,13 @@
 USER=$(whoami)
 DOTFILES_PATH="$HOME/projects/dotfiles"
 INIT_PATH="$HOME/misc/scripts/install"
+USER_HOME=$HOME
 APT_PACKAGES="\
   xclip zsh tmux exa direnv git openvpn vim snapd \
   apt-transport-https ca-certificates gnupg curl \
-  google-cloud-sdk-cbt restic"
-  
+  google-cloud-sdk-cbt restic scdaemon \
+  yubikey-manager"
+
 FLATPAKS="com.visualstudio.code-oss \
   org.cryptomator.Cryptomator \
   org.signal.Signal org.signal.Signal \
@@ -158,6 +160,7 @@ add_cron_jobs() {
   done
 }
 
+############################### Sets up Restic Backups  ##########################
 init_backup() {
   sudo useradd -m -s /bin/bash backup
   sudo passwd -d backup # Remove the password for user 'backup'
@@ -165,9 +168,12 @@ init_backup() {
   gpg --pinentry-mode loopback -d ${DOTFILES_PATH}/credentials/backup-amerenda.json.gpg > /etc/backup-keys/backup-amerenda.json
   gpg --pinentry-mode loopback -d ${DOTFILES_PATH}/credentials/restic_password.txt.gpg > /etc/backup-keys/restic_password.txt
   sudo chown backup:backup /etc/backup-keys/backup-amerenda.json
+  sudo chown backup:backup /etc/backup-keys/restic_password.txt
   sudo chmod 0600 /etc/backup-keys/backup-amerenda.json
   sudo chmod 0600 /etc/backup-keys/restic_password.txt
-  sudo setfacl -Rm u:backup:rx ${HOME}
+  sudo usermod -aG backup alexm
+  sudo setfacl -Rm u:backup:rx ${USER_HOME}
+  cat ${DOTFILES_PATH}/scripts/meta/backup/resticBackup.txt | sudo tee /etc/cron.d/backup > /dev/null
 }
 
 ############################### Install components ###############################
@@ -345,7 +351,7 @@ then
   fi
 fi
 
-# install kubectl 
+# install kubectl
 if ! command -v kubectl &> /dev/null
 then
   echo "***** Installing pyenv *****"
@@ -380,12 +386,14 @@ then
   fi
 fi
 
-if ! [ -f /etc/backup-keys/backup-amerenda.json ]
+if ! [ -f /etc/backup-keys/backup-amerenda.json ] || [[ -f restic_password.txt ]]
 then
-  echo "decrypting ssh keys"
+  echo "backing up"
   init_backup
   if [ $? -ne 0 ]; then
       echo "The decrypt_ssh_keys function failed."
       exit 1
   fi
 fi
+
+

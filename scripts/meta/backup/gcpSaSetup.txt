@@ -1,0 +1,2 @@
+gcloud storage buckets add-iam-policy-binding gs://amerenda-backups/ --member=serviceAccount:backups@amerenda-systems.iam.gserviceaccount.com --role=roles/storage.objectAdmin
+
