@@ -13,7 +13,8 @@ DOTFILES_PATH="$HOME/projects/dotfiles"
 INIT_PATH="$HOME/misc/scripts/install"
 APT_PACKAGES="\
   xclip zsh tmux exa direnv git openvpn vim snapd \
-  apt-transport-https ca-certificates gnupg curl google-cloud-sdk-cbt"
+  apt-transport-https ca-certificates gnupg curl \
+  google-cloud-sdk-cbt restic"
   
 FLATPAKS="com.visualstudio.code-oss \
   org.cryptomator.Cryptomator \
