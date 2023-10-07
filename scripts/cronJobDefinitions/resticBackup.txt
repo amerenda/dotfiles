@@ -1,0 +1,2 @@
+# Backs up files deined in dotfiles/scripts/meta/backup/include.txt as the backup user
+* 9 * * * $HOME/.scripts/backup.sh > $HOME/projects/dotfiles/logs/restic.log 2> $HOME/projects/dotfiles/logs/restic-error.log

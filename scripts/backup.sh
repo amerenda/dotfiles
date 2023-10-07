@@ -1,3 +1,21 @@
 #!/usr/bin/env bash
 
-restic -r b2:amer-backup:sleeperservice backup / --exclude-file=meta/backup/exclude.txt -o b2.connections=10
+export DOTFILES_PATH="${HOME}/projects/dotfiles"
+export INCLUDE_FILE="${DOTFILES_PATH}/scripts/meta/backup/include.txt"
+export EXCLUDE_FILE="${DOTFILES_PATH}/scripts/meta/backup/exclude.txt"
+
+export GOOGLE_APPLICATION_CREDENTIALS=/etc/backup-keys/backup-amerenda.json
+export RESTIC_PASSWORD=$(cat /etc/backup-keys/restic_password.txt)
+export RESTIC_REPO="gs:amerenda-backups:/alexm-moove"
+
+if restic snapshots -r gs:amerenda-backups:/alexm-moove &>/dev/null; then
+    restic backup -r ${RESTIC_REPO} --files-from ${INCLUDE_FILE} --exclude-file ${EXCLUDE_FILE} --exclude-file <(find $HOME -type l) 
+else
+    echo "Restic repository is not initialized. Initializing now..."
+    restic -r ${RESTIC_REPO} init
+fi
+
+unset GOOGLE_APPLICATION_CREDENTIALS
+unset RESTIC_PASSWORD
+unset RESTIC_REPO
+

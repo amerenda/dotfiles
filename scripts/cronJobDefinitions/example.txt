@@ -8,4 +8,7 @@
 # Month (1-2)
 # Day of week (0-7) # Both 0 and 7 represent sunday
 # For example this crontab runs the example.sh script every day at 10am
-0 10 * * * $HOME/.scripts/example.sh
+0 10 * * * $USER $HOME/.scripts/example.sh
+
+
+# ENSURE YOU REPLACE $USER WITH THE USER YOU WANT TO RUN THE SCRIPT

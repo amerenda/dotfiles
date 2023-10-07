@@ -11,9 +11,13 @@
 USER=$(whoami)
 DOTFILES_PATH="$HOME/projects/dotfiles"
 INIT_PATH="$HOME/misc/scripts/install"
+USER_HOME=$HOME
 APT_PACKAGES="\
   xclip zsh tmux exa direnv git openvpn vim snapd \
-  apt-transport-https ca-certificates gnupg curl google-cloud-sdk-cbt"
+  apt-transport-https ca-certificates gnupg curl \
+  google-cloud-sdk-cbt restic scdaemon \
+  yubikey-manager"
+
 FLATPAKS="com.visualstudio.code-oss \
   org.cryptomator.Cryptomator \
   org.signal.Signal org.signal.Signal \
@@ -24,8 +28,8 @@ FLATPAKS="com.visualstudio.code-oss \
 CRON_JOBS=(
   "cleanLogs.txt"
   "cleanRecent.txt"
+  "resticBackup.txt"
 )
-
 
 ############################### Define Functions ###############################
 
@@ -112,6 +116,7 @@ install_nordvpn() {
 }
 
 add_cron_jobs() {
+  echo "updating cronjobs"
   cron_job_dir=$HOME/.scripts/cronJobDefinitions
   for cron in "${CRON_JOBS[@]}"; do
     def="${cron_job_dir}/${cron}"
@@ -157,7 +162,23 @@ add_cron_jobs() {
   done
 }
 
+############################### Sets up Restic Backups  ##########################
+init_backup() {
+  sudo mkdir /etc/backup-keys
+  gpg --pinentry-mode loopback -d ${DOTFILES_PATH}/credentials/backup-amerenda.json.gpg > /etc/backup-keys/backup-amerenda.json
+  gpg --pinentry-mode loopback -d ${DOTFILES_PATH}/credentials/restic_password.txt.gpg > /etc/backup-keys/restic_password.txt
+  sudo chown $USER:$USER /etc/backup-keys/backup-amerenda.json
+  sudo chown $USER:$USER /etc/backup-keys/restic_password.txt
+  sudo chmod 0600 /etc/backup-keys/backup-amerenda.json
+  sudo chmod 0600 /etc/backup-keys/restic_password.txt
+  sudo chown -R $USER:$USER /etc/backup-keys
+}
+
 ############################### Install components ###############################
+
+echo "Enter sudo password to continue with the script:"
+printf "\n"
+sudo -v
 
 add_cron_jobs
 if [ $? -ne 0 ]; then
@@ -328,6 +349,30 @@ then
   fi
 fi
 
+# install kubectl
+if ! command -v kubectl &> /dev/null
+then
+  echo "***** Installing pyenv *****"
+  printf "\n"
+  brew install kubectl
+  if [ $? -ne 0 ]; then
+    echo "Install kubectl (brew) command failed"
+      exit 1
+  fi
+fi
+
+# install  kubectx
+if ! command -v kubectl &> /dev/null
+then
+  echo "***** Installing pyenv *****"
+  printf "\n"
+  brew install kubectx
+  if [ $? -ne 0 ]; then
+    echo "Install kubectx (brew) command failed"
+      exit 1
+  fi
+fi
+
 # Decrypt ssh key
 if ! [ -f ${DOTFILES_PATH}/ssh/decrypted ]
 then
@@ -338,3 +383,18 @@ then
       exit 1
   fi
 fi
+
+if ! [ -f /etc/backup-keys/backup-amerenda.json ] || ! [ -f /etc/backup-keys/restic_password.txt ]; then
+  echo "backing up"
+  init_backup
+  if [ $? -ne 0 ]; then
+      echo "The init_backup function failed."
+      exit 1
+  fi
+fi
+
+if ! [ -f /usr/share/X11/xkb/symbols/customKeys ]; then
+  sudo -E ln -s ${DOTFILES_PATH}/customKeys /usr/share/X11/xkb/symbols/customKeys
+fi
+
+
