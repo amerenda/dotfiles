@@ -15,17 +15,17 @@ scrolling:
   multiplier: 1
 
 font:
-  #  normal:
-  #    family: SauceCodePro Nerd Font Mono
-  #    style: Regular
-  #  bold:
-  #    family: SauceCodePro Nerd Font Mono
-  #    style: Bold
-  #  italic:
-  #    family: SauceCodePro Nerd Font Mono
-  #    style: Italic
+  normal:
+    family: Fira Code
+    style: Regular
+  bold:
+    family: Fira Code
+    style: Bold
+  italic:
+    family: Fira Code
+    style: Italic
+  size: 12.0
 
-  size: 10
 
   glyph_offset:
     x: 0

@@ -52,11 +52,11 @@ source ~/.zsh/external.zsh
 duration=$SECONDS
 debug "~/.zsh/external.zsh" "$(($duration % 60))"
 
-# Source spaceship prompt
-SECONDS=0
-source ~/.zsh/spaceship.zsh
-duration=$SECONDS
-debug "~/.zsh/spaceship.zsh" "$(($duration % 60))"
+## Source spaceship prompt
+#SECONDS=0
+#source ~/.zsh/spaceship.zsh
+#duration=$SECONDS
+#debug "~/.zsh/spaceship.zsh" "$(($duration % 60))"
 
 source ~/.zsh/yq.zsh
 
