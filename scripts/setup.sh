@@ -398,3 +398,8 @@ if ! [ -f /usr/share/X11/xkb/symbols/customKeys ]; then
 fi
 
 
+if ! [ -f ~/.config/systemd/user/customKeys.service ]; then
+  cp ${DOTFILES_PATH}/scripts/meta/customKeys.service ~/.config/systemd/user
+  systemctl --user enable customKeys.service
+  systemctl --user start customKeys.service
+fi

@@ -1,0 +1,9 @@
+[Unit]
+Description=Load xmodmap file
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/xmodmap ~/.xmodmap.custom
+
+[Install]
+WantedBy=default.target
