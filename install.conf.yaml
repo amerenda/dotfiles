@@ -40,4 +40,4 @@
   - [mkdir -p ~/.ssh/config.d, creating ssh config dir]
   - [bash ~/.scripts/setup.sh, installing os components]
   - [bash ~/.scripts/selectOsConfig.sh]
-  - [zsh source ~/.zshrc]
+  - [source ~/.zshrc, sourcing zsh]
