@@ -14,8 +14,6 @@ if [ -f ~/.zshrc_local_before ]; then
     duration=$SECONDS
     debug "false" "~/.zshrc_local_before.zsh" $(($duration % 60))
 fi
-# init plugins
-#/usr/local/bin/antibody bundle < ~/.zsh/plugins.txt > ~/.zsh/plugins.zsh
 
 SECONDS=0
 source ~/.antigen/antigen.zsh
@@ -52,11 +50,11 @@ source ~/.zsh/external.zsh
 duration=$SECONDS
 debug "~/.zsh/external.zsh" "$(($duration % 60))"
 
-# Source spaceship prompt
-SECONDS=0
-source ~/.zsh/spaceship.zsh
-duration=$SECONDS
-debug "~/.zsh/spaceship.zsh" "$(($duration % 60))"
+## Source spaceship prompt
+#SECONDS=0
+#source ~/.zsh/spaceship.zsh
+#duration=$SECONDS
+#debug "~/.zsh/spaceship.zsh" "$(($duration % 60))"
 
 source ~/.zsh/yq.zsh
 

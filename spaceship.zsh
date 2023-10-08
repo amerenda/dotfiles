@@ -3,36 +3,33 @@ SPACESHIP_PROMPT_ORDER=(
   dir           # Current directory section
   git           # Git section (git_branch + git_status)
   docker        # Docker section
-  venv          # virtualenv section
   terraform     # Terraform workspace section
+  venv          # virtualenv section
   exit_code     # Exit code section
-  exec_time
+  exec_time     # How long it took commands to run
   char          # Prompt character
 )
 
-SPACESHIP_RPROMPT_ORDER=()
+#
+SPACESHIP_PROMPT_ASYNC=true
 
 # time settings
 SPACESHIP_TIME_SHOW=false
 
 # dir settings
 SPACESHIP_DIR_TRUNC=2
-SPACESHIP_DIR_TRUNC_REPO=false
+SPACESHIP_DIR_TRUNC_REPO=true
 
 # git settings
 SPACESHIP_GIT_SHOW=true
 SPACESHIP_GIT_BRANCH_SHOW=true
 SPACESHIP_GIT_STATUS_SHOW=true
 
-# xcode settings
-SPACESHIP_XCODE_SHOW_LOCAL=true
-SPACESHIP_XCODE_SHOW_GLOBAL=true
-
 # go settings
 SPACESHIP_GOLANG_SHOW=true
 
 # docker settings
-SPACESHIP_DOCKER_SHOW=false
+SPACESHIP_DOCKER_SHOW=true
 SPACESHIP_DOCKER_SYMBOL=''
 #SPACESHIP_DOCKER_SYMBOL='🐳'
 
@@ -50,9 +47,10 @@ SPACESHIP_PROMPT_ADD_NEWLINE=false
 SPACESHIP_PROMPT_SEPARATE_LINE=false
 SPACESHIP_PROMPT_FIRST_PREFIX_SHOW=false
 SPACESHIP_PROMPT_SUFFIXES_SHOW=true
-SPACESHIP_VI_MODE_SHOW=false
+SPACESHIP_VI_MODE_SHOW=true
 
 # Terraform settings
-SPACESHIP_TERRAFORM_SYMBOL='🛠️'
-SPACESHIP_TERRAFORM_SYMBOL=''
+SPACESHIP_TERRAFORM_SYMBOL='🛠️ '
+SPACESHIP_TERRAFORM_ASYNC=true
 SPACESHIP_TERRAFORM_SHOW=true
+SPACESHIP_TERRAFORM_COLOR=105
