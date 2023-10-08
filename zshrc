@@ -1,82 +1,40 @@
-debug() {
-    debugOn="false"
-    sourceFile="${1}"
-    duration="${2}"
-    if [[ "${debugOn}" == "true" ]]; then
-        echo "${sourceFile}: ${duration}s"
-    fi
-}
-
 # Allow local customizations in the ~/.zshrc_local_before file
 if [ -f ~/.zshrc_local_before ]; then
-    SECONDS=0
     source ~/.zshrc_local_before
-    duration=$SECONDS
-    debug "false" "~/.zshrc_local_before.zsh" $(($duration % 60))
 fi
 
-SECONDS=0
+# Installs plugin manager
 source ~/.antigen/antigen.zsh
-duration=$SECONDS
-debug "~/.antigen/antigen.zsh" "$(($duration % 60))"
 
-## Activate Plugins via antigent
-SECONDS=0
+# Installs plugins
 source ~/.zsh/plugins.zsh
-duration=$SECONDS
-debug  "~/.zsh/plugins.zsh" "$(($duration % 60))"
 
 # Aliases (must be sourced before plugins)
-SECONDS=0
 source ~/.zsh/aliases.zsh
-duration=$SECONDS
-debug  "~/.zsh/aliases.zsh" "$(($duration % 60))"
 
 # go settings
-SECONDS=0
 source ~/.zsh/go.zsh
-duration=$SECONDS
-debug "~/.zsh/go.zsh" "$(($duration % 60))"
 
 # Settings
-SECONDS=0
 source ~/.zsh/settings.zsh
-duration=$SECONDS
-debug "~/.zsh/settings.zsh" "$(($duration % 60))"
 
 # External settings
-SECONDS=0
 source ~/.zsh/external.zsh
-duration=$SECONDS
-debug "~/.zsh/external.zsh" "$(($duration % 60))"
 
-## Source spaceship prompt
-#SECONDS=0
-#source ~/.zsh/spaceship.zsh
-#duration=$SECONDS
-#debug "~/.zsh/spaceship.zsh" "$(($duration % 60))"
-
+# Install yq commands
 source ~/.zsh/yq.zsh
 
 
 # Allow local customizations in the ~/.zshrc_local_after file
 if [ -f ~/.zshrc_local_after ]; then
-    SECONDS=0
     source ~/.zshrc_local_after
-    duration=$SECONDS
-    debug "~/.zshrc_local_after.zsh" "$(($duration % 60))"
 fi
 
 if uname | grep -q Darwin; then
-    SECONDS=0
     source ~/.zsh/macos.zsh
-    duration=$SECONDS
-    debug "~/.zsh/macos.zsh" "$(($duration % 60))"
 fi
 
 if uname | grep -q Linux; then
-    SECONDS=0
     source ~/.zsh/linux.zsh
-    duration=$SECONDS
-    debug "~/.zsh/linux.zsh" "$(($duration % 60))"
 fi
+

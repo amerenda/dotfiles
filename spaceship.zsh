@@ -1,5 +1,6 @@
 SPACESHIP_PROMPT_ORDER=(
-  time
+  battery       # Battery info
+  time          # Shows the curremt time
   dir           # Current directory section
   git           # Git section (git_branch + git_status)
   docker        # Docker section
@@ -16,9 +17,12 @@ SPACESHIP_PROMPT_ASYNC=true
 # time settings
 SPACESHIP_TIME_SHOW=false
 
+# Battery
+SPACESHIP_BATTERY_SHOW=true
+
 # dir settings
 SPACESHIP_DIR_TRUNC=2
-SPACESHIP_DIR_TRUNC_REPO=true
+SPACESHIP_DIR_TRUNC_REPO=false
 
 # git settings
 SPACESHIP_GIT_SHOW=true
