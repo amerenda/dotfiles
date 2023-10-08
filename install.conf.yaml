@@ -9,6 +9,7 @@
   - [mkdir -p ~/.bin, creating bin dir]
   - [mkdir -p ~/.gnupg, creating gnupg dir]
   - [chmod -R 0700 ~/.gnupg, setting permissions on gnupg folder]
+  - [bash ~/.scripts/preSetup.sh, running preinstall steps]
 
 - link:
     ~/.alacritty.yml: alacritty.yml
@@ -16,6 +17,7 @@
     ~/.antigen: antigen/
     ~/.bin: bin
     ~/.cbtrc: cbtrc
+    ~/.config/spaceship.zsh: spaceship.zsh
     ~/.dotfiles: ''
     ~/.gitconfig: gitconfig
     ~/.gitignore_global: gitignore_global
