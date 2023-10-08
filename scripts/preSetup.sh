@@ -3,5 +3,19 @@
 if ! [ -d ~/.config ]; then
   mkdir ~/.config
 fi
-rm -fr ~/.ssh
+
+if ! [ -d ~/.config/conky ]; then
+  mkdir ~/.config/conky
+fi
+
+if ! [ -d ~/.config/autostart ]; then
+  mkdir ~/.config/autostart
+fi
+
+ssh_test_path="$HOME/.ssh/github"
+if ! [ -L ${ssh_test_path} ]; then
+  echo "Symlink not found"
+  rm -fr ~/.ssh
+fi
+
 rm -fr ~/.bin
