@@ -17,6 +17,8 @@
     ~/.antigen: antigen/
     ~/.bin: bin
     ~/.cbtrc: cbtrc
+      #    ~/.config/autostart/conky.desktop: conky.desktop
+    ~/.config/conky/conky.conf: conky.conf
     ~/.config/spaceship.zsh: spaceship.zsh
     ~/.dotfiles: ''
     ~/.gitconfig: gitconfig

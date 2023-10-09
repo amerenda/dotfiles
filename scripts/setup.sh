@@ -16,7 +16,7 @@ APT_PACKAGES="\
   xclip zsh tmux exa direnv git openvpn vim snapd \
   apt-transport-https ca-certificates gnupg curl \
   google-cloud-sdk-cbt restic scdaemon \
-  yubikey-manager dnsutils"
+  yubikey-manager dnsutils feh python3-tk"
 
 FLATPAKS="com.visualstudio.code-oss \
   org.cryptomator.Cryptomator \
