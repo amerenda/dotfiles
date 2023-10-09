@@ -12,9 +12,12 @@ matplotlib.use('TkAgg')
 high_res = cv2.imread('assets/30000×17078.jpg')
 med_res = cv2.imread('assets/2560x1457.jpg')
 low_res = cv2.imread('assets/1280x729.jpg')
+pc_res = (1920, 1080)
+phone_res = (3120, 1440)
 
 black_border_threshold = 2
-resolution = (3120, 1440)  # Desired width and height of slices
+resolution = phone_res
+res_string = "{}x{}".format(resolution[0], resolution[1])
 
 def remove_horizontal_lines(image, line_color, line_thickness=20, threshold=2):
     """
@@ -104,7 +107,7 @@ def draw_grid_adjusted(image, slices_coordinates):
 
 def slice_image_fixed_size(image, resolution):
     """
-    Slices an image into pieces of specified resolution.
+    Slices an image into pieces of specified resolution with an overlap.
     
     :param image: Numpy array of the image.
     :param resolution: Tuple (width, height) specifying the desired resolution of slices.
@@ -113,19 +116,35 @@ def slice_image_fixed_size(image, resolution):
     img_height, img_width, _ = image.shape
     slice_width, slice_height = resolution
     
+    # Setting the overlap to be half the resolution
+    x_overlap = slice_width // 2
+    y_overlap = slice_height // 2
+    
     slices = []
     y = 0
     while y < img_height:
         x = 0
         while x < img_width:
+            # Ensure the slicing does not exceed image boundaries
+            y_end = min(y + slice_height, img_height)
+            x_end = min(x + slice_width, img_width)
+            
             # Crop the image to extract the desired slice
-            slice_ = image[y:min(y + slice_height, img_height),
-                           x:min(x + slice_width, img_width)]
+            slice_ = image[y:y_end, x:x_end]
+
+            # Padding if necessary
+            pad_bottom = slice_height - slice_.shape[0]
+            pad_right = slice_width - slice_.shape[1]
+            if pad_bottom > 0 or pad_right > 0:
+                slice_ = cv2.copyMakeBorder(slice_, 0, pad_bottom, 0, pad_right, cv2.BORDER_CONSTANT, value=[0, 0, 0])
+            
             slices.append(slice_)
-            x += slice_width
-        y += slice_height
+            
+            x += slice_width - x_overlap  # Adjust the step size
+        y += slice_height - y_overlap  # Adjust the step size
     
     return slices
+
 
 def draw_slices_on_image(image, resolution, border_threshold):
     slices_coordinates = []
@@ -160,7 +179,7 @@ def draw_slices_on_image(image, resolution, border_threshold):
     
     draw_grid_adjusted(image, slices_coordinates)
 
-def display_slices_sequentially(slices, border_threshold=2, remove_lines=False, line_color=(0, 0, 0), line_thickness=5):
+def slices_sequentially(slices, action, border_threshold=2, remove_lines=False, line_color=(0, 0, 0), line_thickness=5):
     """
     Displays slices of an image sequentially.
     
@@ -180,11 +199,14 @@ def display_slices_sequentially(slices, border_threshold=2, remove_lines=False, 
             cropped_slice = remove_horizontal_lines(
                 cropped_slice, line_color, line_thickness=line_thickness
             )
-        
-        cv2.imshow(f"Slice {i+1}", cropped_slice)
-        cv2.waitKey(0)  # Wait indefinitely until a key is pressed
-        cv2.destroyAllWindows()
-def draw_updated_slices_on_image(image, slices, resolution, border_threshold=2):
+        if action.lower() == "show":        
+            cv2.imshow(f"Slice {i+1}", cropped_slice)
+            cv2.waitKey(0)  # Wait indefinitely until a key is pressed
+            cv2.destroyAllWindows()
+        elif action.lower() == "save":        
+            cv2.imwrite(f"output/{res_string}_{i+1}.png", cropped_slice)
+
+def draw_updated_slices_on_image(image, slices, resolution, action):
     """
     Overlays an image with updated slices, drawing a grid around each slice.
 
@@ -192,6 +214,7 @@ def draw_updated_slices_on_image(image, slices, resolution, border_threshold=2):
     :param slices: Slices that may have undergone some processing.
     :param resolution: Tuple (width, height) specifying the desired resolution of slices.
     :param border_threshold: Threshold for identifying borders.
+    :param action: "show" or "save"
     :return: Image with overlay of updated slices.
     """
     overlay = image.copy()
@@ -219,24 +242,21 @@ def draw_updated_slices_on_image(image, slices, resolution, border_threshold=2):
             x += slice_width
         y += slice_height
     
-    cv2.imshow("Updated Overlay", overlay)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+        if action.lower() == "show":        
+            cv2.imshow("Updated Overlay", overlay)
+            cv2.waitKey(0)  # Wait indefinitely until a key is pressed
+            cv2.destroyAllWindows()
+        elif action.lower() == "save":        
+            cv2.imwrite(f"output/overlay.jpg", overlay)
 
-def show_individual_slices(image):
+def slice(image, action):
     slices = slice_image_fixed_size(image, resolution)
 
     # To display slices with horizontal lines removed, set remove_lines to True
-    display_slices_sequentially(slices, black_border_threshold, remove_lines=True, line_color=(0, 0, 0), line_thickness=5)
-
-def save_individual_slices(image):
-    slices = slice_image_fixed_size(image, resolution)
-
-    # To display slices with horizontal lines removed, set remove_lines to True
-    display_slices_sequentially(slices, black_border_threshold, remove_lines=True, line_color=(0, 0, 0), line_thickness=5)
+    slices_sequentially(slices, action, border_threshold=black_border_threshold, remove_lines=True, line_color=(0, 0, 0), line_thickness=5, action=action)
 
 
-def show_slices_on_image(image):
+def show_slices_on_image(image, action):
     slices = slice_image_fixed_size(image, resolution)
 
     # Perform any processing you want on the slices here
@@ -253,9 +273,22 @@ def show_slices_on_image(image):
         processed_slices.append(resized_slice)
 
     # Overlay the original image with the processed slices
-    draw_updated_slices_on_image(image, processed_slices, resolution)
+    draw_updated_slices_on_image(image, processed_slices, resolution, action)
 
+def slice_and_process(image, action):
+    # Slice image into defined resolution with overlaps
+    slices = slice_image_fixed_size(image, resolution)
+    
+    # Optionally display each slice with removed horizontal lines
+    slices_sequentially(slices, action, 
+                        border_threshold=black_border_threshold,
+                        remove_lines=True, line_color=(0, 0, 0), 
+                        line_thickness=5)
+    
+    # Further processing on slices, if desired, should be added here
+    
+    # Example: Overlays the original image with the processed slices
+    draw_updated_slices_on_image(image, slices, resolution, action)
 
-#show_slices_on_image(high_res)
-show_individual_slices(high_res)
-save_individual_slices(high_res)
+# Invoke the function to slice and process
+slice_and_process(high_res, action="save")
