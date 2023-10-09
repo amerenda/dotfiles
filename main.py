@@ -183,7 +183,7 @@ def draw_slices_on_image(image, resolution, border_threshold):
     
     draw_grid_adjusted(image, slices_coordinates)
 
-def slices_sequentially(slices, action, border_threshold=2, remove_lines=False, line_color=(0, 0, 0), line_thickness=5, resolution=(256, 256)):
+def slices_sequentially(slices, border_threshold=2, remove_lines=False, line_color=(0, 0, 0), line_thickness=5, resolution=(256, 256), action="save"):
     """
     Displays slices of an image sequentially.
     
@@ -215,7 +215,7 @@ def slices_sequentially(slices, action, border_threshold=2, remove_lines=False, 
             cv2.imwrite(f"output/{res_string}_{i+1}.png", resized_slice)
 
 
-def draw_updated_slices_on_image(image, slices, resolution, action, content_stddev_threshold=2):
+def draw_updated_slices_on_image(image, slices, resolution, content_stddev_threshold=2, action="save"):
     """
     Overlays an image with updated slices, drawing a grid around each slice.
 
@@ -265,7 +265,7 @@ def slice(image, action):
     slices = slice_image_fixed_size(image, resolution)
 
     # To display slices with horizontal lines removed, set remove_lines to True
-    slices_sequentially(slices, action, border_threshold=black_border_threshold, remove_lines=True, line_color=(0, 0, 0), line_thickness=5, action=action)
+    slices_sequentially(slices, border_threshold=black_border_threshold, remove_lines=True, line_color=(0, 0, 0), line_thickness=5, action=action)
 
 
 def show_slices_on_image(image, action):
@@ -292,10 +292,10 @@ def slice_and_process(image, action, resolution):
     slices = slice_image_fixed_size(image, resolution)
     
     # Optionally display each slice with removed horizontal lines
-    slices_sequentially(slices, action, 
+    slices_sequentially(slices, 
                         border_threshold=black_border_threshold,
                         remove_lines=True, line_color=(0, 0, 0), 
-                        line_thickness=5)
+                        line_thickness=5, action=action)
     
     # Further processing on slices, if desired, should be added here
     
