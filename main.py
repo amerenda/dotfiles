@@ -239,6 +239,9 @@ def draw_updated_slices_on_image(image, slices, resolution, content_stddev_thres
                 slice_ = slices.pop(0)  # Pop the first slice
                 
                 # Check whether the slice contains meaningful content
+            if slice_.dtype == np.dtype('O'):  # Check if the slice has object data type
+                print(f"Unexpected data type in slice: {slice_}")
+            else:
                 if np.std(slice_) > content_stddev_threshold:
                     # Determine the height and width of the slice to overlay
                     overlay_height = min(slice_height, img_height - y)
@@ -267,25 +270,6 @@ def slice(image, action):
     # To display slices with horizontal lines removed, set remove_lines to True
     slices_sequentially(slices, border_threshold=black_border_threshold, remove_lines=True, line_color=(0, 0, 0), line_thickness=5, action=action)
 
-
-def show_slices_on_image(image, action):
-    slices = slice_image_fixed_size(image, resolution)
-
-    # Perform any processing you want on the slices here
-    processed_slices = []
-    for slice_ in slices:
-        content_coordinates = get_content_coordinates(slice_, threshold=black_border_threshold)
-        cropped_slice = slice_[content_coordinates[1]:content_coordinates[3], 
-                               content_coordinates[0]:content_coordinates[2]]
-        
-        # Resize the cropped slice back to the original resolution
-        resized_slice = cv2.resize(cropped_slice, (resolution[0], resolution[1]))
-
-        # Add any additional processing steps for each slice if needed
-        processed_slices.append(resized_slice)
-
-    # Overlay the original image with the processed slices
-    draw_updated_slices_on_image(image, processed_slices, resolution, action)
 
 def slice_and_process(image, action, resolution):
     # Slice image into defined resolution with overlaps
