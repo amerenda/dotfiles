@@ -17,82 +17,6 @@ high_res_path = 'assets/30000×17078.jpg'
 med_res_path = 'assets/2560x1457.jpg'
 low_res_path = 'assets/1280x729.jpg'
 
-# Load image using OpenCV
-def saliencyRender(image):
-    output_size = (1920, 1080)
-
-    # Convert image to RGB (OpenCV uses BGR)
-    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-
-    # Initialize Static Saliency Spectral Residual detector
-    saliency = cv2.saliency.StaticSaliencySpectralResidual_create()
-    (success, saliencyMap) = saliency.computeSaliency(image)
-
-    threshMap = cv2.threshold(saliencyMap.astype("uint8"), 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)[1]
-
-    saliencyMap = (saliencyMap * 255).astype("uint8")
-    threshMap = (threshMap * 10).astype("uint8")
-
-    # Convert saliencyMap to uint8 (if not already)
-    saliencyMap_uint8 = (saliencyMap * 255).astype(np.uint8)
-
-    # 1. Binarize the saliency map
-    _, binarizedMap = cv2.threshold(saliencyMap_uint8, 127, 255, cv2.THRESH_BINARY)
-
-    # Apply morphological operations (Optional: to remove noise or small regions)
-    kernel = np.ones((5,5),np.uint8) 
-    #binarizedMap = cv2.morphologyEx(binarizedMap, cv2.MORPH_OPEN, kernel)
-
-
-
-    # 2. Find contours
-    (contours, _) = cv2.findContours(binarizedMap, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-    print(len(contours))
-    # Draw contours on a copy of the original image or saliency map
-    image_copy = image.copy()
-    cv2.drawContours(image_copy, contours, -1, (0, 255, 0), 2)
-
-    plt.imshow(image_copy)
-    plt.savefig("output.png")
-    plt.show()
-
-    sys.exit()
-    for contour in contours:
-        # 3. Extract bounding boxes
-        x, y, w, h = cv2.boundingRect(contour)
-
-        # Optionally: Filter bounding boxes by size
-        if w > 50 and h > 50: # Adjust size criteria as needed
-            # 4. Crop original image
-            cropped_region = image[y:y+h, x:x+w]
-            #plt.imshow(cropped_region)
-            #plt.show()
-
-            # Resize while maintaining aspect ratio
-            aspect_ratio = w/h
-            target_w, target_h = output_size
-            if aspect_ratio > target_w/target_h:
-                new_w = target_w
-                new_h = int(new_w / aspect_ratio)
-            else:
-                new_h = target_h
-                new_w = int(new_h * aspect_ratio)
-
-            resized_region = cv2.resize(cropped_region, (new_w, new_h))
-
-            # Create an empty image of the desired size
-            output_image = np.zeros((target_h, target_w, 3), dtype=np.uint8)
-
-            # Paste the resized crop into the center of the image
-            x_offset = (target_w - new_w) // 2
-            y_offset = (target_h - new_h) // 2
-            output_image[y_offset:y_offset+new_h, x_offset:x_offset+new_w] = resized_region
-
-            # Convert to PIL Image and save or display
-            #output_image_pil = Image.fromarray(output_image)
-            #output_image_pil.show()
-
 
 def slice_image(image_array, rows, cols):
     """
@@ -191,63 +115,56 @@ def get_content_coordinates(image, threshold=255):
     
     return best_box
 
-def remove_black_border(image, threshold=10):
+def remove_black_border(image, threshold=255):
     # Get content coordinates from the grayscale version
     x1, y1, x2, y2 = get_content_coordinates(image, threshold)
     
     # Crop the original, colored image
     cropped_image = image[y1:y2, x1:x2]
     
-    return cropped_image
+    return cropped_image, (x1, y1, x2, y2)
 
-def draw_grid(image, rows, cols, color=(0, 255, 0), thickness=2):
-    """
-    Draw a grid overlay on the image.
+def draw_grid_adjusted(image, slices_coordinates):
+    for coordinates in slices_coordinates:
+        x1, y1, x2, y2 = coordinates
+        
+        # Draw horizontal and vertical lines using OpenCV
+        cv2.line(image, (x1, y1), (x2, y1), (0, 255, 0), 1)  # Horizontal top line
+        cv2.line(image, (x1, y2), (x2, y2), (0, 255, 0), 1)  # Horizontal bottom line
+        cv2.line(image, (x1, y1), (x1, y2), (0, 255, 0), 1)  # Vertical left line
+        cv2.line(image, (x2, y1), (x2, y2), (0, 255, 0), 1)  # Vertical right line
+    
+    cv2.imshow("Grid Overlay", image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
-    :param image: Original image (NumPy array).
-    :param rows: Number of rows in the grid.
-    :param cols: Number of columns in the grid.
-    :param color: Color of the grid lines (BGR tuple).
-    :param thickness: Thickness of the grid lines.
-    """
-    img_height, img_width, _ = image.shape
-    slice_width = img_width // cols
-    slice_height = img_height // rows
-
-    # Drawing vertical lines
-    for i in range(1, cols):
-        cv2.line(image, (i * slice_width, 0), (i * slice_width, img_height), color, thickness)
-
-    # Drawing horizontal lines
-    for i in range(1, rows):
-        cv2.line(image, (0, i * slice_height), (img_width, i * slice_height), color, thickness)
-
-    # Display the image with grid
-    plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
-    plt.axis("off")
-    plt.show()
 
 # Example usage:
-image = med_res
+image = low_res
 rows = 4  # Number of rows
 cols = 3  # Number of columns
+slices = slice_image(image, rows, cols)
 
-draw_grid(image, rows, cols)
-sys.exit()
+slices_coordinates = []
 
-
-
-rows = 3  # number of rows in the grid
-cols = 4  # number of columns in the grid
-
-# Example usage:
-slices = slice_image(image_path, rows, cols)
-
-# Assuming `slices` is a 2D list of your image slices
 for i, row_slices in enumerate(slices):
     for j, slice_img in enumerate(row_slices):
-        cropped_slice = remove_black_border(slice_img)
-        # Now, `cropped_slice` retains the original color
-        plt.imshow(cv2.cvtColor(cropped_slice, cv2.COLOR_BGR2RGB))
-        plt.show()
+        cropped_slice, coords = remove_black_border(slice_img)
+        
+        # Adjusting coordinates relative to the original image
+        x_offset = j * (image.shape[1] // cols)
+        y_offset = i * (image.shape[0] // rows)
+        adjusted_coords = (
+            coords[0] + x_offset, 
+            coords[1] + y_offset, 
+            coords[2] + x_offset, 
+            coords[3] + y_offset
+        )
+        
+        slices_coordinates.append(adjusted_coords)
+        
+        # Displaying the cropped slice
+        #plt.imshow(cv2.cvtColor(cropped_slice, cv2.COLOR_BGR2RGB))
+        #plt.show()
 
+draw_grid_adjusted(image, slices_coordinates)
