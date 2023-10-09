@@ -118,7 +118,7 @@ def slice_image_fixed_size(image, resolution):
     :return: List of slices with specified resolution.
     """
     img_height, img_width, _ = image.shape
-    slice_width, slice_height = resolution
+    slice_height, slice_width = resolution
     
     slices = []
     y = 0
@@ -150,38 +150,46 @@ def slice_image_fixed_size(image, resolution):
     return slices
 
 
-def draw_slices_on_image(image, resolution, border_threshold):
-    slices_coordinates = []
+def draw_slice_overlay(image, resolution, overlay_alpha=0.3):
+    """
+    Overlays the original image with semi-transparent colored rectangles,
+    representing each slice. Different colors are used to highlight overlaps.
+
+    :param image: Original image.
+    :param resolution: Tuple (width, height) specifying the desired resolution of slices.
+    :param overlay_alpha: Transparency level of the overlay. 0 is fully transparent, 1 is opaque.
+    :return: Image with overlay of slices.
+    """
+    overlay = image.copy()  # Create a copy to draw overlay slices on
+    output = image.copy()  # Create another copy to blend with the overlay
+    
     img_height, img_width, _ = image.shape
     slice_width, slice_height = resolution
     
-    x_step = slice_width // 2  # Half the slice width
-    y_step = slice_height // 2  # Half the slice height
+    colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0)]  # Example colors
     
     y = 0
-    while y < img_height - slice_height + 1:  # Ensuring the window stays within image bounds
+    while y < img_height:
         x = 0
-        while x < img_width - slice_width + 1:  # Ensuring the window stays within image bounds
-            # Extract the current slice
-            slice_coordinates = (x, y, x + slice_width, y + slice_height)
-            sliced_img = image[y:y + slice_height, x:x + slice_width]
+        while x < img_width:
+            # Determine the height and width of the slice to overlay
+            overlay_height = min(slice_height, img_height - y)
+            overlay_width = min(slice_width, img_width - x)
             
-            # Get the content coordinates of the slice
-            content_coordinates = get_content_coordinates(sliced_img, border_threshold)
+            # Choose a color for the current slice (cycling through the defined colors)
+            color = colors[(x // slice_width + y // slice_height) % len(colors)]
             
-            # Adjust the content coordinates relative to the original image
-            content_coordinates_adjusted = (
-                content_coordinates[0] + x,
-                content_coordinates[1] + y,
-                content_coordinates[2] + x,
-                content_coordinates[3] + y
-            )
+            # Draw a semi-transparent rectangle on the overlay
+            cv2.rectangle(overlay, (x, y), (x + overlay_width, y + overlay_height), color, -1)
             
-            slices_coordinates.append(content_coordinates_adjusted)
-            x += x_step  # Move to the next slice horizontally
-        y += y_step  # Move to the next slice vertically
+            x += slice_width  # Move to the next column
+        y += slice_height  # Move to the next row
     
-    draw_grid_adjusted(image, slices_coordinates)
+    # Blend the overlay with the original image using the specified alpha
+    cv2.addWeighted(overlay, overlay_alpha, output, 1 - overlay_alpha, 0, output)
+    
+    return output
+
 
 def slices_sequentially(slices, border_threshold=2, remove_lines=False, line_color=(0, 0, 0), line_thickness=5, resolution=(256, 256), action="save"):
     """
@@ -215,55 +223,6 @@ def slices_sequentially(slices, border_threshold=2, remove_lines=False, line_col
             cv2.imwrite(f"output/{res_string}_{i+1}.png", resized_slice)
 
 
-def draw_updated_slices_on_image(image, slices, resolution, content_stddev_threshold=2, action="save"):
-    """
-    Overlays an image with updated slices, drawing a grid around each slice.
-
-    :param image: Original image.
-    :param slices: Slices that may have undergone some processing.
-    :param resolution: Tuple (width, height) specifying the desired resolution of slices.
-    :param action: "show" or "save"
-    :param content_stddev_threshold: standard deviation threshold to check if the slice has content.
-    :return: Image with overlay of updated slices.
-    """
-    overlay = image.copy()
-    
-    img_height, img_width, _ = image.shape
-    slice_width, slice_height = resolution
-    
-    y = 0
-    while y < img_height:
-        x = 0
-        while x < img_width:
-            if slices:  # Just to be safe and not get an index out of range
-                slice_ = slices.pop(0)  # Pop the first slice
-                
-                # Check whether the slice contains meaningful content
-            if slice_.dtype == np.dtype('O'):  # Check if the slice has object data type
-                print(f"Unexpected data type in slice: {slice_}")
-            else:
-                if np.std(slice_) > content_stddev_threshold:
-                    # Determine the height and width of the slice to overlay
-                    overlay_height = min(slice_height, img_height - y)
-                    overlay_width = min(slice_width, img_width - x)
-                    
-                    # Overlay the updated slice onto the original image
-                    overlay[y:y+overlay_height, x:x+overlay_width] = slice_[:overlay_height, :overlay_width]
-                
-                    # Draw rectangle around the slice
-                    cv2.rectangle(overlay, (x, y), (x + overlay_width, y + overlay_height), (0, 255, 0), 2)
-                
-            x += slice_width
-        y += slice_height
-    
-    if action.lower() == "show":        
-        cv2.imshow("Updated Overlay", overlay)
-        cv2.waitKey(0)  # Wait indefinitely until a key is pressed
-        cv2.destroyAllWindows()
-    elif action.lower() == "save":        
-        cv2.imwrite(f"output/overlay.jpg", overlay)
-
-
 def slice(image, action):
     slices = slice_image_fixed_size(image, resolution)
 
@@ -271,21 +230,35 @@ def slice(image, action):
     slices_sequentially(slices, border_threshold=black_border_threshold, remove_lines=True, line_color=(0, 0, 0), line_thickness=5, action=action)
 
 
-def slice_and_process(image, action, resolution):
+def slice_and_process(image, action, resolution, overlay_only=False):
     # Slice image into defined resolution with overlaps
-    slices = slice_image_fixed_size(image, resolution)
+    if overlay_only:
+        overlay_img = draw_slice_overlay(image, resolution)
+        if action.lower() == "show":        
+            cv2.imshow("Overlay", overlay_img)
+            cv2.waitKey(0)  # Wait indefinitely until a key is pressed
+            cv2.destroyAllWindows()
+        elif action.lower() == "save":        
+            cv2.imwrite("output/overlay.jpg", overlay_img)
+    else:
+        slices = slice_image_fixed_size(image, resolution)
     
-    # Optionally display each slice with removed horizontal lines
-    slices_sequentially(slices, 
-                        border_threshold=black_border_threshold,
-                        remove_lines=True, line_color=(0, 0, 0), 
-                        line_thickness=5, action=action)
+
+        # Optionally display each slice with removed horizontal lines
+        slices_sequentially(slices, 
+                            border_threshold=black_border_threshold,
+                            remove_lines=True, line_color=(0, 0, 0), 
+                            line_thickness=5, action=action)
+
+        overlay_img = draw_slice_overlay(image, resolution)
+        if action.lower() == "show":        
+            cv2.imshow("Overlay", overlay_img)
+            cv2.waitKey(0)  # Wait indefinitely until a key is pressed
+            cv2.destroyAllWindows()
+        elif action.lower() == "save":        
+            cv2.imwrite("output/overlay.jpg", overlay_img)
+
     
-    # Further processing on slices, if desired, should be added here
-    
-    # Example: Overlays the original image with the processed slices
-    draw_updated_slices_on_image(image, slices, resolution, action)
 
 # Invoke the function to slice and process
-
-slice_and_process(low_res, action="save", resolution=test_res)
+slice_and_process(high_res, action="save", resolution=phone_res, overlay_only=True)
