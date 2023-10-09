@@ -14,80 +14,49 @@ med_res = cv2.imread('assets/2560x1457.jpg')
 low_res = cv2.imread('assets/1280x729.jpg')
 
 black_border_threshold = 2
+resolution = (3120, 1440)  # Desired width and height of slices
 
-def slice_image(image_array, rows, cols):
+def remove_horizontal_lines(image, line_color, line_thickness=20, threshold=2):
     """
-    Slices an image into a grid of (rows x cols) sub-images.
+    Removes horizontal lines from an image.
     
-    :param image_array: Numpy array of the image.
-    :param rows: Number of rows in the grid.
-    :param cols: Number of columns in the grid.
-    :return: 2D list of numpy array objects representing the slices.
+    Parameters:
+        image (numpy.ndarray): The input image.
+        line_color (tuple): BGR values of the line to be removed.
+        line_thickness (int): Expected thickness of the line to be removed.
+        threshold (int): Threshold value for color comparison.
+    
+    Returns:
+        numpy.ndarray: The processed image.
     """
-    # Convert numpy array to PIL Image
-    image = Image.fromarray(image_array)
-    
-    img_width, img_height = image.size
-    slice_width = img_width // cols
-    slice_height = img_height // rows
-    
-    slices = []
-    for i in range(rows):
-        row_slices = []
-        for j in range(cols):
-            left = j * slice_width
-            upper = i * slice_height
-            right = (j + 1) * slice_width
-            lower = (i + 1) * slice_height
-            
-            # Crop the image to extract the desired slice
-            slice_ = image.crop((left, upper, right, lower))
-            
-            # Optionally, convert the PIL Image slice back to a numpy array
-            slice_array = np.array(slice_)
-            
-            row_slices.append(slice_array)
-        slices.append(row_slices)
-    
-    return slices
 
-
-def display_slices(slices):
-    rows = len(slices)
-    cols = len(slices[0])
-    
-    fig, axes = plt.subplots(rows, cols)
-    
-    for i in range(rows):
-        for j in range(cols):
-            # Convert BGR to RGB before displaying
-            rgb_slice = cv2.cvtColor(slices[i][j], cv2.COLOR_BGR2RGB)
-            axes[i, j].imshow(rgb_slice)
-            axes[i, j].axis("off")
-    
-    plt.show()
-
-
-def get_content_coordinates_adaptive(image, block_size=501, c=-10):
-    # Convert the image to grayscale
+    # Convert to grayscale for easier processing
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     
-    # Adaptive Thresholding
-    thresh = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
-                                   cv2.THRESH_BINARY_INV, block_size, c)
+    # Threshold the image to keep only the lines
+    _, thresh = cv2.threshold(gray, threshold, 255, cv2.THRESH_BINARY_INV)
     
-    contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    max_area = 0
-    best_box = (0, 0, image.shape[1], image.shape[0]) # default to whole image if no contours found
+    # Define a horizontal kernel
+    horizontal_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (line_thickness, 1))
     
+    # Apply morphological opening to remove horizontal lines
+    detected_lines = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, horizontal_kernel, iterations=2)
+    
+    # Find contours of the lines
+    contours, _ = cv2.findContours(detected_lines, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    
+    # Loop over the contours
     for contour in contours:
+        # Get bounding box of the line
         x, y, w, h = cv2.boundingRect(contour)
-        area = w * h
-        if area > max_area:
-            max_area = area
-            best_box = (x, y, x + w, y + h)
-    
-    return best_box
+        
+        # Check whether the found contour is of a horizontal line
+        if w > 1.5*h:
+            # Replace line area with the background color
+            cv2.rectangle(image, (x, y), (x+w, y+h), line_color, -1)
+            
+    return image
+
 
 def get_content_coordinates(image, threshold=255):
     # Convert the image to grayscale
@@ -112,59 +81,26 @@ def get_content_coordinates(image, threshold=255):
     
     return best_box
 
-def remove_black_border(image, threshold=black_border_threshold):
-    # Get content coordinates from the grayscale version
-    x1, y1, x2, y2 = get_content_coordinates(image, threshold)
-    
-    # Crop the original, colored image
-    cropped_image = image[y1:y2, x1:x2]
-    
-    return cropped_image, (x1, y1, x2, y2)
-
 def draw_grid_adjusted(image, slices_coordinates):
+    colors = [(0, 255, 0), (255, 0, 0), (0, 0, 255), (255, 255, 0)]
+    color_idx = 0
+    
     for coordinates in slices_coordinates:
         x1, y1, x2, y2 = coordinates
         
+        # Get color
+        color = colors[color_idx]
+        color_idx = (color_idx + 1) % len(colors)  # Move to the next color
+        
         # Draw horizontal and vertical lines using OpenCV
-        cv2.line(image, (x1, y1), (x2, y1), (0, 255, 0), 1)  # Horizontal top line
-        cv2.line(image, (x1, y2), (x2, y2), (0, 255, 0), 1)  # Horizontal bottom line
-        cv2.line(image, (x1, y1), (x1, y2), (0, 255, 0), 1)  # Vertical left line
-        cv2.line(image, (x2, y1), (x2, y2), (0, 255, 0), 1)  # Vertical right line
+        cv2.line(image, (x1, y1), (x2, y1), color, 1)  # Horizontal top line
+        cv2.line(image, (x1, y2), (x2, y2), color, 1)  # Horizontal bottom line
+        cv2.line(image, (x1, y1), (x1, y2), color, 1)  # Vertical left line
+        cv2.line(image, (x2, y1), (x2, y2), color, 1)  # Vertical right line
     
     cv2.imshow("Grid Overlay", image)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-
-def adjust_coordinates(adjusted_coords, image, threshold=black_border_threshold):
-    """
-    Adjusts coordinates to expand towards left and right, up to the black borders.
-    
-    :param adjusted_coords: Original coordinates tuple (x1, y1, x2, y2).
-    :param image: Source image.
-    :param threshold: Black border threshold.
-    :return: New adjusted coordinates.
-    """
-    x1, y1, x2, y2 = adjusted_coords
-    
-    # Convert the image to grayscale
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    
-    # Get the middle vertical position of the area
-    middle_y = (y1 + y2) // 2
-    
-    # Scan towards the left to find the black border
-    new_x1 = x1
-    while new_x1 > 0 and np.mean(gray[middle_y, new_x1-1:new_x1+1]) > threshold:
-        new_x1 -= 1
-    
-    # Scan towards the right to find the black border
-    new_x2 = x2
-    while new_x2 < image.shape[1] and np.mean(gray[middle_y, new_x2-1:new_x2+1]) > threshold:
-        new_x2 += 1
-    
-    # Returning adjusted coordinates
-    return new_x1, y1, new_x2, y2
-
 
 def slice_image_fixed_size(image, resolution):
     """
@@ -192,17 +128,20 @@ def slice_image_fixed_size(image, resolution):
     return slices
 
 def draw_slices_on_image(image, resolution, border_threshold):
-    y = 0
     slices_coordinates = []
     img_height, img_width, _ = image.shape
     slice_width, slice_height = resolution
     
-    while y < img_height:
+    x_step = slice_width // 2  # Half the slice width
+    y_step = slice_height // 2  # Half the slice height
+    
+    y = 0
+    while y < img_height - slice_height + 1:  # Ensuring the window stays within image bounds
         x = 0
-        while x < img_width:
+        while x < img_width - slice_width + 1:  # Ensuring the window stays within image bounds
             # Extract the current slice
-            slice_coordinates = (x, y, min(x + slice_width, img_width), min(y + slice_height, img_height))
-            sliced_img = image[slice_coordinates[1]:slice_coordinates[3], slice_coordinates[0]:slice_coordinates[2]]
+            slice_coordinates = (x, y, x + slice_width, y + slice_height)
+            sliced_img = image[y:y + slice_height, x:x + slice_width]
             
             # Get the content coordinates of the slice
             content_coordinates = get_content_coordinates(sliced_img, border_threshold)
@@ -216,15 +155,107 @@ def draw_slices_on_image(image, resolution, border_threshold):
             )
             
             slices_coordinates.append(content_coordinates_adjusted)
-            x += slice_width
-        y += slice_height
+            x += x_step  # Move to the next slice horizontally
+        y += y_step  # Move to the next slice vertically
     
     draw_grid_adjusted(image, slices_coordinates)
 
+def display_slices_sequentially(slices, border_threshold=2, remove_lines=False, line_color=(0, 0, 0), line_thickness=5):
+    """
+    Displays slices of an image sequentially.
+    
+    Parameters:
+        slices (list): List of image slices.
+        border_threshold (int): Threshold value to define borders.
+        remove_lines (bool): If True, removes horizontal lines from slices.
+        line_color (tuple): BGR values of the line to be removed.
+        line_thickness (int): Expected thickness of the line to be removed.
+    """
+    for i, slice_ in enumerate(slices):
+        content_coordinates = get_content_coordinates(slice_, threshold=border_threshold)
+        cropped_slice = slice_[content_coordinates[1]:content_coordinates[3], 
+                               content_coordinates[0]:content_coordinates[2]]
+        
+        if remove_lines:
+            cropped_slice = remove_horizontal_lines(
+                cropped_slice, line_color, line_thickness=line_thickness
+            )
+        
+        cv2.imshow(f"Slice {i+1}", cropped_slice)
+        cv2.waitKey(0)  # Wait indefinitely until a key is pressed
+        cv2.destroyAllWindows()
+def draw_updated_slices_on_image(image, slices, resolution, border_threshold=2):
+    """
+    Overlays an image with updated slices, drawing a grid around each slice.
 
-# Example usage:
-image = low_res
-resolution = (256, 256)  # Desired width and height of slices
-slices = slice_image_fixed_size(image, resolution)
+    :param image: Original image.
+    :param slices: Slices that may have undergone some processing.
+    :param resolution: Tuple (width, height) specifying the desired resolution of slices.
+    :param border_threshold: Threshold for identifying borders.
+    :return: Image with overlay of updated slices.
+    """
+    overlay = image.copy()
+    
+    img_height, img_width, _ = image.shape
+    slice_width, slice_height = resolution
+    
+    y = 0
+    while y < img_height:
+        x = 0
+        while x < img_width:
+            if slices:  # Just to be safe and not get an index out of range
+                slice_ = slices.pop(0)  # Pop the first slice
 
-draw_slices_on_image(image, resolution, black_border_threshold)
+                # Determine the height and width of the slice to overlay
+                overlay_height = min(slice_height, img_height - y)
+                overlay_width = min(slice_width, img_width - x)
+                
+                # Overlay the updated slice onto the original image
+                overlay[y:y+overlay_height, x:x+overlay_width] = slice_[:overlay_height, :overlay_width]
+            
+                # Draw rectangle around the slice
+                cv2.rectangle(overlay, (x, y), (x + overlay_width, y + overlay_height), (0, 255, 0), 2)
+                
+            x += slice_width
+        y += slice_height
+    
+    cv2.imshow("Updated Overlay", overlay)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+def show_individual_slices(image):
+    slices = slice_image_fixed_size(image, resolution)
+
+    # To display slices with horizontal lines removed, set remove_lines to True
+    display_slices_sequentially(slices, black_border_threshold, remove_lines=True, line_color=(0, 0, 0), line_thickness=5)
+
+def save_individual_slices(image):
+    slices = slice_image_fixed_size(image, resolution)
+
+    # To display slices with horizontal lines removed, set remove_lines to True
+    display_slices_sequentially(slices, black_border_threshold, remove_lines=True, line_color=(0, 0, 0), line_thickness=5)
+
+
+def show_slices_on_image(image):
+    slices = slice_image_fixed_size(image, resolution)
+
+    # Perform any processing you want on the slices here
+    processed_slices = []
+    for slice_ in slices:
+        content_coordinates = get_content_coordinates(slice_, threshold=black_border_threshold)
+        cropped_slice = slice_[content_coordinates[1]:content_coordinates[3], 
+                               content_coordinates[0]:content_coordinates[2]]
+        
+        # Resize the cropped slice back to the original resolution
+        resized_slice = cv2.resize(cropped_slice, (resolution[0], resolution[1]))
+
+        # Add any additional processing steps for each slice if needed
+        processed_slices.append(resized_slice)
+
+    # Overlay the original image with the processed slices
+    draw_updated_slices_on_image(image, processed_slices, resolution)
+
+
+#show_slices_on_image(high_res)
+show_individual_slices(high_res)
+save_individual_slices(high_res)
