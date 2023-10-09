@@ -9,14 +9,17 @@ from PIL import Image
 
 
 matplotlib.use('TkAgg')
+high_res = cv2.imread('assets/30000×17078.jpg')
+med_res = cv2.imread('assets/2560x1457.jpg')
+low_res = cv2.imread('assets/1280x729.jpg')
+
+high_res_path = 'assets/30000×17078.jpg'
+med_res_path = 'assets/2560x1457.jpg'
+low_res_path = 'assets/1280x729.jpg'
 
 # Load image using OpenCV
-def saliencyRender():
-    high_res = cv2.imread('assets/30000×17078.jpg')
-    med_res = cv2.imread('assets/2560x1457.jpg')
-    low_res = cv2.imread('assets/1280x729.jpg')
+def saliencyRender(image):
     output_size = (1920, 1080)
-    image = low_res
 
     # Convert image to RGB (OpenCV uses BGR)
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
@@ -29,8 +32,6 @@ def saliencyRender():
 
     saliencyMap = (saliencyMap * 255).astype("uint8")
     threshMap = (threshMap * 10).astype("uint8")
-
-    # Sailency map output
 
     # Convert saliencyMap to uint8 (if not already)
     saliencyMap_uint8 = (saliencyMap * 255).astype(np.uint8)
@@ -199,10 +200,43 @@ def remove_black_border(image, threshold=10):
     
     return cropped_image
 
-high_res = cv2.imread('assets/30000×17078.jpg')
-med_res = cv2.imread('assets/2560x1457.jpg')
-low_res = cv2.imread('assets/1280x729.jpg')
-image_path = med_res
+def draw_grid(image, rows, cols, color=(0, 255, 0), thickness=2):
+    """
+    Draw a grid overlay on the image.
+
+    :param image: Original image (NumPy array).
+    :param rows: Number of rows in the grid.
+    :param cols: Number of columns in the grid.
+    :param color: Color of the grid lines (BGR tuple).
+    :param thickness: Thickness of the grid lines.
+    """
+    img_height, img_width, _ = image.shape
+    slice_width = img_width // cols
+    slice_height = img_height // rows
+
+    # Drawing vertical lines
+    for i in range(1, cols):
+        cv2.line(image, (i * slice_width, 0), (i * slice_width, img_height), color, thickness)
+
+    # Drawing horizontal lines
+    for i in range(1, rows):
+        cv2.line(image, (0, i * slice_height), (img_width, i * slice_height), color, thickness)
+
+    # Display the image with grid
+    plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+    plt.axis("off")
+    plt.show()
+
+# Example usage:
+image = med_res
+rows = 4  # Number of rows
+cols = 3  # Number of columns
+
+draw_grid(image, rows, cols)
+sys.exit()
+
+
+
 rows = 3  # number of rows in the grid
 cols = 4  # number of columns in the grid
 
