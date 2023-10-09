@@ -13,7 +13,7 @@ high_res = cv2.imread('assets/30000×17078.jpg')
 med_res = cv2.imread('assets/2560x1457.jpg')
 low_res = cv2.imread('assets/1280x729.jpg')
 
-black_border_threshold = 50
+black_border_threshold = 2
 
 def slice_image(image_array, rows, cols):
     """
@@ -166,34 +166,65 @@ def adjust_coordinates(adjusted_coords, image, threshold=black_border_threshold)
     return new_x1, y1, new_x2, y2
 
 
+def slice_image_fixed_size(image, resolution):
+    """
+    Slices an image into pieces of specified resolution.
+    
+    :param image: Numpy array of the image.
+    :param resolution: Tuple (width, height) specifying the desired resolution of slices.
+    :return: List of slices with specified resolution.
+    """
+    img_height, img_width, _ = image.shape
+    slice_width, slice_height = resolution
+    
+    slices = []
+    y = 0
+    while y < img_height:
+        x = 0
+        while x < img_width:
+            # Crop the image to extract the desired slice
+            slice_ = image[y:min(y + slice_height, img_height),
+                           x:min(x + slice_width, img_width)]
+            slices.append(slice_)
+            x += slice_width
+        y += slice_height
+    
+    return slices
+
+def draw_slices_on_image(image, resolution, border_threshold):
+    y = 0
+    slices_coordinates = []
+    img_height, img_width, _ = image.shape
+    slice_width, slice_height = resolution
+    
+    while y < img_height:
+        x = 0
+        while x < img_width:
+            # Extract the current slice
+            slice_coordinates = (x, y, min(x + slice_width, img_width), min(y + slice_height, img_height))
+            sliced_img = image[slice_coordinates[1]:slice_coordinates[3], slice_coordinates[0]:slice_coordinates[2]]
+            
+            # Get the content coordinates of the slice
+            content_coordinates = get_content_coordinates(sliced_img, border_threshold)
+            
+            # Adjust the content coordinates relative to the original image
+            content_coordinates_adjusted = (
+                content_coordinates[0] + x,
+                content_coordinates[1] + y,
+                content_coordinates[2] + x,
+                content_coordinates[3] + y
+            )
+            
+            slices_coordinates.append(content_coordinates_adjusted)
+            x += slice_width
+        y += slice_height
+    
+    draw_grid_adjusted(image, slices_coordinates)
+
 
 # Example usage:
 image = low_res
-rows = 4  # Number of rows
-cols = 3  # Number of columns
-slices = slice_image(image, rows, cols)
+resolution = (256, 256)  # Desired width and height of slices
+slices = slice_image_fixed_size(image, resolution)
 
-slices_coordinates = []
-
-for i, row_slices in enumerate(slices):
-    for j, slice_img in enumerate(row_slices):
-        cropped_slice, coords = remove_black_border(slice_img)
-        
-        # Adjusting coordinates relative to the original image
-        x_offset = j * (image.shape[1] // cols)
-        y_offset = i * (image.shape[0] // rows)
-        adjusted_coords = (
-            coords[0] + x_offset, 
-            coords[1] + y_offset, 
-            coords[2] + x_offset, 
-            coords[3] + y_offset
-        )
-
-        # Further adjust the coordinates
-        new_adjusted_coords = adjust_coordinates(adjusted_coords, image)
-        
-        slices_coordinates.append(new_adjusted_coords)
-
-
-
-draw_grid_adjusted(image, slices_coordinates)
+draw_slices_on_image(image, resolution, black_border_threshold)
