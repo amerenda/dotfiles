@@ -13,11 +13,6 @@ high_res = cv2.imread('assets/30000×17078.jpg')
 med_res = cv2.imread('assets/2560x1457.jpg')
 low_res = cv2.imread('assets/1280x729.jpg')
 
-high_res_path = 'assets/30000×17078.jpg'
-med_res_path = 'assets/2560x1457.jpg'
-low_res_path = 'assets/1280x729.jpg'
-
-
 def slice_image(image_array, rows, cols):
     """
     Slices an image into a grid of (rows x cols) sub-images.
