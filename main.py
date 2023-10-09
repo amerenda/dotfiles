@@ -157,9 +157,5 @@ for i, row_slices in enumerate(slices):
         )
         
         slices_coordinates.append(adjusted_coords)
-        
-        # Displaying the cropped slice
-        #plt.imshow(cv2.cvtColor(cropped_slice, cv2.COLOR_BGR2RGB))
-        #plt.show()
 
 draw_grid_adjusted(image, slices_coordinates)
