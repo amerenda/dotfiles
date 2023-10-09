@@ -13,7 +13,7 @@ high_res = cv2.imread('assets/30000×17078.jpg')
 med_res = cv2.imread('assets/2560x1457.jpg')
 low_res = cv2.imread('assets/1280x729.jpg')
 
-black_border_threshold = 40
+black_border_threshold = 50
 
 def slice_image(image_array, rows, cols):
     """
@@ -135,6 +135,37 @@ def draw_grid_adjusted(image, slices_coordinates):
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
+def adjust_coordinates(adjusted_coords, image, threshold=black_border_threshold):
+    """
+    Adjusts coordinates to expand towards left and right, up to the black borders.
+    
+    :param adjusted_coords: Original coordinates tuple (x1, y1, x2, y2).
+    :param image: Source image.
+    :param threshold: Black border threshold.
+    :return: New adjusted coordinates.
+    """
+    x1, y1, x2, y2 = adjusted_coords
+    
+    # Convert the image to grayscale
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    
+    # Get the middle vertical position of the area
+    middle_y = (y1 + y2) // 2
+    
+    # Scan towards the left to find the black border
+    new_x1 = x1
+    while new_x1 > 0 and np.mean(gray[middle_y, new_x1-1:new_x1+1]) > threshold:
+        new_x1 -= 1
+    
+    # Scan towards the right to find the black border
+    new_x2 = x2
+    while new_x2 < image.shape[1] and np.mean(gray[middle_y, new_x2-1:new_x2+1]) > threshold:
+        new_x2 += 1
+    
+    # Returning adjusted coordinates
+    return new_x1, y1, new_x2, y2
+
+
 
 # Example usage:
 image = low_res
@@ -157,7 +188,12 @@ for i, row_slices in enumerate(slices):
             coords[2] + x_offset, 
             coords[3] + y_offset
         )
+
+        # Further adjust the coordinates
+        new_adjusted_coords = adjust_coordinates(adjusted_coords, image)
         
-        slices_coordinates.append(adjusted_coords)
+        slices_coordinates.append(new_adjusted_coords)
+
+
 
 draw_grid_adjusted(image, slices_coordinates)
