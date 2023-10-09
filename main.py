@@ -148,8 +148,7 @@ def slice_image_fixed_size(image, resolution):
     return slices
 
 
-
-def draw_slice_overlay(image, resolution, overlay_alpha=0.3):
+def draw_slice_overlay(image, resolution, overlay_alpha=0.3, show_index=True, show_coordinates=False):
     """
     Overlays the original image with semi-transparent colored rectangles,
     representing each slice. Different colors are used to highlight overlaps.
@@ -157,6 +156,8 @@ def draw_slice_overlay(image, resolution, overlay_alpha=0.3):
     :param image: Original image.
     :param resolution: Tuple (width, height) specifying the desired resolution of slices.
     :param overlay_alpha: Transparency level of the overlay. 0 is fully transparent, 1 is opaque.
+    :param show_index: Boolean, if True, display the slice index on the overlay.
+    :param show_coordinates: Boolean, if True, display the coordinates on the overlay.
     :return: Image with overlay of slices.
     """
     overlay = image.copy()  # Create a copy to draw overlay slices on
@@ -168,6 +169,8 @@ def draw_slice_overlay(image, resolution, overlay_alpha=0.3):
     colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0)]  # Example colors
     
     y = 0
+    slice_index = 0
+    
     while y < img_height:
         x = 0
         while x < img_width:
@@ -181,7 +184,27 @@ def draw_slice_overlay(image, resolution, overlay_alpha=0.3):
             # Draw a semi-transparent rectangle on the overlay
             cv2.rectangle(overlay, (x, y), (x + overlay_width, y + overlay_height), color, -1)
             
+            # Add text annotations for slice index and/or coordinates
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            font_scale = 0.5
+            font_thickness = 1
+            font_color = (255, 255, 255)  # White color for text
+
+            text_x = x + 10  # Small margin from the top left corner of the slice
+            text_y = y + 20 
+            
+            if show_index:
+                cv2.putText(overlay, f"Idx: {slice_index}", (text_x, text_y), 
+                            font, font_scale, font_color, font_thickness, cv2.LINE_AA)
+            
+            if show_coordinates:
+                coord_text = f"({x}, {y})"
+                cv2.putText(overlay, coord_text, (text_x, text_y + 20), 
+                            font, font_scale, font_color, font_thickness, cv2.LINE_AA)
+            
             x += slice_width  # Move to the next column
+            slice_index += 1  # Increment the slice index
+            
         y += slice_height  # Move to the next row
     
     # Blend the overlay with the original image using the specified alpha
@@ -262,4 +285,4 @@ def slice_and_process(image, action, resolution, overlay_only=False):
     
 
 # Invoke the function to slice and process
-slice_and_process(high_res, action="save", resolution=phone_res, overlay_only=False)
+slice_and_process(high_res, action="save", resolution=phone_res, overlay_only=True)
