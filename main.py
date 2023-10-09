@@ -13,6 +13,8 @@ high_res = cv2.imread('assets/30000×17078.jpg')
 med_res = cv2.imread('assets/2560x1457.jpg')
 low_res = cv2.imread('assets/1280x729.jpg')
 
+black_border_threshold = 40
+
 def slice_image(image_array, rows, cols):
     """
     Slices an image into a grid of (rows x cols) sub-images.
@@ -110,7 +112,7 @@ def get_content_coordinates(image, threshold=255):
     
     return best_box
 
-def remove_black_border(image, threshold=255):
+def remove_black_border(image, threshold=black_border_threshold):
     # Get content coordinates from the grayscale version
     x1, y1, x2, y2 = get_content_coordinates(image, threshold)
     
