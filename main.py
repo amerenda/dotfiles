@@ -14,12 +14,10 @@ med_res = cv2.imread('assets/2560x1457.jpg')
 low_res = cv2.imread('assets/1280x729.jpg')
 
 test_res = (256, 256)
-pc_res = (1920, 1080)
-phone_res = (3120, 1440)
+pc_res = (1080, 1920)
+phone_res = (1440, 3120)
 
 black_border_threshold = 2
-resolution = test_res
-res_string = "{}x{}".format(resolution[0], resolution[1])
 
 
 def remove_horizontal_lines(image, line_color, line_thickness=20, threshold=2):
@@ -118,7 +116,7 @@ def slice_image_fixed_size(image, resolution):
     :return: List of slices with specified resolution.
     """
     img_height, img_width, _ = image.shape
-    slice_height, slice_width = resolution
+    slice_width, slice_height = resolution  # Modified line
     
     slices = []
     y = 0
@@ -148,6 +146,7 @@ def slice_image_fixed_size(image, resolution):
         y += slice_height  # Adjust the step size vertically
     
     return slices
+
 
 
 def draw_slice_overlay(image, resolution, overlay_alpha=0.3):
@@ -220,6 +219,7 @@ def slices_sequentially(slices, border_threshold=2, remove_lines=False, line_col
         elif action.lower() == "save":
             if not os.path.exists("output"):
                 os.makedirs("output")
+            res_string = "{}x{}".format(resolution[0], resolution[1])
             cv2.imwrite(f"output/{res_string}_{i+1}.png", resized_slice)
 
 
@@ -248,7 +248,8 @@ def slice_and_process(image, action, resolution, overlay_only=False):
         slices_sequentially(slices, 
                             border_threshold=black_border_threshold,
                             remove_lines=True, line_color=(0, 0, 0), 
-                            line_thickness=5, action=action)
+                            line_thickness=5, action=action,
+                            resolution=resolution)
 
         overlay_img = draw_slice_overlay(image, resolution)
         if action.lower() == "show":        
@@ -261,4 +262,4 @@ def slice_and_process(image, action, resolution, overlay_only=False):
     
 
 # Invoke the function to slice and process
-slice_and_process(high_res, action="save", resolution=phone_res, overlay_only=True)
+slice_and_process(high_res, action="save", resolution=phone_res, overlay_only=False)
