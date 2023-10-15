@@ -15,4 +15,5 @@
 /home/alexm/.dropbox-dist
 /home/alexm/.gnupg
 /home/alexm/**/.*
+/home/alexm/Downloads
 
