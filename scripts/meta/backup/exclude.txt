@@ -1,6 +1,4 @@
-/mnt/data
-/var/lib/libvirt/images/isos
-~/projects
+/home/alexm/projects
 /home/alexm/.cache
 /home/alexm/tmp
 /home/alexm/.pip
@@ -8,7 +6,6 @@
 /home/alexm/Dropbox
 /home/alexm/cargo
 /home/alexm/.ssh
-/home/alexm/projects/dotfiles
 /home/alexm/.dropbox
 /home/alexm/.cargo
 /home/alexm/.config

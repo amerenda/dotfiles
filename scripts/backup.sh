@@ -1,4 +1,11 @@
 #!/usr/bin/env bash
+#!/bin/bash
+
+# Calculate seconds until 2 am
+SECONDS=$(echo $(date -d '2:00 next day' +%s) - $(date +%s) | bc)
+
+# Wake up laptop at 2 am
+sudo rtcwake -m mem -s $SECONDS
 
 export DOTFILES_PATH="${HOME}/projects/dotfiles"
 export INCLUDE_FILE="${DOTFILES_PATH}/scripts/meta/backup/include.txt"
@@ -19,3 +26,4 @@ unset GOOGLE_APPLICATION_CREDENTIALS
 unset RESTIC_PASSWORD
 unset RESTIC_REPO
 
+sudo systemctl suspend
