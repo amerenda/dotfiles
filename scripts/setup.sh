@@ -1,12 +1,5 @@
 #!/bin/bash
 
-### TO ADD
-# Alacritty -deb
-# kubectl - curl
-# kubectx - brew
-# install terraform - https://learn.hashicorp.com/tutorials/terraform/install-cli
-# nordvpn
-
 # Set variables
 USER=$(whoami)
 DOTFILES_PATH="$HOME/projects/dotfiles"
@@ -16,7 +9,8 @@ APT_PACKAGES="\
   xclip zsh tmux exa direnv git openvpn vim snapd \
   apt-transport-https ca-certificates gnupg curl \
   google-cloud-sdk-cbt restic scdaemon \
-  yubikey-manager dnsutils htop"
+  yubikey-manager dnsutils htop
+  gnupg software-properties-common"
 
 FLATPAKS="com.visualstudio.code-oss \
   org.cryptomator.Cryptomator \
@@ -398,6 +392,7 @@ if ! [ -f /usr/share/X11/xkb/symbols/customKeys ]; then
 fi
 
 
+# Install kind
 if ! command -v kind &> /dev/null
 then
   echo "***** installing kind *****"
@@ -405,3 +400,35 @@ then
   chmod +x ./kind
   sudo  mv ./kind /usr/local/bin/kind
 fi
+
+# Install skaffold
+if ! command -v skaffold &> /dev/null
+then
+  echo "***** installing skaffold *****"
+  curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64 && \
+  sudo install skaffold /usr/local/bin/
+fi
+
+# Install terraform
+if ! command -v terraform &> /dev/null
+then
+  # Get terraform key
+  wget -O- https://apt.releases.hashicorp.com/gpg | \
+  gpg --dearmor | \
+  sudo tee /usr/share/keyrings/hashicorp-archive-keyring.gpg
+  # Verify key
+  gpg --no-default-keyring \
+    --keyring /usr/share/keyrings/hashicorp-archive-keyring.gpg \
+    --fingerprint
+  # Add terraform repo
+  echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] \
+    https://apt.releases.hashicorp.com $(lsb_release -cs) main" | \
+  sudo tee /etc/apt/sources.list.d/hashicorp.list
+  # Update
+  sudo apt update
+  # Install 
+  sudo apt -y install terraform
+fi
+
+
+
