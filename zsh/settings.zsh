@@ -47,6 +47,11 @@ bindkey "^R" history-incremental-search-backward
 if kubectl &> /dev/null; then
   source <(kubectl completion zsh)
 fi
+#
+# kind autocompletion
+if kind &> /dev/null; then
+  source <(kind completion zsh)
+fi
 
 # Mute shitty system76 microphone on mute
 if [[ $(hostname) == *"moove"* ]]; then

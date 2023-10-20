@@ -9,6 +9,7 @@ export PIP_DOWNLOAD_CACHE=$HOME/.pip/cache
 export PATH="/usr/local/opt/openjdk/bin:$PATH"
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="$HOME/.cargo/env:$PATH"
+export PATH=$PATH:/usr/local/go/bin
 
 # Google variables
 export USE_GKE_GCLOUD_AUTH_PLUGIN=True
