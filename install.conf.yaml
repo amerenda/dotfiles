@@ -6,10 +6,8 @@
 
 - shell:
   - [git submodule foreach git pull origin master, updating submodules]
-  - [mkdir -p ~/.bin, creating bin dir]
   - [mkdir -p ~/.gnupg, creating gnupg dir]
   - [chmod -R 0700 ~/.gnupg, setting permissions on gnupg folder]
-  - [bash ~/.scripts/preSetup.sh, running preinstall steps]
 
 - link:
     ~/.alacritty.yml: alacritty.yml
@@ -38,6 +36,5 @@
 
 - shell:
   - [mkdir -p ~/.ssh/config.d, creating ssh config dir]
-  - [bash ~/.scripts/setup.sh, installing os components]
   - [bash ~/.scripts/selectOsConfig.sh]
   - [source ~/.zshrc, sourcing zsh]

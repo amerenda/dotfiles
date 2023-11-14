@@ -24,7 +24,9 @@ source ~/.zsh/external.zsh
 # Install yq commands
 source ~/.zsh/yq.zsh
 
-
+# source spaceship
+source ~/.zsh/spaceship.zsh
+#
 # Allow local customizations in the ~/.zshrc_local_after file
 if [ -f ~/.zshrc_local_after ]; then
     source ~/.zshrc_local_after
@@ -38,3 +40,4 @@ if uname | grep -q Linux; then
     source ~/.zsh/linux.zsh
 fi
 
+#source ~/.zsh/temp.zsh

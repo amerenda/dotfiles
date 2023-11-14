@@ -89,4 +89,6 @@ cursor:
   style:
     blinking: Always
   blink_interval: 750
+
+shell:
   program: /usr/bin/zsh

@@ -4,4 +4,9 @@ Include config.d/*
 Host github.com
   IdentityFile ~/.ssh/github
 
+Host rpi-docker
+  HostName 10.100.20.231
+  User alex
+  IdentityFile ~/.ssh/alex_personal
+  RequestTTY force
 

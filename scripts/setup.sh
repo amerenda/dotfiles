@@ -362,7 +362,7 @@ then
 fi
 
 # install  kubectx
-if ! command -v kubectl &> /dev/null
+if ! command -v kubectx &> /dev/null
 then
   echo "***** Installing pyenv *****"
   printf "\n"
