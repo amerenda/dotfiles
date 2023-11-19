@@ -17,7 +17,6 @@ export USE_GKE_GCLOUD_AUTH_PLUGIN=True
 export TF_LOG_PATH=$HOME/tmp/terraform-debug.log
 
 # Evals
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 eval "$(direnv hook zsh)"
 
 # Dotfiles helper
