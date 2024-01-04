@@ -1,0 +1,39 @@
+{
+    "font_size": 12,
+    "stories": [
+        {
+            "provider": "wikipedia_current_events",
+            "config": {}
+        },
+        {
+            "provider": "rss",
+            "config": {
+                "rss_path": "https://feeds.npr.org/1001/rss.xml",
+                "limit": 5
+            }
+        },
+        {
+            "provider": "rss",
+            "config": {
+                "rss_path": "https://www.newyorker.com/feed/news",
+                "limit": 3
+            }
+        },
+        {
+            "provider": "rss",
+            "config": {
+                "rss_path": "https://www.newyorker.com/feed/tech",
+                "limit": 3
+            }
+        },
+        {
+            "provider": "reddit",
+            "config": { "subreddit": "news" }
+        },
+        {
+            "provider": "reddit",
+            "config": { "subreddit": "todayilearned" }
+        }
+    ]
+}
+
