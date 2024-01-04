@@ -1,1 +1,1 @@
-#setxkbmap -symbols "customKeys
+#setxkbmap -symbols "customKeys"

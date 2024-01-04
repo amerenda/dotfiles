@@ -1,7 +1,5 @@
 xkb_symbols "basic" {
     key <CAPS> { [ Escape ] };
-    key <TLDE> { [ grave, asciitilde ] };
-    key <PGUP> { [ NoSymbol ] };
-    key <PGDN> { [ NoSymbol ] };
+    key <ESC> { [ grave, asciitilde ] };
 };
 

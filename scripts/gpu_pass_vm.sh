@@ -12,26 +12,18 @@ VIRSH_GPU_SERIAL=pci_0000_01_00_3
 #VIRSH_NVME_SSD=pci_0000_04_00_0
 
 # Install prereqs
-echo "*** installing prereqs ***"
-
-apt -y install libvirt-daemon-system libvirt-clients qemu-kvm qemu-utils virt-manager ovmf libhugetlbfs-bin &> /dev/null
-
-if ! [[ $! -eq 0 ]]
-then
-  echo "Failed installing prereqs"
-  exit 1
-fi
+#echo "*** installing prereqs ***"
+#
+#apt -y install libvirt-daemon-system libvirt-clients qemu-kvm qemu-utils virt-manager ovmf libhugetlbfs-bin &> /dev/null
+#
+#if ! [[ $! -eq 0 ]]
+#then
+#  echo "Failed installing prereqs"
+#  exit 1
+#fi
 
 # Ensure fail is false by default
 fail=false
-
-# Check if virtualization is supported
-if ! kvm-ok  &> /dev/null
-then
-  echo "Please reboot and enable VT-d in your BIOS settings"
-  echo "You may also need to add kvm_intel to modprobe"
-  fail=true
-fi
 
 # Check if iommu groups is supported
 if !  dmesg | grep IOMMU &> /dev/null
@@ -45,17 +37,6 @@ if $fail
 then
   exit 1
 fi
-
-# Using kernelstub because kernel parameters get overwritten on reboot
-if ! command -v kernelstub
-then
-  echo "kernelstub is missing."
-  exit 1
-fi
-
-# This ensures we can isolate the GPU group and pass it to the VM
-echo "Adding intel_iommu to kernel parameters"
-kernelstub --add-options "intel_iommu=on"
 
 # This is the directory we will be installing VMs to
 echo "ensuring vm directory"
