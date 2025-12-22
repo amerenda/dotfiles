@@ -25,7 +25,7 @@ LAUNCHER="/usr/local/bin/steam-bigpicture-primary.sh"
 WATCHLOG=/tmp/joystick-watcher.log
 
 # ---------- deps ----------
-need_cmds=(kscreen-doctor jq pactl tail flock)
+need_cmds=(kscreen-doctor jq pactl tail flock kwriteconfig6)
 QDBUS_BIN="${QDBUS_BIN:-$(command -v qdbus || command -v qdbus6 || command -v qdbus-qt5 || true)}"
 for c in "${need_cmds[@]}"; do command -v "$c" >/dev/null || { echo "missing: $c" >&2; exit 1; }; done
 [ -n "${QDBUS_BIN:-}" ] || { echo "missing: qdbus (qt5/qt6)"; exit 1; }
@@ -88,12 +88,26 @@ mouse_bottom_right() {
   fi
 }
 
+hide_cursor_on() {
+  # Native KWin desktop effect: "Hide Cursor"
+  kwriteconfig6 --file kwinrc --group Plugins --key hidecursorEnabled true
+  "$QDBUS_BIN" org.kde.KWin /KWin reconfigure >/dev/null 2>&1 || true
+  log "cursor: hidecursor effect enabled"
+}
+
+hide_cursor_off() {
+  kwriteconfig6 --file kwinrc --group Plugins --key hidecursorEnabled false
+  "$QDBUS_BIN" org.kde.KWin /KWin reconfigure >/dev/null 2>&1 || true
+  log "cursor: hidecursor effect disabled"
+}
+
 make_desk_primary() {
   log "begin: make_desk_primary"
   if $DEBUG_MODE; then
     note "🧪 DEBUG" "make_desk_primary (HDMI-A-1 primary; audio -> Headset)"
     set_default_sink "$HEADSET_SINK"
   else
+    hide_cursor_off || true
     # Enable A-1 first, then disable A-2 to avoid 'no outputs'
     kscreen-doctor \
       output.HDMI-A-1.enable \
@@ -113,6 +127,7 @@ make_tv_primary() {
     note "🧪 DEBUG" "make_tv_primary (HDMI-A-2 primary; audio -> TV)"
     set_default_sink "$TV_SINK"
   else
+    hide_cursor_on || true
     kscreen-doctor \
       output.HDMI-A-2.enable \
       output.HDMI-A-2.mode.3840x2160@60 \
