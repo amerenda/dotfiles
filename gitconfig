@@ -40,6 +40,8 @@
     path = ~/.gitconfig_local
 [push]
     default = simple
+    autoSetupRemote = true
+
 [gpg]
     program = gpg
 [filter "lfs"]

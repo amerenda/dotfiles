@@ -23,3 +23,7 @@ eval "$(direnv hook zsh)"
 # Dotfiles helper
 export DOTFILES_PATH=$HOME/projects/dotfiles
 
+# Fix issues with electron apps in wayland
+ELECTRON_OZONE_PLATFORM_HINT=auto
+
+#sudo /usr/sbin/setcap -r $(readlink -f $(which sunshine))

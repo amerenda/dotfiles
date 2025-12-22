@@ -1,18 +1,18 @@
-/mnt/data
-/var/lib/libvirt/images/isos
-~/projects
-/home/alexm/.cache
-/home/alexm/tmp
-/home/alexm/.pip
-/home/alexm/.terraform.d
-/home/alexm/Dropbox
-/home/alexm/cargo
-/home/alexm/.ssh
-/home/alexm/projects/dotfiles
-/home/alexm/.dropbox
-/home/alexm/.cargo
-/home/alexm/.config
-/home/alexm/.dropbox-dist
-/home/alexm/.gnupg
-/home/alexm/**/.*
+# System directories to exclude
+/dev
+/proc
+/sys
+/tmp
+/run
+/mnt
+/media
+/lost+found
+/etc/backup-keys
 
+# User specified exclusions
+/var/cache/pacman/pkg
+
+# Other common cache/temp locations
+/var/tmp
+/var/run
+.cache

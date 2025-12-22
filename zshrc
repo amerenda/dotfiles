@@ -27,6 +27,8 @@ source ~/.zsh/yq.zsh
 # source spaceship
 source ~/.zsh/spaceship.zsh
 #
+
+source ~/.zsh/cuda.zsh
 # Allow local customizations in the ~/.zshrc_local_after file
 if [ -f ~/.zshrc_local_after ]; then
     source ~/.zshrc_local_after

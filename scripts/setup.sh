@@ -180,20 +180,20 @@ echo "Enter sudo password to continue with the script:"
 printf "\n"
 sudo -v
 
-add_cron_jobs
-if [ $? -ne 0 ]; then
-    echo "The check_cron_jobs command failed."
-    exit 1
-fi
+#add_cron_jobs
+#if [ $? -ne 0 ]; then
+#    echo "The check_cron_jobs command failed."
+#    exit 1
+#fi
 
 # Init check & install
-if ! [ -f $INIT_PATH/init ]; then
-  init
-  if [ $? -ne 0 ]; then
-      echo "The init function failed."
-      exit 1
-  fi
-fi
+#if ! [ -f $INIT_PATH/init ]; then
+#  init
+#  if [ $? -ne 0 ]; then
+#      echo "The init function failed."
+#      exit 1
+#  fi
+#fi
 
 # Brew check & install
 if ! command -v brew &> /dev/null
@@ -217,16 +217,16 @@ then
   fi
 fi
 
-# Install Cargo
-if ! command -v cargo &> /dev/null
-then
-    echo "cargo not found, installing"
-    install_cargo
-  if [ $? -ne 0 ]; then
-      echo "The cargo install function failed"
-      exit 1
-  fi
-fi
+## Install Cargo
+#if ! command -v cargo &> /dev/null
+#then
+#    echo "cargo not found, installing"
+#    install_cargo
+#  if [ $? -ne 0 ]; then
+#      echo "The cargo install function failed"
+#      exit 1
+#  fi
+#fi
 
 # Change dotfiles to use git
 echo "***** Changing dotfiles repo to use git *****"
@@ -246,17 +246,17 @@ bash ${DOTFILES_PATH}/tmux/plugins/tpm/scripts/install_plugins.sh 2&> /dev/null
       exit 1
   fi
 
-# Install glcoud
-if ! command -v gcloud &> /dev/null
-then
-  echo "***** Installing gcloud *****"
-  printf "\n"
-  install_gcloud
-  if [ $? -ne 0 ]; then
-      echo "The install_gcloud function failed."
-      exit 1
-  fi
-fi
+## Install glcoud
+#if ! command -v gcloud &> /dev/null
+#then
+#  echo "***** Installing gcloud *****"
+#  printf "\n"
+#  install_gcloud
+#  if [ $? -ne 0 ]; then
+#      echo "The install_gcloud function failed."
+#      exit 1
+#  fi
+#fi
 
 # Install nordpass
 if ! command -v nordpass &> /dev/null

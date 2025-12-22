@@ -4,9 +4,25 @@ Include config.d/*
 Host github.com
   IdentityFile ~/.ssh/github
 
-Host rpi-docker
-  HostName 10.100.20.231
+
+Host rpi5-0
+  IdentityFile ~/.ssh/alex_id_ed25519
+  HostName 10.100.20.10
   User alex
-  IdentityFile ~/.ssh/alex_personal
-  RequestTTY force
+
+
+Host rpi5-1
+  IdentityFile ~/.ssh/alex_id_ed25519
+  HostName 10.100.20.11
+  User alex
+
+Host rpi4-0
+  IdentityFile ~/.ssh/alex_id_ed25519
+  HostName 10.100.20.12
+  User alex
+
+Host rpi3-0
+  IdentityFile ~/.ssh/alex_id_ed25519
+  HostName 10.100.20.13
+  User alex
 

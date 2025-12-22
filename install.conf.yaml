@@ -30,7 +30,6 @@
     ~/.utility: utility
     ~/.vim: vim/
     ~/.vimrc: vimrc
-    ~/.xmodmap.custom: xmodmap.custom
     ~/.zsh: zsh/
     ~/.zshrc: zshrc
 
