@@ -83,6 +83,34 @@ is_steam_running() {
   pgrep -x steam >/dev/null 2>&1 || pgrep -f '/steam' >/dev/null 2>&1
 }
 
+# Try to bring the Steam window to the foreground.
+# On Plasma Wayland, Steam typically runs under XWayland; focus tools like wmctrl/xdotool can work.
+# This is best-effort (no failure if tools aren't installed or focus is denied by policy).
+focus_steam_best_effort() {
+  local i
+
+  if command -v wmctrl >/dev/null 2>&1; then
+    # Try common WM_CLASS values for Steam.
+    for i in {1..30}; do
+      wmctrl -xa steam >/dev/null 2>&1 && return 0
+      wmctrl -xa Steam >/dev/null 2>&1 && return 0
+      wmctrl -a "Steam" >/dev/null 2>&1 && return 0
+      sleep 0.1
+    done
+  fi
+
+  if command -v xdotool >/dev/null 2>&1; then
+    # XWayland-only fallback.
+    for i in {1..30}; do
+      xdotool search --onlyvisible --class steam windowactivate >/dev/null 2>&1 && return 0
+      xdotool search --onlyvisible --class Steam windowactivate >/dev/null 2>&1 && return 0
+      sleep 0.1
+    done
+  fi
+
+  return 0
+}
+
 # Always prefer steam:// so an existing client can be reused
 open_bigpicture() {
   # -ifrunning avoids spawning a second instance
@@ -102,11 +130,14 @@ main() {
     open_bigpicture
   else
     # Steam not running → start directly into Big Picture
-    exec steam -gamepadui
+    steam -gamepadui >/dev/null 2>&1 &
   fi
 
   # Re-assert a moment later (non-blocking).
   ( sleep 1; set_default_sink_best_effort ) >/dev/null 2>&1 &
+
+  # And try to bring Steam to the front after it has had time to respond to the URI.
+  ( sleep 0.4; focus_steam_best_effort ) >/dev/null 2>&1 &
 }
 
 main "$@"
