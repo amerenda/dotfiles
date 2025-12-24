@@ -24,8 +24,53 @@ note(){ notify-send "$@"; }
 
 # ---------- Audio (prefer pactl stable sink names) ----------
 HEADSET_SINK="alsa_output.usb-SteelSeries_Arctis_Nova_7X-00.iec958-stereo"
-TV_SINK="alsa_output.pci-0000_03_00.1.hdmi-stereo-extra2"
-set_default_sink() { pactl set-default-sink "$1" >/dev/null 2>&1 || true; log "audio: default -> $1"; }
+
+# TV sink auto-detection (stable across extra2/extra3 churn)
+# Your TV is ALSA card=2 device=9 (S90D). Override via env if needed.
+TV_ALSA_CARD="${TV_ALSA_CARD:-2}"
+TV_ALSA_DEVICE="${TV_ALSA_DEVICE:-9}"
+
+resolve_sink_by_alsa() {
+  local want_card="${1:-}"
+  local want_dev="${2:-}"
+  local fallback="${3:-}"
+  command -v pactl >/dev/null 2>&1 || { echo -n "$fallback"; return 0; }
+
+  # Parse: match sinks by alsa.card + alsa.device, return sink Name.
+  local found
+  found="$(
+    pactl list sinks 2>/dev/null | awk -v want_card="$want_card" -v want_dev="$want_dev" '
+      $1=="Sink" && $2 ~ /^#/ { name=""; card=""; dev=""; next }
+      $1=="Name:" { name=$2; next }
+      $1=="alsa.card" && $2=="=" { gsub(/"/,"",$3); card=$3; next }
+      $1=="alsa.device" && $2=="=" { gsub(/"/,"",$3); dev=$3; next }
+      name!="" && card==want_card && dev==want_dev { print name; exit 0 }
+    '
+  )"
+
+  if [ -n "${found:-}" ]; then
+    echo -n "$found"
+  else
+    echo -n "$fallback"
+  fi
+}
+
+tv_sink_name() {
+  # Prefer env override TV_SINK if provided; otherwise resolve from ALSA mapping.
+  if [ -n "${TV_SINK:-}" ]; then
+    echo -n "$TV_SINK"
+  else
+    resolve_sink_by_alsa "$TV_ALSA_CARD" "$TV_ALSA_DEVICE" ""
+  fi
+}
+
+set_default_sink() {
+  local sink="${1:-}"
+  command -v pactl >/dev/null 2>&1 || return 0
+  [ -n "$sink" ] || return 0
+  pactl set-default-sink "$sink" >/dev/null 2>&1 || true
+  log "audio: default -> $sink"
+}
 
 # ---------- Display + Audio wrappers ----------
 make_desk_primary() {
@@ -50,7 +95,7 @@ make_tv_primary() {
     note "🧪 DEBUG" "make_tv_primary (HDMI-A-2 primary; audio -> TV)"
   else
     # Enable A-2 first, then disable A-1
-    set_default_sink "$TV_SINK"
+    set_default_sink "$(tv_sink_name)"
     kscreen-doctor \
       output.HDMI-A-2.enable \
       output.HDMI-A-2.mode.3840x2160@60 \

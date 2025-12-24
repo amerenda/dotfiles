@@ -63,7 +63,13 @@ systemctl --user daemon-reload
 if [ "$ENABLE" -eq 1 ]; then
   echo "[joystick-notify] Enabling + starting systemd user service ..."
   systemctl --user enable --now joystick-notify.service
+  echo "[joystick-notify] Restarting systemd user service to pick up updates ..."
+  systemctl --user restart joystick-notify.service
 else
+  if systemctl --user is-active --quiet joystick-notify.service; then
+    echo "[joystick-notify] Service is running; restarting to pick up updates ..."
+    systemctl --user restart joystick-notify.service
+  fi
   echo "[joystick-notify] Installed. To enable later:"
   echo "  systemctl --user enable --now joystick-notify.service"
 fi
