@@ -1,0 +1,43 @@
+# /etc/udev/rules.d/99-joystick-notify.rules
+#
+# Consolidated rules for controller + couch-mode automation.
+# Put everything here so you can remove other overlapping rules files.
+#
+# Goals:
+# - Trigger joystick-notify using a stable device ID (HID_UNIQ / Bluetooth MAC).
+# - Avoid spurious duplicate events during driver bind/unbind churn.
+# - Keep Steam happy by *not* ignoring evdev; only ignore legacy joydev js* (optional).
+
+# -------------------------------------------------------------------
+# 1) Joystick-notify: Bluetooth controllers (preferred)
+#
+# Why HID-based?
+# - Some controllers (notably Xbox) may not set ID_INPUT_JOYSTICK/ID_INPUT_GAMEPAD.
+# - HID exposes HID_UNIQ (Bluetooth MAC), which is stable across event number churn.
+#
+# IMPORTANT:
+# - We intentionally only use ACTION add/remove (not bind/unbind) to reduce noisy flapping.
+# -------------------------------------------------------------------
+
+# connect-ish
+ACTION=="add", SUBSYSTEM=="hid", ENV{HID_UNIQ}=="*:*", ENV{HID_NAME}=="*Controller*", RUN+="/usr/bin/env ACTION=add /usr/local/bin/joystick-event.sh %E{HID_UNIQ}"
+ACTION=="add", SUBSYSTEM=="hid", ENV{HID_UNIQ}=="*:*", ENV{HID_NAME}=="*Gamepad*",   RUN+="/usr/bin/env ACTION=add /usr/local/bin/joystick-event.sh %E{HID_UNIQ}"
+
+# disconnect-ish
+ACTION=="remove", SUBSYSTEM=="hid", ENV{HID_UNIQ}=="*:*", ENV{HID_NAME}=="*Controller*", RUN+="/usr/bin/env ACTION=remove /usr/local/bin/joystick-event.sh %E{HID_UNIQ}"
+ACTION=="remove", SUBSYSTEM=="hid", ENV{HID_UNIQ}=="*:*", ENV{HID_NAME}=="*Gamepad*",   RUN+="/usr/bin/env ACTION=remove /usr/local/bin/joystick-event.sh %E{HID_UNIQ}"
+
+# -------------------------------------------------------------------
+# 2) Xbox Elite Series 2: hide legacy joydev node (js*)
+#
+# This only ignores /dev/input/js* (legacy joydev) while leaving evdev (/dev/input/event*)
+# available for Steam and other apps.
+# -------------------------------------------------------------------
+ACTION=="add|change", SUBSYSTEM=="input", KERNEL=="js*", ENV{ID_INPUT_JOYSTICK}=="1", ATTRS{name}=="Xbox Wireless Controller", OPTIONS+="ignore_device"
+
+# -------------------------------------------------------------------
+# 3) 8BitDo USB receiver forcing xpad (legacy rule you had in 99-8bitdo-xinput.rules)
+# -------------------------------------------------------------------
+ACTION=="add", ATTRS{idVendor}=="2dc8", ATTRS{idProduct}=="3106", RUN+="/sbin/modprobe xpad", RUN+="/bin/sh -c 'echo 2dc8 3106 > /sys/bus/usb/drivers/xpad/new_id'"
+
+
