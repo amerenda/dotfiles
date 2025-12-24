@@ -166,7 +166,13 @@ trap cleanup EXIT INT TERM
 if [ -f "$LOCK" ] && [ ! -e "/dev/input/$(cat "$LOCK")" ]; then log "lock: stale ($(cat "$LOCK")) -> clearing"; rm -f "$LOCK"; fi
 
 # ---------- helpers ----------
-any_js_present() { compgen -G "/dev/input/js*" >/dev/null; }
+any_js_present() {
+  # Support both legacy /dev/input/js* and modern event-based controllers.
+  compgen -G "/dev/input/js*" >/dev/null && return 0
+  compgen -G "/dev/input/by-id/*-event-joystick" >/dev/null && return 0
+  compgen -G "/dev/input/by-path/*-event-joystick" >/dev/null && return 0
+  return 1
+}
 
 # Wait until events file exists (systemd-tmpfiles or udev creates it)
 while [ ! -e "$LOG" ]; do log "waiting for $LOG to appear..."; sleep 0.5; done
