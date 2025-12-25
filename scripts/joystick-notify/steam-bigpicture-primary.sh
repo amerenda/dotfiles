@@ -118,6 +118,15 @@ steam_process_present() {
 
 steam_present() { steam_process_present; }
 
+steam_ipc_ready() {
+  # Steam typically creates a local IPC socket/pipe once the client is ready.
+  # Paths vary; check common ones.
+  [ -S "$HOME/.steam/steam/steam.pipe" ] && return 0
+  [ -S "$HOME/.steam/steam.pipe" ] && return 0
+  [ -S "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/steam.pipe" ] && return 0
+  return 1
+}
+
 log_steam_processes() {
   # Best-effort snapshot for debugging.
   ( ps -C steam,steamwebhelper,steamservice -o pid=,comm=,args= 2>/dev/null || true ) | sed 's/^/ps: /' >>"$LOG" 2>&1 || true
@@ -170,29 +179,17 @@ focus_steam_best_effort() {
   return 0
 }
 
-request_gamepad_ui() {
-  # Do not use -ifrunning: on some setups it returns success even if Steam isn't actually running.
-  # Instead, just invoke the URI; if Steam is running it should reuse it; otherwise it starts Steam.
-  if steam "steam://open/gamepadui" >>"$LOG" 2>&1; then
-    log "steam: requested gamepad ui via steam://open/gamepadui"
+STEAM_UI_URI="${STEAM_UI_URI:-steam://open/bigpicture}"
+
+request_ui() {
+  # Do not use -ifrunning; it is not a reliable signal across environments.
+  # Repeatedly requesting the URI after Steam starts is the most robust approach.
+  if steam "$STEAM_UI_URI" >>"$LOG" 2>&1; then
+    log "steam: requested ui via $STEAM_UI_URI"
     return 0
   fi
-  log "steam: steam://open/gamepadui FAILED"
+  log "steam: request ui FAILED via $STEAM_UI_URI"
   return 1
-}
-
-request_bigpicture_ui() {
-  if steam "steam://open/bigpicture" >>"$LOG" 2>&1; then
-    log "steam: requested bigpicture via steam://open/bigpicture"
-    return 0
-  fi
-  log "steam: steam://open/bigpicture FAILED"
-  return 1
-}
-
-request_ui_best_effort() {
-  # Prefer gamepad UI; fall back to legacy big picture.
-  request_gamepad_ui || request_bigpicture_ui || true
 }
 
 # ---- Main ----
@@ -203,6 +200,7 @@ main() {
   log "bin: steam=$(bin_path steam) pactl=$(bin_path pactl) wmctrl=$(bin_path wmctrl) xdotool=$(bin_path xdotool)"
   log "steam: pid before=$(steam_pid_list)"
   log "steam: present before=$(steam_present && echo yes || echo no)"
+  log "steam: ipc ready before=$(steam_ipc_ready && echo yes || echo no)"
   log_steam_processes
 
   enable_kwin_hidecursor_effect_best_effort
@@ -218,14 +216,33 @@ main() {
     log "steam: present -> requesting UI switch"
   fi
 
-  # Retry requesting UI for a while; Steam can take a bit to become ready to handle URIs.
+  # Retry requesting UI for a while; Steam can take time to become ready to handle URIs.
+  # IMPORTANT: do NOT stop retrying just because steam_present becomes true — the first URI
+  # request might happen before Steam is ready and get ignored.
   (
+    ok_count=0
     for i in {1..160}; do
-      request_ui_best_effort
-      if steam_present; then
-        log "steam: present after request (attempt=$i)"
-        ( sleep 0.4; focus_steam_best_effort ) >>"$LOG" 2>&1 &
-        break
+      if [ $((i % 10)) -eq 1 ]; then
+        log "steam: retry loop attempt=$i present=$(steam_present && echo yes || echo no) ipc=$(steam_ipc_ready && echo yes || echo no)"
+      fi
+
+      # Wait until Steam is at least present; prefer waiting for IPC readiness too.
+      if ! steam_present; then
+        sleep 0.25
+        continue
+      fi
+
+      # Once present, start hammering the URI; if IPC is ready it's more likely to stick.
+      if steam_ipc_ready || [ "$i" -gt 20 ]; then
+        if request_ui; then
+          ok_count=$((ok_count + 1))
+          log "steam: ui request ok_count=$ok_count (attempt=$i)"
+          ( sleep 0.4; focus_steam_best_effort ) >>"$LOG" 2>&1 &
+          # Require two successful requests to reduce races during initial startup.
+          if [ "$ok_count" -ge 2 ]; then
+            break
+          fi
+        fi
       fi
       sleep 0.25
     done
