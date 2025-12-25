@@ -45,6 +45,7 @@ echo "[joystick-notify] Installing scripts to /usr/local/bin ..."
 sudo install -Dm0755 "$ROOT/monitor-switcher.sh" /usr/local/bin/monitor-switcher.sh
 sudo install -Dm0755 "$ROOT/joystick-event.sh" /usr/local/bin/joystick-event.sh
 sudo install -Dm0755 "$ROOT/steam-bigpicture-primary.sh" /usr/local/bin/steam-bigpicture-primary.sh
+sudo install -Dm0755 "$ROOT/launch-bigpicture.sh" /usr/local/bin/launch-bigpicture.sh
 
 echo "[joystick-notify] Installing udev rules ..."
 sudo install -Dm0644 "$ROOT/udev/99-joystick-notify.rules" /etc/udev/rules.d/99-joystick-notify.rules

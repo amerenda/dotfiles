@@ -14,7 +14,8 @@ export WAYLAND_DISPLAY="${WAYLAND_DISPLAY:-wayland-0}"
 
 LOG=/tmp/joystick-events.log
 LOCK=/tmp/joystick-owner.lock
-LAUNCHER="/usr/local/bin/steam-bigpicture-primary.sh"
+LAUNCHER="/usr/local/bin/launch-bigpicture.sh"
+#LAUNCHER="/usr/local/bin/steam-bigpicture-primary.sh"
 WATCHLOG=/tmp/joystick-watcher.log
 
 # --- logging helpers ---
@@ -64,12 +65,69 @@ tv_sink_name() {
   fi
 }
 
+resolve_sink_by_description() {
+  local want_desc="${1:-}"
+  [ -n "$want_desc" ] || return 1
+  command -v pactl >/dev/null 2>&1 || return 1
+
+  pactl list sinks 2>/dev/null | awk -v want="$want_desc" '
+    $1=="Sink" && $2 ~ /^#/ { name=""; desc=""; next }
+    $1=="Name:" { name=$2; next }
+    $1=="Description:" { desc=$2; for (i=3;i<=NF;i++) desc=desc " " $i; next }
+    name!="" && desc==want { print name; exit 0 }
+  ' | head -n 1
+}
+
+resolve_tv_sink_with_wait() {
+  # The HDMI sink can appear a moment after enabling the output / hotplug.
+  # Wait a bit and retry resolution.
+  local sink i
+  for i in {1..40}; do
+    sink="$(tv_sink_name)"
+    if [ -n "${sink:-}" ]; then
+      echo -n "$sink"
+      return 0
+    fi
+
+    # Fallback: if your PipeWire description is literally "TV" (as shown earlier), use it.
+    sink="$(resolve_sink_by_description "TV" || true)"
+    if [ -n "${sink:-}" ]; then
+      echo -n "$sink"
+      return 0
+    fi
+
+    sleep 0.25
+  done
+  return 1
+}
+
 set_default_sink() {
   local sink="${1:-}"
   command -v pactl >/dev/null 2>&1 || return 0
   [ -n "$sink" ] || return 0
   pactl set-default-sink "$sink" >/dev/null 2>&1 || true
   log "audio: default -> $sink"
+}
+
+move_all_sink_inputs_to() {
+  local sink="${1:-}"
+  command -v pactl >/dev/null 2>&1 || return 0
+  [ -n "$sink" ] || return 0
+
+  # Move any currently-playing streams to the target sink. This fixes the common case where
+  # changing the default sink doesn't affect already-running apps (e.g. Steam).
+  local ids moved=0 id
+  ids="$(pactl list short sink-inputs 2>/dev/null | awk '{print $1}' || true)"
+  for id in $ids; do
+    pactl move-sink-input "$id" "$sink" >/dev/null 2>&1 && moved=$((moved + 1)) || true
+  done
+  log "audio: moved ${moved} sink-input(s) -> $sink"
+}
+
+set_audio_to_sink() {
+  local sink="${1:-}"
+  set_default_sink "$sink"
+  move_all_sink_inputs_to "$sink"
 }
 
 # ---------- Display + Audio wrappers ----------
@@ -79,7 +137,7 @@ make_desk_primary() {
     note "🧪 DEBUG" "make_desk_primary (HDMI-A-1 primary; audio -> Headset)"
   else
     # Enable A-1 first, then disable A-2 to avoid 'no outputs'
-    set_default_sink "$HEADSET_SINK"
+    set_audio_to_sink "$HEADSET_SINK"
     kscreen-doctor \
       output.HDMI-A-1.enable \
       output.HDMI-A-1.mode.2560x1440@144 \
@@ -94,13 +152,20 @@ make_tv_primary() {
   if $DEBUG_MODE; then
     note "🧪 DEBUG" "make_tv_primary (HDMI-A-2 primary; audio -> TV)"
   else
-    # Enable A-2 first, then disable A-1
-    set_default_sink "$(tv_sink_name)"
+    # Enable A-2 first, then disable A-1 (helps ensure the HDMI audio device exists).
     kscreen-doctor \
       output.HDMI-A-2.enable \
       output.HDMI-A-2.mode.3840x2160@60 \
       output.HDMI-A-2.position.2560,0 \
       output.HDMI-A-1.disable 2>/dev/null || true
+
+    # Now that the output is enabled, resolve the TV sink and switch audio (default + move streams).
+    if tv_sink="$(resolve_tv_sink_with_wait)"; then
+      log "audio: resolved tv sink -> $tv_sink"
+      set_audio_to_sink "$tv_sink"
+    else
+      log "audio: warn: could not resolve TV sink after waiting (TV_ALSA_CARD=$TV_ALSA_CARD TV_ALSA_DEVICE=$TV_ALSA_DEVICE)"
+    fi
   fi
   log "end: make_tv_primary"
 }
@@ -185,6 +250,15 @@ stdbuf -oL -eL tail -F -n 0 "$LOG" | while IFS= read -r line; do
           if launcher_exists; then
             log "action: launch steam big picture ($LAUNCHER)"
             "$LAUNCHER" >/dev/null 2>&1 &
+
+            # Steam/PipeWire can race and restore streams back to the old device;
+            # re-assert the TV sink after launch and move streams again.
+            (
+              sleep 2
+              tv_sink="$(tv_sink_name)"
+              [ -n "${tv_sink:-}" ] || exit 0
+              set_audio_to_sink "$tv_sink"
+            ) >/dev/null 2>&1 &
           else
             log "warn: launcher missing/not executable: $LAUNCHER"
           fi

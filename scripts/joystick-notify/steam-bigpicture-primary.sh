@@ -90,6 +90,7 @@ set_default_sink_best_effort() {
 #
 # Set HIDE_CURSOR=0 to disable this behavior.
 HIDE_CURSOR="${HIDE_CURSOR:-1}"
+HIDE_CURSOR_TIMEOUT="${HIDE_CURSOR_TIMEOUT:-1}"  # seconds-ish; effect uses a small discrete set
 
 enable_kwin_hidecursor_effect_best_effort() {
   [ "$HIDE_CURSOR" != "0" ] || return 0
@@ -97,12 +98,22 @@ enable_kwin_hidecursor_effect_best_effort() {
   command -v kwriteconfig6 >/dev/null 2>&1 || return 0
   command -v qdbus6 >/dev/null 2>&1 || return 0
 
-  # Enable the effect in kwinrc if the plugin key exists (Plasma 6.1+).
-  # KWin will ignore unknown keys, so this is safe across versions.
+  # Enable the effect (Plasma 6.1+).
   kwriteconfig6 --file kwinrc --group Plugins --key hidecursorEnabled true >/dev/null 2>&1 || true
 
-  # Ask KWin to reload config.
+  # Configure it (best-effort): many installs default to "never hide on inactivity".
+  # Unfortunately KWin's exact group naming can vary; write the common variants.
+  for grp in "Effect-hidecursor" "Effect-HideCursor" "HideCursor" "HideCursorEffect"; do
+    kwriteconfig6 --file kwinrc --group "$grp" --key HideOnTyping true >/dev/null 2>&1 || true
+    kwriteconfig6 --file kwinrc --group "$grp" --key InactivityDuration "$HIDE_CURSOR_TIMEOUT" >/dev/null 2>&1 || true
+  done
+
+  # Try to load/reconfigure the effect immediately via DBus.
+  qdbus6 org.kde.KWin /Effects org.kde.kwin.Effects.loadEffect hidecursor >/dev/null 2>&1 || true
+  qdbus6 org.kde.KWin /Effects org.kde.kwin.Effects.reconfigureEffect hidecursor >/dev/null 2>&1 || true
   qdbus6 org.kde.KWin /KWin org.kde.KWin.reconfigure >/dev/null 2>&1 || true
+
+  log "cursor: ensured hidecursor effect enabled (timeout=${HIDE_CURSOR_TIMEOUT}s, hide_on_typing=true)"
 }
 
 # ---- Helpers ----
@@ -150,46 +161,28 @@ start_steam_best_effort() {
   fi
 }
 
-# Try to bring the Steam window to the foreground.
-# On Plasma Wayland, Steam typically runs under XWayland; focus tools like wmctrl/xdotool can work.
-# This is best-effort (no failure if tools aren't installed or focus is denied by policy).
-focus_steam_best_effort() {
-  local i
+# We intentionally avoid wmctrl/focus here. This script's job is only:
+# - ensure Steam is running
+# - request Big Picture mode (legacy URI is the most compatible)
+open_bigpicture_best_effort() {
+  # Keep the known-good behavior, but add a few extra attempts that often work when
+  # Steam is already running but ignores the URI.
+  #
+  # NOTE: Steam's exit codes are not always meaningful, so we treat this as best-effort
+  # and rely on retries in the caller.
+  local ok=1
 
-  if command -v wmctrl >/dev/null 2>&1; then
-    # Try common WM_CLASS values for Steam.
-    for i in {1..30}; do
-      wmctrl -xa steam >>"$LOG" 2>&1 && { log "focus: wmctrl -xa steam ok"; return 0; }
-      wmctrl -xa Steam >>"$LOG" 2>&1 && { log "focus: wmctrl -xa Steam ok"; return 0; }
-      wmctrl -a "Steam" >>"$LOG" 2>&1 && { log "focus: wmctrl -a Steam ok"; return 0; }
-      sleep 0.1
-    done
-  fi
+  steam -ifrunning "steam://open/bigpicture" >>"$LOG" 2>&1 && { log "steam: open_bigpicture via -ifrunning ok"; ok=0; } || log "steam: -ifrunning bigpicture failed"
+  steam -ifrunning "steam://open/gamepadui" >>"$LOG" 2>&1 && { log "steam: open_gamepadui via -ifrunning ok"; ok=0; } || log "steam: -ifrunning gamepadui failed"
 
-  if command -v xdotool >/dev/null 2>&1; then
-    # XWayland-only fallback.
-    for i in {1..30}; do
-      xdotool search --onlyvisible --class steam windowactivate >>"$LOG" 2>&1 && { log "focus: xdotool class=steam ok"; return 0; }
-      xdotool search --onlyvisible --class Steam windowactivate >>"$LOG" 2>&1 && { log "focus: xdotool class=Steam ok"; return 0; }
-      sleep 0.1
-    done
-  fi
+  # These flags can force a mode switch for some Steam builds.
+  steam -bigpicture >>"$LOG" 2>&1 && { log "steam: invoked 'steam -bigpicture' ok"; ok=0; } || log "steam: 'steam -bigpicture' failed"
+  steam -tenfoot >>"$LOG" 2>&1 && { log "steam: invoked 'steam -tenfoot' ok"; ok=0; } || log "steam: 'steam -tenfoot' failed"
 
-  log "focus: no focus method succeeded (wmctrl/xdotool missing or denied)"
-  return 0
-}
+  steam "steam://open/bigpicture" >>"$LOG" 2>&1 && { log "steam: open_bigpicture direct ok"; ok=0; } || log "steam: open_bigpicture direct failed"
+  steam "steam://open/gamepadui" >>"$LOG" 2>&1 && { log "steam: open_gamepadui direct ok"; ok=0; } || log "steam: open_gamepadui direct failed"
 
-STEAM_UI_URI="${STEAM_UI_URI:-steam://open/bigpicture}"
-
-request_ui() {
-  # Do not use -ifrunning; it is not a reliable signal across environments.
-  # Repeatedly requesting the URI after Steam starts is the most robust approach.
-  if steam "$STEAM_UI_URI" >>"$LOG" 2>&1; then
-    log "steam: requested ui via $STEAM_UI_URI"
-    return 0
-  fi
-  log "steam: request ui FAILED via $STEAM_UI_URI"
-  return 1
+  return "$ok"
 }
 
 # ---- Main ----
@@ -212,15 +205,11 @@ main() {
   if ! steam_present; then
     log "steam: not present -> starting"
     start_steam_best_effort
-  else
-    log "steam: present -> requesting UI switch"
   fi
 
-  # Retry requesting UI for a while; Steam can take time to become ready to handle URIs.
-  # IMPORTANT: do NOT stop retrying just because steam_present becomes true — the first URI
-  # request might happen before Steam is ready and get ignored.
+  # Always request Big Picture. When Steam starts cold, it can ignore early requests;
+  # keep retrying for a bit until it accepts them.
   (
-    ok_count=0
     for i in {1..160}; do
       if [ $((i % 10)) -eq 1 ]; then
         log "steam: retry loop attempt=$i present=$(steam_present && echo yes || echo no) ipc=$(steam_ipc_ready && echo yes || echo no)"
@@ -232,16 +221,17 @@ main() {
         continue
       fi
 
-      # Once present, start hammering the URI; if IPC is ready it's more likely to stick.
+      # Once present, send the request; if IPC is ready it's more likely to stick.
       if steam_ipc_ready || [ "$i" -gt 20 ]; then
-        if request_ui; then
-          ok_count=$((ok_count + 1))
-          log "steam: ui request ok_count=$ok_count (attempt=$i)"
-          ( sleep 0.4; focus_steam_best_effort ) >>"$LOG" 2>&1 &
-          # Require two successful requests to reduce races during initial startup.
-          if [ "$ok_count" -ge 2 ]; then
-            break
-          fi
+        if open_bigpicture_best_effort; then
+          log "steam: bigpicture request succeeded (attempt=$i)"
+          # Don't break immediately: Steam can ignore early requests even if the wrapper exits 0.
+          # Keep nudging a little longer to ensure it actually switches.
+          for j in {1..8}; do
+            sleep 0.25
+            open_bigpicture_best_effort || true
+          done
+          break
         fi
       fi
       sleep 0.25
@@ -251,9 +241,6 @@ main() {
 
   # Re-assert a moment later (non-blocking).
   ( sleep 1; set_default_sink_best_effort ) >>"$LOG" 2>&1 &
-
-  # And try to bring Steam to the front after it has had time to respond to the URI.
-  ( sleep 0.4; focus_steam_best_effort ) >>"$LOG" 2>&1 &
 
   log "----- end (async tasks scheduled) -----"
 }
