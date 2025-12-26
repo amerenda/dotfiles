@@ -10,25 +10,10 @@ export XDG_SESSION_TYPE=wayland
 export DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$(id -u)/bus"
 export WAYLAND_DISPLAY="${WAYLAND_DISPLAY:-wayland-0}"
 
-# --- single-instance guard (user service safe) ---
-RUNDIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
-LOCK_RUN="$RUNDIR/monitor-switcher.instance.lock"
-exec 9> "$LOCK_RUN"
-if ! flock -n 9; then
-  echo "monitor-switcher: already running (lock: $LOCK_RUN)" >&2
-  exit 0
-fi
-
-LOG=/tmp/joystick-events.log          # produced by your other process
+LOG=/tmp/joystick-events.log
 LOCK=/tmp/joystick-owner.lock
 LAUNCHER="/usr/local/bin/steam-bigpicture-primary.sh"
 WATCHLOG=/tmp/joystick-watcher.log
-
-# ---------- deps ----------
-need_cmds=(kscreen-doctor jq pactl tail flock)
-QDBUS_BIN="${QDBUS_BIN:-$(command -v qdbus || command -v qdbus6 || command -v qdbus-qt5 || true)}"
-for c in "${need_cmds[@]}"; do command -v "$c" >/dev/null || { echo "missing: $c" >&2; exit 1; }; done
-[ -n "${QDBUS_BIN:-}" ] || { echo "missing: qdbus (qt5/qt6)"; exit 1; }
 
 # --- logging helpers ---
 ts()  { date -Is; }
@@ -38,56 +23,9 @@ note(){ notify-send "$@"; }
 # ---------- Audio (prefer pactl stable sink names) ----------
 HEADSET_SINK="alsa_output.usb-SteelSeries_Arctis_Nova_7X-00.iec958-stereo"
 TV_SINK="alsa_output.pci-0000_03_00.1.hdmi-stereo-extra3"
-
-resolve_sink() {
-  # exact match first
-  if pactl list short sinks | awk '{print $2}' | grep -Fxq "$1"; then
-    echo "$1"; return 0
-  fi
-  # pattern fallbacks (tweak as needed)
-  case "$1" in
-    *hdmi-stereo*)    pactl list short sinks | awk '$2 ~ /hdmi-stereo/ {print $2}'    | tail -1; return 0;;
-    *iec958-stereo*)  pactl list short sinks | awk '$2 ~ /iec958-stereo/ {print $2}'  | head -1; return 0;;
-  esac
-  return 1
-}
-
-set_default_sink() {
-  local want="$1" sink
-  sink="$(resolve_sink "$want" || true)"
-  if [ -n "${sink:-}" ]; then
-    pactl set-default-sink "$sink" && log "audio: default -> $sink" || log "audio: set-default failed for $sink"
-  else
-    log "audio: could not resolve sink for pattern '$want'"
-  fi
-}
+set_default_sink() { pactl set-default-sink "$1"; log "audio: default -> $1"; }
 
 # ---------- Display + Audio wrappers ----------
-mouse_bottom_right() {
-  local pad="${1:-6}"
-  local geo x y
-  geo="$(kscreen-doctor -j)"
-  x="$(jq -r '[.[] | select(.enabled==true) | (.pos.x + .mode.size.width  - 1)] | max' <<<"$geo")"
-  y="$(jq -r '[.[] | select(.enabled==true) | (.pos.y + .mode.size.height - 1)] | max' <<<"$geo")"
-  x=$((x - pad)); y=$((y - pad))
-
-  if [[ "${XDG_SESSION_TYPE:-}" == "wayland" ]]; then
-    local js f s
-    js='workspace.cursorPos = Qt.point('"$x,$y"');'
-    f="$(mktemp --suffix=.js)"
-    printf '%s\n' "$js" > "$f"
-    if ! s="$("$QDBUS_BIN" org.kde.KWin /Scripting org.kde.kwin.Scripting.loadScript "$f" 2>/dev/null)"; then
-      log "kwin scripting unavailable"; rm -f "$f"; return 1
-    fi
-    "$QDBUS_BIN" org.kde.KWin "/Scripting/Script${s}" org.kde.kwin.Script.run  >/dev/null 2>&1 || true
-    "$QDBUS_BIN" org.kde.KWin "/Scripting/Script${s}" org.kde.kwin.Script.stop >/dev/null 2>&1 || true
-    rm -f "$f"
-  else
-    command -v xdotool >/dev/null || { log "xdotool required for X11 fallback"; return 1; }
-    xdotool mousemove "$x" "$y"
-  fi
-}
-
 make_desk_primary() {
   log "begin: make_desk_primary"
   if $DEBUG_MODE; then
@@ -99,8 +37,8 @@ make_desk_primary() {
       output.HDMI-A-1.enable \
       output.HDMI-A-1.mode.2560x1440@144 \
       output.HDMI-A-1.position.0,0 \
-      output.HDMI-A-2.disable 2>/dev/null || true
-    mouse_bottom_right || true
+      output.HDMI-A-2.disable 2>/dev/null
+    mouse_bottom_right
     sleep 0.5
     set_default_sink "$HEADSET_SINK"
   fi
@@ -113,16 +51,51 @@ make_tv_primary() {
     note "🧪 DEBUG" "make_tv_primary (HDMI-A-2 primary; audio -> TV)"
     set_default_sink "$TV_SINK"
   else
+    # Enable A-2 first, then disable A-1
     kscreen-doctor \
       output.HDMI-A-2.enable \
       output.HDMI-A-2.mode.3840x2160@60 \
       output.HDMI-A-2.position.2560,0 \
-      output.HDMI-A-1.disable 2>/dev/null || true
+      output.HDMI-A-1.disable 2>/dev/null
     sleep 0.5
     set_default_sink "$TV_SINK"
   fi
   log "end: make_tv_primary"
 }
+
+
+# ----------- Mouse Hider ----------
+# deps: kscreen-doctor, jq, qdbus (qdbus-qt5), kwin_wayland running
+mouse_bottom_right() {
+  local pad="${1:-6}"
+
+  # Compute bottom-right of the combined layout via kscreen-doctor JSON
+  local geo
+  geo="$(kscreen-doctor -j)"
+  local x y
+  x="$(jq -r '[.[] | select(.enabled==true) | (.pos.x + .mode.size.width - 1)] | max' <<<"$geo")"
+  y="$(jq -r '[.[] | select(.enabled==true) | (.pos.y + .mode.size.height - 1)] | max' <<<"$geo")"
+  x=$((x - pad)); y=$((y - pad))
+
+  if [[ "${XDG_SESSION_TYPE:-}" == "wayland" ]]; then
+    # Wayland/Plasma: set workspace.cursorPos via a one-shot KWin script
+    local js f s
+    js='workspace.cursorPos = Qt.point('"$x,$y"');'
+    f="$(mktemp --suffix=.js)"
+    printf '%s\n' "$js" > "$f"
+    s="$(qdbus org.kde.KWin /Scripting org.kde.kwin.Scripting.loadScript "$f" 2>/dev/null)" || {
+      echo "kwin scripting not available"; rm -f "$f"; return 1; }
+    qdbus org.kde.KWin "/Scripting/Script${s}" org.kde.kwin.Script.run >/dev/null 2>&1
+    qdbus org.kde.KWin "/Scripting/Script${s}" org.kde.kwin.Script.stop >/dev/null 2>&1
+    rm -f "$f"
+  else
+    # X11 fallback
+    command -v xdotool >/dev/null || { echo "xdotool required"; return 1; }
+    xdotool mousemove "$x" "$y"
+  fi
+}
+
+
 
 # ---------- lock helpers ----------
 lock_owner() { [ -f "$LOCK" ] && cat "$LOCK" || true; }
@@ -137,16 +110,6 @@ release_lock_if_owner() {
   if [ "$(lock_owner)" = "$dev" ]; then rm -f "$LOCK"; log "lock: released by $dev"; else log "lock: release skipped (owner=$(lock_owner), dev=$dev)"; fi
 }
 
-cleanup() {
-  # if owner is still present, tear down nicely
-  if [ -n "$(lock_owner)" ]; then
-    make_desk_primary || true
-    rm -f "$LOCK" || true
-  fi
-  log "exiting"
-}
-trap cleanup EXIT INT TERM
-
 # If lock exists but device is gone (stale), clear it
 if [ -f "$LOCK" ] && [ ! -e "/dev/input/$(cat "$LOCK")" ]; then log "lock: stale ($(cat "$LOCK")) -> clearing"; rm -f "$LOCK"; fi
 
@@ -157,12 +120,16 @@ any_js_present() { compgen -G "/dev/input/js*" >/dev/null; }
 while [ ! -e "$LOG" ]; do log "waiting for $LOG to appear..."; sleep 0.5; done
 log "watcher started, tailing $LOG"
 
-# Start at EOF; only new lines trigger. --pid ties tail to our PID.
-while read -r ts act dev _; do
-  case "${act:-}" in
+# Start at EOF; only new lines trigger
+stdbuf -oL -eL tail -F -n 0 "$LOG" | while IFS= read -r line; do
+  ACT="$(awk '{print $2}' <<<"$line" 2>/dev/null || echo)"
+  DEV="$(awk '{print $3}' <<<"$line" 2>/dev/null || echo)"
+  [ -n "${ACT:-}" ] && [ -n "${DEV:-}" ] || continue
+  log "event: $ACT $DEV"
+
+  case "$ACT" in
     add)
-      log "event: add ${dev:-?}"
-      if acquire_lock "${dev:-?}"; then
+      if acquire_lock "$DEV"; then
         make_tv_primary
         if $DEBUG_MODE; then
           log "DEBUG: would launch Steam Big Picture"
@@ -172,23 +139,23 @@ while read -r ts act dev _; do
           log "action: launch steam big picture"
           "$LAUNCHER" >/dev/null 2>&1 &
         fi
-        note "🎮 Controller Connected" "${dev:-?} (owner)"
+        note "🎮 Controller Connected" "$DEV (owner)"
       else
         log "info: add ignored (owner=$(lock_owner))"
       fi
       ;;
     remove)
-      log "event: remove ${dev:-?}"
-      if [ "$(lock_owner)" = "${dev:-}" ] || ! any_js_present; then
-        log "teardown: triggered by ${dev:-none} (owner=$(lock_owner))"
+      # Teardown if the *owner* disconnected OR there are no js* left at all.
+      if [ "$(lock_owner)" = "$DEV" ] || ! any_js_present; then
+        log "teardown: triggered by ${DEV:-none} (owner=$(lock_owner))"
         make_desk_primary
         rm -f "$LOCK" || true
-        note "🛑 Controller Disconnected" "${dev:-all gone} (teardown)"
+        note "🛑 Controller Disconnected" "${DEV:-all gone} (teardown)"
       else
         log "info: remove ignored (non-owner; owner=$(lock_owner))"
       fi
       ;;
-    *) : ;;
   esac
-done < <(tail --pid="$$" -F -n0 "$LOG")
+done
+
 
