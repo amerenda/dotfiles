@@ -15,7 +15,6 @@ export WAYLAND_DISPLAY="${WAYLAND_DISPLAY:-wayland-0}"
 LOG=/tmp/joystick-events.log
 LOCK=/tmp/joystick-owner.lock
 LAUNCHER="/usr/local/bin/launch-bigpicture.sh"
-#LAUNCHER="/usr/local/bin/steam-bigpicture-primary.sh"
 WATCHLOG=/tmp/joystick-watcher.log
 
 # --- logging helpers ---
@@ -202,6 +201,55 @@ hid_uniq_present() {
   return 1
 }
 
+usb_vidpid_present() {
+  # Check for presence of a USB device by vendor/product hex ids (lowercase).
+  local vid="${1:-}"
+  local pid="${2:-}"
+  [ -n "$vid" ] && [ -n "$pid" ] || return 1
+  local d
+  for d in /sys/bus/usb/devices/*; do
+    [ -e "$d/idVendor" ] || continue
+    [ -e "$d/idProduct" ] || continue
+    if [ "$(tr 'A-F' 'a-f' <"$d/idVendor" 2>/dev/null)" = "$vid" ] && \
+       [ "$(tr 'A-F' 'a-f' <"$d/idProduct" 2>/dev/null)" = "$pid" ]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+id_present() {
+  # Supported IDs:
+  # - Bluetooth HID_UNIQ MAC: aa:bb:cc:dd:ee:ff
+  # - USB VID/PID: usb:2dc8:3106
+  # - USB joydev: js0
+  # - USB evdev: event26
+  local id
+  id="$(norm_id "${1:-}")"
+  [ -n "$id" ] || return 1
+
+  if [[ "$id" == event* ]]; then
+    [ -e "/dev/input/$id" ]
+    return $?
+  fi
+
+  if [[ "$id" == js* ]]; then
+    [ -e "/dev/input/$id" ]
+    return $?
+  fi
+
+  if [[ "$id" == usb:*:* ]]; then
+    local vid pid
+    vid="$(cut -d: -f2 <<<"$id" 2>/dev/null || true)"
+    pid="$(cut -d: -f3 <<<"$id" 2>/dev/null || true)"
+    usb_vidpid_present "$vid" "$pid"
+    return $?
+  fi
+
+  # Default: treat as MAC HID_UNIQ
+  hid_uniq_present "$id"
+}
+
 any_controller_present() {
   local f name uniq
   for f in /sys/bus/hid/devices/*/uevent; do
@@ -212,13 +260,26 @@ any_controller_present() {
     [[ "$uniq" == *:* ]] || continue
     return 0
   done
+
+  # Also consider any USB joystick devices present (legacy joydev nodes).
+  compgen -G "/dev/input/js*" >/dev/null && return 0
+
+  # And USB evdev joystick-only devices (like the 8BitDo dongle which has event* but no js*).
+  local ev
+  for ev in /dev/input/event*; do
+    [ -e "$ev" ] || continue
+    if udevadm info --query=property --name="$ev" 2>/dev/null | grep -q '^ID_INPUT_JOYSTICK=1$'; then
+      return 0
+    fi
+  done
+
   return 1
 }
 
 # If lock exists but owner is gone (stale), clear it
 if [ -f "$LOCK" ]; then
   owner="$(lock_owner)"
-  if [ -n "$owner" ] && ! hid_uniq_present "$owner"; then
+  if [ -n "$owner" ] && ! id_present "$owner"; then
     log "lock: stale ($owner) -> clearing"
     rm -f "$LOCK"
   fi

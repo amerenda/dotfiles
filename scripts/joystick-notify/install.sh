@@ -44,8 +44,12 @@ sudo -v
 echo "[joystick-notify] Installing scripts to /usr/local/bin ..."
 sudo install -Dm0755 "$ROOT/monitor-switcher.sh" /usr/local/bin/monitor-switcher.sh
 sudo install -Dm0755 "$ROOT/joystick-event.sh" /usr/local/bin/joystick-event.sh
-sudo install -Dm0755 "$ROOT/steam-bigpicture-primary.sh" /usr/local/bin/steam-bigpicture-primary.sh
 sudo install -Dm0755 "$ROOT/launch-bigpicture.sh" /usr/local/bin/launch-bigpicture.sh
+
+# Optional legacy launcher (kept only if present in the repo)
+if [ -f "$ROOT/steam-bigpicture-primary.sh" ]; then
+  sudo install -Dm0755 "$ROOT/steam-bigpicture-primary.sh" /usr/local/bin/steam-bigpicture-primary.sh
+fi
 
 echo "[joystick-notify] Installing udev rules ..."
 sudo install -Dm0644 "$ROOT/udev/99-joystick-notify.rules" /etc/udev/rules.d/99-joystick-notify.rules
@@ -53,6 +57,8 @@ sudo udevadm control --reload-rules
 
 echo "[joystick-notify] Installing systemd user unit ..."
 install -Dm0644 "$ROOT/systemd/joystick-notify.service" "$HOME/.config/systemd/user/joystick-notify.service"
+install -Dm0644 "$ROOT/systemd/joystick-notify-steam-shutdown.service" "$HOME/.config/systemd/user/joystick-notify-steam-shutdown.service"
+install -Dm0644 "$ROOT/systemd/joystick-notify-steam-shutdown.path" "$HOME/.config/systemd/user/joystick-notify-steam-shutdown.path"
 
 # Ensure user bus vars exist (some terminals / sudo contexts can be missing them).
 uid="$(id -u)"
@@ -64,6 +70,7 @@ systemctl --user daemon-reload
 if [ "$ENABLE" -eq 1 ]; then
   echo "[joystick-notify] Enabling + starting systemd user service ..."
   systemctl --user enable --now joystick-notify.service
+  systemctl --user enable --now joystick-notify-steam-shutdown.path
   echo "[joystick-notify] Restarting systemd user service to pick up updates ..."
   systemctl --user restart joystick-notify.service
 else
@@ -71,8 +78,13 @@ else
     echo "[joystick-notify] Service is running; restarting to pick up updates ..."
     systemctl --user restart joystick-notify.service
   fi
+  if systemctl --user is-active --quiet joystick-notify-steam-shutdown.path; then
+    echo "[joystick-notify] Steam shutdown watcher is running; restarting to pick up updates ..."
+    systemctl --user restart joystick-notify-steam-shutdown.path
+  fi
   echo "[joystick-notify] Installed. To enable later:"
   echo "  systemctl --user enable --now joystick-notify.service"
+  echo "  systemctl --user enable --now joystick-notify-steam-shutdown.path"
 fi
 
 echo "[joystick-notify] Done."

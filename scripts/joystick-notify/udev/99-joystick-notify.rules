@@ -40,4 +40,17 @@ ACTION=="add|change", SUBSYSTEM=="input", KERNEL=="js*", ENV{ID_INPUT_JOYSTICK}=
 # -------------------------------------------------------------------
 ACTION=="add", ATTRS{idVendor}=="2dc8", ATTRS{idProduct}=="3106", RUN+="/sbin/modprobe xpad", RUN+="/bin/sh -c 'echo 2dc8 3106 > /sys/bus/usb/drivers/xpad/new_id'"
 
+# -------------------------------------------------------------------
+# 4) Joystick-notify: USB joysticks/gamepads (e.g. 8BitDo Ultimate wireless Controller for PC)
+#
+# Your 8BitDo dongle exposes evdev only (no /dev/input/js*), so trigger on event*.
+# We log a stable identifier that is available on both add and remove: eventXX (kernel name).
+# -------------------------------------------------------------------
+
+# connect-ish (8BitDo 2dc8:3106)
+ACTION=="add", SUBSYSTEM=="input", KERNEL=="event*", ENV{ID_BUS}=="usb", ENV{ID_INPUT_JOYSTICK}=="1", ATTRS{idVendor}=="2dc8", ATTRS{idProduct}=="3106", RUN+="/usr/bin/env ACTION=add /usr/local/bin/joystick-event.sh %k"
+
+# disconnect-ish
+ACTION=="remove", SUBSYSTEM=="input", KERNEL=="event*", ATTRS{idVendor}=="2dc8", ATTRS{idProduct}=="3106", RUN+="/usr/bin/env ACTION=remove /usr/local/bin/joystick-event.sh %k"
+
 

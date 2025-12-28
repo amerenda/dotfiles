@@ -1,0 +1,18 @@
+# System directories to exclude
+/dev
+/proc
+/sys
+/tmp
+/run
+/mnt
+/media
+/lost+found
+/etc/backup-keys
+
+# User specified exclusions
+/var/cache/pacman/pkg
+
+# Other common cache/temp locations
+/var/tmp
+/var/run
+.cache

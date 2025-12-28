@@ -11,8 +11,8 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 # SCRIPT_DIR is .../dotfiles/scripts, so DOTFILES_PATH is .../dotfiles
 DOTFILES_PATH="$(dirname "$SCRIPT_DIR")"
 
-export INCLUDE_FILE="${DOTFILES_PATH}/scripts/meta/backup/include.txt"
-export EXCLUDE_FILE="${DOTFILES_PATH}/scripts/meta/backup/exclude.txt"
+export INCLUDE_FILE="${DOTFILES_PATH}/scripts/backup/meta/include.txt"
+export EXCLUDE_FILE="${DOTFILES_PATH}/scripts/backup/meta/exclude.txt"
 
 export GOOGLE_APPLICATION_CREDENTIALS=/etc/backup-keys/backup-amerenda.json
 
