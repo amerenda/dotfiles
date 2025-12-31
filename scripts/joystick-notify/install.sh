@@ -42,9 +42,10 @@ fi
 sudo -v
 
 echo "[joystick-notify] Installing scripts to /usr/local/bin ..."
-sudo install -Dm0755 "$ROOT/monitor-switcher.sh" /usr/local/bin/monitor-switcher.sh
-sudo install -Dm0755 "$ROOT/joystick-event.sh" /usr/local/bin/joystick-event.sh
-sudo install -Dm0755 "$ROOT/launch-bigpicture.sh" /usr/local/bin/launch-bigpicture.sh
+sudo install -Dm0755 "$ROOT/scripts/monitor-switcher.sh" /usr/local/bin/monitor-switcher.sh
+sudo install -Dm0755 "$ROOT/scripts/joystick-event.sh" /usr/local/bin/joystick-event.sh
+sudo install -Dm0755 "$ROOT/scripts/launch-bigpicture.sh" /usr/local/bin/launch-bigpicture.sh
+sudo install -Dm0755 "$ROOT/system-tray/joystick-tray.py" /usr/local/bin/joystick-notify-tray
 
 # Optional legacy launcher (kept only if present in the repo)
 if [ -f "$ROOT/steam-bigpicture-primary.sh" ]; then
@@ -53,12 +54,17 @@ fi
 
 echo "[joystick-notify] Installing udev rules ..."
 sudo install -Dm0644 "$ROOT/udev/99-joystick-notify.rules" /etc/udev/rules.d/99-joystick-notify.rules
+sudo install -Dm0644 "$ROOT/udev/71-8bitdo-controllers.rules" /etc/udev/rules.d/71-8bitdo-controllers.rules
 sudo udevadm control --reload-rules
 
 echo "[joystick-notify] Installing systemd user unit ..."
 install -Dm0644 "$ROOT/systemd/joystick-notify.service" "$HOME/.config/systemd/user/joystick-notify.service"
 install -Dm0644 "$ROOT/systemd/joystick-notify-steam-shutdown.service" "$HOME/.config/systemd/user/joystick-notify-steam-shutdown.service"
 install -Dm0644 "$ROOT/systemd/joystick-notify-steam-shutdown.path" "$HOME/.config/systemd/user/joystick-notify-steam-shutdown.path"
+install -Dm0644 "$ROOT/systemd/joystick-notify-tray.service" "$HOME/.config/systemd/user/joystick-notify-tray.service"
+
+echo "[joystick-notify] Installing desktop entry (tray app id)..."
+install -Dm0644 "$ROOT/system-tray/joystick-notify-tray.desktop" "$HOME/.local/share/applications/joystick-notify-tray.desktop"
 
 # Ensure user bus vars exist (some terminals / sudo contexts can be missing them).
 uid="$(id -u)"
@@ -71,6 +77,11 @@ if [ "$ENABLE" -eq 1 ]; then
   echo "[joystick-notify] Enabling + starting systemd user service ..."
   systemctl --user enable --now joystick-notify.service
   systemctl --user enable --now joystick-notify-steam-shutdown.path
+  if python3 -c 'import PyQt6' >/dev/null 2>&1; then
+    systemctl --user enable --now joystick-notify-tray.service
+  else
+    echo "[joystick-notify] NOTE: tray icon not enabled (missing PyQt6). Install: pacman -S --needed python-pyqt6"
+  fi
   echo "[joystick-notify] Restarting systemd user service to pick up updates ..."
   systemctl --user restart joystick-notify.service
 else
@@ -82,9 +93,14 @@ else
     echo "[joystick-notify] Steam shutdown watcher is running; restarting to pick up updates ..."
     systemctl --user restart joystick-notify-steam-shutdown.path
   fi
+  if systemctl --user is-active --quiet joystick-notify-tray.service; then
+    echo "[joystick-notify] Tray icon service is running; restarting to pick up updates ..."
+    systemctl --user restart joystick-notify-tray.service
+  fi
   echo "[joystick-notify] Installed. To enable later:"
   echo "  systemctl --user enable --now joystick-notify.service"
   echo "  systemctl --user enable --now joystick-notify-steam-shutdown.path"
+  echo "  systemctl --user enable --now joystick-notify-tray.service"
 fi
 
 echo "[joystick-notify] Done."
