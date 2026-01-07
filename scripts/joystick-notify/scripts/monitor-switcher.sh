@@ -12,6 +12,25 @@ DISCONNECT_GRACE="${DISCONNECT_GRACE:-15}"
 
 # How often (seconds) to poll for Steam exiting while in couch-mode.
 STEAM_POLL="${STEAM_POLL:-2}"
+
+# HDMI-CEC (optional): wake TV + switch input when entering couch-mode.
+# Requires either `cec-ctl` (preferred; package: v4l-utils on many distros) or `cec-client`
+# (package name varies: e.g. libcec).
+CEC_ENABLED="${CEC_ENABLED:-true}"
+# HDMI port number on the TV that your PC is connected to (1..N). Adjust as needed.
+# For your setup: HDMI 3.
+CEC_HDMI_PORT="${CEC_HDMI_PORT:-3}"
+# Back-compat: older name used in earlier iteration.
+CEC_TV_PORT="${CEC_TV_PORT:-$CEC_HDMI_PORT}"
+# Optional: explicit adapter device for cec-ctl (e.g. /dev/cec0). Empty = auto.
+CEC_ADAPTER="${CEC_ADAPTER:-}"
+# If true, send CEC standby (power off) on teardown (best-effort).
+CEC_POWER_OFF_ON_TEARDOWN="${CEC_POWER_OFF_ON_TEARDOWN:-true}"
+
+# Virtual desktop isolation (KWin/Plasma). Prefer a desktop named "Couch".
+COUCH_DESKTOP_NAME="${COUCH_DESKTOP_NAME:-Couch}"
+# Optional numeric override (1..N). If empty, we look up by name or fall back to last desktop.
+COUCH_DESKTOP_NUM="${COUCH_DESKTOP_NUM:-}"
 # ==================================================
 
 # Wayland/KDE session env
@@ -20,15 +39,23 @@ export DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$(id -u)/bus"
 export WAYLAND_DISPLAY="${WAYLAND_DISPLAY:-wayland-0}"
 
 LOG=/tmp/joystick-events.log
+EVENTS_LOCK=/tmp/joystick-events.lock
 LOCK=/tmp/joystick-owner.lock
 LAUNCHER="/usr/local/bin/launch-bigpicture.sh"
 WATCHLOG=/tmp/joystick-watcher.log
 JOY_EVENT="/usr/local/bin/joystick-event.sh"
+DESKTOP_STATE="/tmp/joystick-prev-desktop.$(id -u)"
+CEC_STATE="/tmp/joystick-cec-used.$(id -u)"
 
 # --- logging helpers ---
 ts()  { date -Is; }
 log() { ( umask 0; [ -e "$WATCHLOG" ] || { : >"$WATCHLOG"; chmod 666 "$WATCHLOG"; }; printf '%s %s\n' "$(ts)" "$*" >> "$WATCHLOG" ); }
-note(){ notify-send "$@"; }
+note(){
+  # Notifications are best-effort: never let notify daemon rate limits crash the watcher.
+  command -v notify-send >/dev/null 2>&1 || return 0
+  # Coalesce repeated notifications when supported by the notification server.
+  notify-send -h string:x-canonical-private-synchronous:joystick-notify "$@" >/dev/null 2>&1 || true
+}
 
 # ---------- background job helpers ----------
 is_pid_alive() { local p="${1:-}"; [ -n "$p" ] && kill -0 "$p" >/dev/null 2>&1; }
@@ -52,22 +79,185 @@ cancel_steam_watcher() {
 
 emit_event() {
   # Emit a synthetic event into the same log stream monitor-switcher watches.
-  # Prefer using joystick-event.sh to reuse its file-locking logic.
+  # NOTE: We do NOT rely on joystick-event.sh here because it uses `flock -n` and can
+  # silently drop events under contention. For timers/watchers, we want reliable delivery,
+  # so we do our own `flock -w` + append.
   local act="${1:-}"
   local dev="${2:-synthetic}"
   [ -n "$act" ] || return 0
 
-  if [ -x "$JOY_EVENT" ]; then
-    ACTION="$act" "$JOY_EVENT" "$dev" >/dev/null 2>&1 || true
+  # Ensure events log exists and is writable
+  if [ ! -e "$LOG" ]; then
+    ( umask 0; : >"$LOG"; chmod 666 "$LOG" ) >/dev/null 2>&1 || true
+  fi
+
+  # Append with a short wait on the lock to avoid dropping synthetic events.
+  if {
+    flock -w 2 9 || exit 1
+    printf '%s %s %s\n' "$(date -Is)" "$act" "$dev" >> "$LOG"
+  } 9>"$EVENTS_LOCK" 2>/dev/null; then
     return 0
   fi
 
-  # Fallback: best-effort append (without flock).
+  # If we can't open/lock the lockfile (e.g. permissions regression), still try to append.
   printf '%s %s %s\n' "$(date -Is)" "$act" "$dev" >> "$LOG" 2>/dev/null || true
 }
 
 is_steam_running() {
   pgrep -x steam >/dev/null 2>&1 || pgrep -f '/steam' >/dev/null 2>&1
+}
+
+have() { command -v "$1" >/dev/null 2>&1; }
+
+cec_wake_and_select_input_best_effort() {
+  # Best-effort HDMI-CEC:
+  # - Power on TV
+  # - Select the TV input port that the PC is connected to (active source / routing)
+  # This is intentionally forgiving: if tools/devices aren't present, it just logs and returns.
+  [ "$CEC_ENABLED" = "true" ] || [ "$CEC_ENABLED" = "1" ] || return 0
+
+  # Prefer libcec (cec-client) on systems like yours where the adapter is /dev/ttyACM0
+  # and there is no kernel CEC device node (/dev/cec*).
+  if have cec-client; then
+    # `on 0` powers on TV; `as` sets this device as active source (TV will switch to it).
+    # We also send Image View On. Use -p to advertise the physical HDMI port to the TV.
+    if printf 'on 0\nas\nis\nq\n' | cec-client -s -d 1 -p "$CEC_HDMI_PORT" >/dev/null 2>&1; then
+      log "cec: wake+switch OK (cec-client -p $CEC_HDMI_PORT)"
+    else
+      log "cec: warn: wake+switch failed (cec-client -p $CEC_HDMI_PORT) — check /dev/ttyACM0 permissions (need uucp group)"
+    fi
+    ( umask 077; : >"$CEC_STATE" ) 2>/dev/null || true
+    return 0
+  fi
+
+  # Kernel CEC framework (cec-ctl) is only usable if /dev/cec* exists.
+  if have cec-ctl && compgen -G "/dev/cec*" >/dev/null; then
+    # Build optional adapter arg.
+    local adapter_args=()
+    if [ -n "${CEC_ADAPTER:-}" ]; then
+      adapter_args+=( -d "$CEC_ADAPTER" )
+    fi
+
+    # Power on TV (0 is TV logical address). Ignore errors.
+    cec-ctl "${adapter_args[@]}" --to 0 --image-view-on >/dev/null 2>&1 || true
+    cec-ctl "${adapter_args[@]}" --to 0 --power-on >/dev/null 2>&1 || true
+
+    # Route to the given port. cec-ctl uses 1-based port numbers with --route-to.
+    cec-ctl "${adapter_args[@]}" --route-to "$CEC_TV_PORT" >/dev/null 2>&1 || true
+    log "cec: attempted wake + route-to port $CEC_TV_PORT (cec-ctl ${CEC_ADAPTER:-auto})"
+    ( umask 077; : >"$CEC_STATE" ) 2>/dev/null || true
+    return 0
+  fi
+
+  log "cec: skipped (missing cec-ctl/cec-client)"
+}
+
+cec_standby_best_effort() {
+  [ "$CEC_ENABLED" = "true" ] || [ "$CEC_ENABLED" = "1" ] || return 0
+  [ "$CEC_POWER_OFF_ON_TEARDOWN" = "true" ] || [ "$CEC_POWER_OFF_ON_TEARDOWN" = "1" ] || return 0
+
+  # Only power off if we used CEC during this couch-mode session (conservative).
+  [ -e "$CEC_STATE" ] || return 0
+
+  if have cec-client; then
+    if printf 'standby 0\nq\n' | cec-client -s -d 1 -p "$CEC_HDMI_PORT" >/dev/null 2>&1; then
+      log "cec: standby OK (cec-client -p $CEC_HDMI_PORT)"
+    else
+      log "cec: warn: standby failed (cec-client -p $CEC_HDMI_PORT) — check /dev/ttyACM0 permissions"
+    fi
+    return 0
+  fi
+
+  if have cec-ctl && compgen -G "/dev/cec*" >/dev/null; then
+    local adapter_args=()
+    if [ -n "${CEC_ADAPTER:-}" ]; then
+      adapter_args+=( -d "$CEC_ADAPTER" )
+    fi
+    cec-ctl "${adapter_args[@]}" --to 0 --standby >/dev/null 2>&1 || true
+    log "cec: standby sent (cec-ctl ${CEC_ADAPTER:-auto})"
+    return 0
+  fi
+}
+
+kwin_current_desktop() {
+  have qdbus6 || return 1
+  qdbus6 org.kde.KWin /KWin org.kde.KWin.currentDesktop 2>/dev/null | head -n 1
+}
+
+kwin_set_desktop() {
+  local n="${1:-}"
+  have qdbus6 || return 1
+  [[ "$n" =~ ^[0-9]+$ ]] || return 1
+  qdbus6 org.kde.KWin /KWin org.kde.KWin.setCurrentDesktop "$n" >/dev/null 2>&1 || return 1
+}
+
+kwin_desktop_count() {
+  have kreadconfig6 || return 1
+  kreadconfig6 --file kwinrc --group Desktops --key Number 2>/dev/null | head -n 1
+}
+
+kwin_desktop_name() {
+  local n="${1:-}"
+  have kreadconfig6 || return 1
+  kreadconfig6 --file kwinrc --group Desktops --key "Name_${n}" 2>/dev/null || true
+}
+
+kwin_find_desktop_by_name() {
+  local want="${1:-}"
+  [ -n "$want" ] || return 1
+  local count n name
+  count="$(kwin_desktop_count || echo)"
+  [[ "${count:-}" =~ ^[0-9]+$ ]] || return 1
+  for ((n=1; n<=count; n++)); do
+    name="$(kwin_desktop_name "$n" | head -n 1)"
+    if [ "${name:-}" = "$want" ]; then
+      echo -n "$n"
+      return 0
+    fi
+  done
+  return 1
+}
+
+save_and_switch_to_couch_desktop_best_effort() {
+  local cur target count
+  cur="$(kwin_current_desktop || echo)"
+  [[ "${cur:-}" =~ ^[0-9]+$ ]] || { log "kwin: skip desktop save/switch (no currentDesktop)"; return 0; }
+  ( umask 077; echo -n "$cur" >"$DESKTOP_STATE" ) 2>/dev/null || true
+
+  target=""
+  if [[ "${COUCH_DESKTOP_NUM:-}" =~ ^[0-9]+$ ]]; then
+    target="$COUCH_DESKTOP_NUM"
+  else
+    target="$(kwin_find_desktop_by_name "$COUCH_DESKTOP_NAME" || true)"
+    if [ -z "${target:-}" ]; then
+      count="$(kwin_desktop_count || echo)"
+      [[ "${count:-}" =~ ^[0-9]+$ ]] && target="$count" || target=""
+    fi
+  fi
+
+  if [ -z "${target:-}" ]; then
+    log "kwin: warn: could not resolve couch desktop (name=$COUCH_DESKTOP_NAME num=${COUCH_DESKTOP_NUM:-auto})"
+    return 0
+  fi
+
+  if [ "$target" != "$cur" ]; then
+    if kwin_set_desktop "$target"; then
+      log "kwin: switched desktop $cur -> $target"
+    else
+      log "kwin: warn: failed to switch desktop $cur -> $target"
+    fi
+  else
+    log "kwin: couch desktop already active (desktop=$cur)"
+  fi
+}
+
+restore_previous_desktop_best_effort() {
+  local prev
+  [ -r "$DESKTOP_STATE" ] || return 0
+  prev="$(cat "$DESKTOP_STATE" 2>/dev/null || echo)"
+  rm -f "$DESKTOP_STATE" >/dev/null 2>&1 || true
+  [[ "${prev:-}" =~ ^[0-9]+$ ]] || return 0
+  kwin_set_desktop "$prev" && log "kwin: restored desktop -> $prev" || log "kwin: warn: failed to restore desktop -> $prev"
 }
 
 teardown_couch_mode() {
@@ -78,6 +268,9 @@ teardown_couch_mode() {
   # Steam watcher will also exit naturally when the lock disappears, but cancel anyway.
   cancel_steam_watcher
   make_desk_primary
+  restore_previous_desktop_best_effort
+  cec_standby_best_effort
+  rm -f "$CEC_STATE" >/dev/null 2>&1 || true
   rm -f "$LOCK" || true
   note "🛑 Couch-mode Ended" "${why:-ended} ${dev:-}"
 }
@@ -409,16 +602,25 @@ while IFS= read -r line; do
     add)
       cancel_pending_timer
       if acquire_lock "$DEV"; then
-        make_tv_primary
+        # 1) OPTIONAL isolation: jump to a dedicated couch desktop so your current work isn't shown.
+        save_and_switch_to_couch_desktop_best_effort
+
+        # 2/3) Hide cursor + start Steam (launcher keeps running until lock is removed).
         start_steam_watcher
         if $DEBUG_MODE; then
           log "DEBUG: would launch Steam Big Picture"
           note "🧪 DEBUG" "Would launch Steam Big Picture"
         else
-          sleep 1
           if launcher_exists; then
             log "action: launch steam big picture ($LAUNCHER)"
             "$LAUNCHER" >/dev/null 2>&1 &
+
+            # 4) While Steam starts, wake TV + switch its input to this PC (CEC), in the background.
+            ( cec_wake_and_select_input_best_effort ) >/dev/null 2>&1 &
+
+            # 5) Switch output/audio to the TV.
+            sleep 0.5
+            make_tv_primary
 
             # Steam/PipeWire can race and restore streams back to the old device;
             # re-assert the TV sink after launch and move streams again.
@@ -448,9 +650,14 @@ while IFS= read -r line; do
       # We schedule if the owner disconnected, or if this removal leaves us with no controllers.
       owner_now="$(lock_owner)"
       if [ "$owner_now" = "$DEV" ] || ! any_controller_present; then
-        log "remove: scheduling grace teardown check (dev=$DEV owner=$owner_now)"
-        schedule_disconnect_grace "$DEV"
-        note "🎮 Controller Disconnected" "$DEV (waiting ${DISCONNECT_GRACE}s)"
+        if is_steam_running; then
+          log "remove: steam running -> scheduling grace teardown check (dev=$DEV owner=$owner_now)"
+          schedule_disconnect_grace "$DEV"
+          note "🎮 Controller Disconnected" "$DEV (waiting ${DISCONNECT_GRACE}s)"
+        else
+          log "remove: steam not running -> immediate teardown (dev=$DEV owner=$owner_now)"
+          teardown_couch_mode "controller_disconnect" "$DEV"
+        fi
       else
         log "info: remove ignored (non-owner; owner=$owner_now)"
       fi

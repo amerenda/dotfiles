@@ -17,6 +17,17 @@ if [ ! -e "$LOG" ]; then
   chmod 666 "$LOG" || true
 fi
 
+# Ensure lock file exists and is writable by both root (udev) and the user service.
+# Without this, monitor-switcher (running as user) may be unable to flock() the lock,
+# causing synthetic grace_timeout/steam_exit events to be dropped.
+if [ ! -e "$LOCK" ]; then
+  ( umask 0; : >"$LOCK" ) 2>/dev/null || true
+  chown root:root "$LOCK" || true
+  chmod 666 "$LOCK" || true
+else
+  chmod 666 "$LOCK" || true
+fi
+
 # Append-only write with lock
 {
   flock -n 9 || exit 0
