@@ -5,6 +5,13 @@ set -euo pipefail
 # Set to "true" to skip real actions (only log + notify).
 # You can also override via systemd: Environment=DEBUG_MODE=true
 DEBUG_MODE="${DEBUG_MODE:-false}"
+
+# Disconnect grace period (seconds) before tearing down couch-mode on controller loss.
+# This protects against transient Bluetooth hiccups.
+DISCONNECT_GRACE="${DISCONNECT_GRACE:-15}"
+
+# How often (seconds) to poll for Steam exiting while in couch-mode.
+STEAM_POLL="${STEAM_POLL:-2}"
 # ==================================================
 
 # Wayland/KDE session env
@@ -16,11 +23,106 @@ LOG=/tmp/joystick-events.log
 LOCK=/tmp/joystick-owner.lock
 LAUNCHER="/usr/local/bin/launch-bigpicture.sh"
 WATCHLOG=/tmp/joystick-watcher.log
+JOY_EVENT="/usr/local/bin/joystick-event.sh"
 
 # --- logging helpers ---
 ts()  { date -Is; }
 log() { ( umask 0; [ -e "$WATCHLOG" ] || { : >"$WATCHLOG"; chmod 666 "$WATCHLOG"; }; printf '%s %s\n' "$(ts)" "$*" >> "$WATCHLOG" ); }
 note(){ notify-send "$@"; }
+
+# ---------- background job helpers ----------
+is_pid_alive() { local p="${1:-}"; [ -n "$p" ] && kill -0 "$p" >/dev/null 2>&1; }
+
+PENDING_TIMER_PID=""
+STEAM_WATCHER_PID=""
+
+cancel_pending_timer() {
+  if is_pid_alive "${PENDING_TIMER_PID:-}"; then
+    kill "$PENDING_TIMER_PID" >/dev/null 2>&1 || true
+  fi
+  PENDING_TIMER_PID=""
+}
+
+cancel_steam_watcher() {
+  if is_pid_alive "${STEAM_WATCHER_PID:-}"; then
+    kill "$STEAM_WATCHER_PID" >/dev/null 2>&1 || true
+  fi
+  STEAM_WATCHER_PID=""
+}
+
+emit_event() {
+  # Emit a synthetic event into the same log stream monitor-switcher watches.
+  # Prefer using joystick-event.sh to reuse its file-locking logic.
+  local act="${1:-}"
+  local dev="${2:-synthetic}"
+  [ -n "$act" ] || return 0
+
+  if [ -x "$JOY_EVENT" ]; then
+    ACTION="$act" "$JOY_EVENT" "$dev" >/dev/null 2>&1 || true
+    return 0
+  fi
+
+  # Fallback: best-effort append (without flock).
+  printf '%s %s %s\n' "$(date -Is)" "$act" "$dev" >> "$LOG" 2>/dev/null || true
+}
+
+is_steam_running() {
+  pgrep -x steam >/dev/null 2>&1 || pgrep -f '/steam' >/dev/null 2>&1
+}
+
+teardown_couch_mode() {
+  local why="${1:-}"
+  local dev="${2:-}"
+  log "teardown: $why ${dev:-}"
+  cancel_pending_timer
+  # Steam watcher will also exit naturally when the lock disappears, but cancel anyway.
+  cancel_steam_watcher
+  make_desk_primary
+  rm -f "$LOCK" || true
+  note "🛑 Couch-mode Ended" "${why:-ended} ${dev:-}"
+}
+
+schedule_disconnect_grace() {
+  # Start (or restart) a grace timer. When it fires it emits a grace_timeout event.
+  local removed_dev="${1:-}"
+  cancel_pending_timer
+
+  (
+    sleep "$DISCONNECT_GRACE"
+    emit_event "grace_timeout" "${removed_dev:-timeout}"
+  ) >/dev/null 2>&1 &
+  PENDING_TIMER_PID=$!
+  log "grace: scheduled ${DISCONNECT_GRACE}s (pid=$PENDING_TIMER_PID) for ${removed_dev:-unknown}"
+}
+
+start_steam_watcher() {
+  # Watch Steam while in couch-mode. Only trigger once Steam has been observed running,
+  # then later disappears for 2 consecutive polls (avoids startup races).
+  if is_pid_alive "${STEAM_WATCHER_PID:-}"; then
+    return 0
+  fi
+
+  (
+    local seen_running=0 misses=0
+    while [ -e "$LOCK" ]; do
+      if is_steam_running; then
+        seen_running=1
+        misses=0
+      else
+        if [ "$seen_running" -eq 1 ]; then
+          misses=$((misses + 1))
+          if [ "$misses" -ge 2 ]; then
+            emit_event "steam_exit" "steam"
+            exit 0
+          fi
+        fi
+      fi
+      sleep "$STEAM_POLL"
+    done
+  ) >/dev/null 2>&1 &
+  STEAM_WATCHER_PID=$!
+  log "steam: watcher started (pid=$STEAM_WATCHER_PID poll=${STEAM_POLL}s)"
+}
 
 # ---------- Audio (prefer pactl stable sink names) ----------
 HEADSET_SINK="alsa_output.usb-SteelSeries_Arctis_Nova_7X-00.iec958-stereo"
@@ -293,7 +395,11 @@ while [ ! -e "$LOG" ]; do log "waiting for $LOG to appear..."; sleep 0.5; done
 log "watcher started, tailing $LOG"
 
 # Start at EOF; only new lines trigger
-stdbuf -oL -eL tail -F -n 0 "$LOG" | while IFS= read -r line; do
+# If we boot into an already-active couch-mode (lock exists), ensure the Steam watcher is running.
+[ -e "$LOCK" ] && start_steam_watcher || true
+
+# Use process substitution (not a pipeline) so this loop runs in the current shell.
+while IFS= read -r line; do
   ACT="$(awk '{print $2}' <<<"$line" 2>/dev/null || echo)"
   DEV="$(norm_id "$(awk '{print $3}' <<<"$line" 2>/dev/null || echo)")"
   [ -n "${ACT:-}" ] && [ -n "${DEV:-}" ] || continue
@@ -301,8 +407,10 @@ stdbuf -oL -eL tail -F -n 0 "$LOG" | while IFS= read -r line; do
 
   case "$ACT" in
     add)
+      cancel_pending_timer
       if acquire_lock "$DEV"; then
         make_tv_primary
+        start_steam_watcher
         if $DEBUG_MODE; then
           log "DEBUG: would launch Steam Big Picture"
           note "🧪 DEBUG" "Would launch Steam Big Picture"
@@ -330,18 +438,55 @@ stdbuf -oL -eL tail -F -n 0 "$LOG" | while IFS= read -r line; do
       fi
       ;;
     remove)
-      # Teardown if the *owner* disconnected OR there are no controllers left at all.
-      if [ "$(lock_owner)" = "$DEV" ] || ! any_controller_present; then
-        log "teardown: triggered by ${DEV:-none} (owner=$(lock_owner))"
-        make_desk_primary
-        rm -f "$LOCK" || true
-        note "🛑 Controller Disconnected" "${DEV:-all gone} (teardown)"
+      # If we're not in couch-mode, ignore disconnect noise.
+      if [ ! -e "$LOCK" ]; then
+        log "info: remove ignored (no couch-mode lock)"
+        continue
+      fi
+
+      # Do not teardown immediately on disconnect; schedule a grace window to ignore BT hiccups.
+      # We schedule if the owner disconnected, or if this removal leaves us with no controllers.
+      owner_now="$(lock_owner)"
+      if [ "$owner_now" = "$DEV" ] || ! any_controller_present; then
+        log "remove: scheduling grace teardown check (dev=$DEV owner=$owner_now)"
+        schedule_disconnect_grace "$DEV"
+        note "🎮 Controller Disconnected" "$DEV (waiting ${DISCONNECT_GRACE}s)"
       else
-        log "info: remove ignored (non-owner; owner=$(lock_owner))"
+        log "info: remove ignored (non-owner; owner=$owner_now)"
       fi
       ;;
+    grace_timeout)
+      if [ ! -e "$LOCK" ]; then
+        log "grace: timeout ignored (no couch-mode lock)"
+        cancel_pending_timer
+        continue
+      fi
+
+      # If controllers returned during the grace window, do nothing.
+      if any_controller_present; then
+        log "grace: timeout ignored (controllers present)"
+        cancel_pending_timer
+        continue
+      fi
+
+      owner_now="$(lock_owner)"
+      if [ -n "${owner_now:-}" ] && id_present "$owner_now"; then
+        log "grace: timeout ignored (owner present: $owner_now)"
+        cancel_pending_timer
+        continue
+      fi
+
+      teardown_couch_mode "grace_timeout" "$DEV"
+      ;;
+    steam_exit)
+      if [ ! -e "$LOCK" ]; then
+        log "steam: exit ignored (no couch-mode lock)"
+        continue
+      fi
+      teardown_couch_mode "steam_exit" "$DEV"
+      ;;
   esac
-done
+done < <(stdbuf -oL -eL tail -F -n 0 "$LOG")
 
 
 
