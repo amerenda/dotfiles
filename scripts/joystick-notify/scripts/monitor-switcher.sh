@@ -119,12 +119,22 @@ cec_wake_and_select_input_best_effort() {
   # Prefer libcec (cec-client) on systems like yours where the adapter is /dev/ttyACM0
   # and there is no kernel CEC device node (/dev/cec*).
   if have cec-client; then
-    # `on 0` powers on TV; `as` sets this device as active source (TV will switch to it).
-    # We also send Image View On. Use -p to advertise the physical HDMI port to the TV.
-    if printf 'on 0\nas\nis\nq\n' | cec-client -s -d 1 -p "$CEC_HDMI_PORT" >/dev/null 2>&1; then
-      log "cec: wake+switch OK (cec-client -p $CEC_HDMI_PORT)"
+    # We intentionally do NOT send an explicit `on 0` here.
+    # On many TVs, asserting Active Source is enough to power on and switch inputs, and avoids
+    # some races where the TV powers on and immediately flips to another device (e.g. Shield).
+    # Use -p to advertise the physical HDMI port to the TV.
+    local ok=0 attempt
+    for attempt in 1 2 3 4 5; do
+      if printf 'as\nis\nq\n' | cec-client -s -d 1 -p "$CEC_HDMI_PORT" >/dev/null 2>&1; then
+        ok=1
+        break
+      fi
+      sleep 1
+    done
+    if [ "$ok" -eq 1 ]; then
+      log "cec: active-source asserted (cec-client -p $CEC_HDMI_PORT)"
     else
-      log "cec: warn: wake+switch failed (cec-client -p $CEC_HDMI_PORT) — check /dev/ttyACM0 permissions (need uucp group)"
+      log "cec: warn: active-source failed (cec-client -p $CEC_HDMI_PORT) — check /dev/ttyACM0 permissions (need uucp group)"
     fi
     ( umask 077; : >"$CEC_STATE" ) 2>/dev/null || true
     return 0
