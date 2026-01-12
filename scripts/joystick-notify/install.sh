@@ -54,7 +54,6 @@ fi
 
 echo "[joystick-notify] Installing udev rules ..."
 sudo install -Dm0644 "$ROOT/udev/99-joystick-notify.rules" /etc/udev/rules.d/99-joystick-notify.rules
-sudo install -Dm0644 "$ROOT/udev/71-8bitdo-controllers.rules" /etc/udev/rules.d/71-8bitdo-controllers.rules
 sudo udevadm control --reload-rules
 
 echo "[joystick-notify] Installing systemd user unit ..."

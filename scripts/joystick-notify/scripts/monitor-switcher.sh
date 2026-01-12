@@ -31,6 +31,12 @@ CEC_POWER_OFF_ON_TEARDOWN="${CEC_POWER_OFF_ON_TEARDOWN:-true}"
 COUCH_DESKTOP_NAME="${COUCH_DESKTOP_NAME:-Couch}"
 # Optional numeric override (1..N). If empty, we look up by name or fall back to last desktop.
 COUCH_DESKTOP_NUM="${COUCH_DESKTOP_NUM:-}"
+
+# Plasma Activity isolation (per-wallpaper). Prefer an Activity named "Couch".
+# You create the Activity and set its wallpaper once; we just switch and restore.
+COUCH_ACTIVITY_NAME="${COUCH_ACTIVITY_NAME:-Couch}"
+# Optional explicit Activity ID override. If set, name lookup is skipped.
+COUCH_ACTIVITY_ID="${COUCH_ACTIVITY_ID:-}"
 # ==================================================
 
 # Wayland/KDE session env
@@ -45,6 +51,7 @@ LAUNCHER="/usr/local/bin/launch-bigpicture.sh"
 WATCHLOG=/tmp/joystick-watcher.log
 JOY_EVENT="/usr/local/bin/joystick-event.sh"
 DESKTOP_STATE="/tmp/joystick-prev-desktop.$(id -u)"
+ACTIVITY_STATE="/tmp/joystick-prev-activity.$(id -u)"
 CEC_STATE="/tmp/joystick-cec-used.$(id -u)"
 
 # --- logging helpers ---
@@ -228,6 +235,83 @@ kwin_find_desktop_by_name() {
   return 1
 }
 
+activity_current() {
+  have qdbus6 || return 1
+  qdbus6 org.kde.ActivityManager /ActivityManager/Activities org.kde.ActivityManager.Activities.CurrentActivity 2>/dev/null | head -n 1
+}
+
+activity_set_current() {
+  local id="${1:-}"
+  have qdbus6 || return 1
+  [ -n "$id" ] || return 1
+  qdbus6 org.kde.ActivityManager /ActivityManager/Activities org.kde.ActivityManager.Activities.SetCurrentActivity "$id" >/dev/null 2>&1 || return 1
+}
+
+activity_name() {
+  local id="${1:-}"
+  have qdbus6 || return 1
+  [ -n "$id" ] || return 1
+  qdbus6 org.kde.ActivityManager /ActivityManager/Activities org.kde.ActivityManager.Activities.ActivityName "$id" 2>/dev/null | head -n 1
+}
+
+activity_list() {
+  have qdbus6 || return 1
+  qdbus6 org.kde.ActivityManager /ActivityManager/Activities org.kde.ActivityManager.Activities.ListActivities 2>/dev/null | tr ' ' '\n' | sed '/^$/d'
+}
+
+activity_find_by_name() {
+  local want="${1:-}"
+  [ -n "$want" ] || return 1
+  local id n
+  while IFS= read -r id; do
+    n="$(activity_name "$id" || true)"
+    if [ "${n:-}" = "$want" ]; then
+      echo -n "$id"
+      return 0
+    fi
+  done < <(activity_list || true)
+  return 1
+}
+
+save_and_switch_to_couch_activity_best_effort() {
+  local cur target
+  cur="$(activity_current || echo)"
+  [ -n "${cur:-}" ] || { log "activity: skip (cannot read current activity)"; return 0; }
+  ( umask 077; echo -n "$cur" >"$ACTIVITY_STATE" ) 2>/dev/null || true
+
+  target=""
+  if [ -n "${COUCH_ACTIVITY_ID:-}" ]; then
+    target="$COUCH_ACTIVITY_ID"
+  else
+    target="$(activity_find_by_name "$COUCH_ACTIVITY_NAME" || true)"
+  fi
+
+  if [ -z "${target:-}" ]; then
+    log "activity: warn: could not resolve couch activity (name=$COUCH_ACTIVITY_NAME id=${COUCH_ACTIVITY_ID:-auto})"
+    return 0
+  fi
+
+  if [ "$target" = "$cur" ]; then
+    log "activity: couch activity already active"
+    return 0
+  fi
+
+  if activity_set_current "$target"; then
+    log "activity: switched activity -> $COUCH_ACTIVITY_NAME"
+  else
+    log "activity: warn: failed to switch activity -> $COUCH_ACTIVITY_NAME"
+  fi
+}
+
+restore_previous_activity_best_effort() {
+  local prev
+  [ -r "$ACTIVITY_STATE" ] || return 0
+  prev="$(cat "$ACTIVITY_STATE" 2>/dev/null || echo)"
+  rm -f "$ACTIVITY_STATE" >/dev/null 2>&1 || true
+  [ -n "${prev:-}" ] || return 0
+  activity_set_current "$prev" && log "activity: restored previous activity" || log "activity: warn: failed to restore previous activity"
+}
+
 save_and_switch_to_couch_desktop_best_effort() {
   local cur target count
   cur="$(kwin_current_desktop || echo)"
@@ -279,6 +363,7 @@ teardown_couch_mode() {
   cancel_steam_watcher
   make_desk_primary
   restore_previous_desktop_best_effort
+  restore_previous_activity_best_effort
   cec_standby_best_effort
   rm -f "$CEC_STATE" >/dev/null 2>&1 || true
   rm -f "$LOCK" || true
@@ -612,6 +697,9 @@ while IFS= read -r line; do
     add)
       cancel_pending_timer
       if acquire_lock "$DEV"; then
+        # 0) Switch to Couch Activity (per-wallpaper), if configured.
+        save_and_switch_to_couch_activity_best_effort
+
         # 1) OPTIONAL isolation: jump to a dedicated couch desktop so your current work isn't shown.
         save_and_switch_to_couch_desktop_best_effort
 
