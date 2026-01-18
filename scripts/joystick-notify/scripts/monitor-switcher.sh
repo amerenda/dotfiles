@@ -39,6 +39,11 @@ COUCH_ACTIVITY_NAME="${COUCH_ACTIVITY_NAME:-Couch}"
 COUCH_ACTIVITY_ID="${COUCH_ACTIVITY_ID:-}"
 # ==================================================
 
+# Display outputs (KScreen names). These can change when you swap GPU ports/cables.
+# Use `kscreen-doctor -o` to confirm.
+DESK_OUTPUT="${DESK_OUTPUT:-HDMI-A-2}"
+TV_OUTPUT="${TV_OUTPUT:-HDMI-A-1}"
+
 # Wayland/KDE session env
 export XDG_SESSION_TYPE=wayland
 export DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$(id -u)/bus"
@@ -62,6 +67,15 @@ note(){
   command -v notify-send >/dev/null 2>&1 || return 0
   # Coalesce repeated notifications when supported by the notification server.
   notify-send -h string:x-canonical-private-synchronous:joystick-notify "$@" >/dev/null 2>&1 || true
+}
+
+set_dnd() {
+  # KDE Plasma 6 Do Not Disturb toggle via DBus.
+  local state="${1:-false}"
+  have qdbus6 || return 0
+  qdbus6 org.freedesktop.Notifications /org/freedesktop/Notifications \
+    org.freedesktop.Notifications.DoNotDisturbMode "$state" >/dev/null 2>&1 || true
+  log "dnd: set to $state"
 }
 
 # ---------- background job helpers ----------
@@ -365,6 +379,7 @@ teardown_couch_mode() {
   restore_previous_desktop_best_effort
   restore_previous_activity_best_effort
   cec_standby_best_effort
+  set_dnd false
   rm -f "$CEC_STATE" >/dev/null 2>&1 || true
   rm -f "$LOCK" || true
   note "🛑 Couch-mode Ended" "${why:-ended} ${dev:-}"
@@ -523,15 +538,15 @@ set_audio_to_sink() {
 make_desk_primary() {
   log "begin: make_desk_primary"
   if $DEBUG_MODE; then
-    note "🧪 DEBUG" "make_desk_primary (HDMI-A-1 primary; audio -> Headset)"
+    note "🧪 DEBUG" "make_desk_primary ($DESK_OUTPUT primary; audio -> Headset)"
   else
-    # Enable A-1 first, then disable A-2 to avoid 'no outputs'
+    # Enable desk output first, then disable the other output to avoid 'no outputs'
     set_audio_to_sink "$HEADSET_SINK"
     kscreen-doctor \
-      output.HDMI-A-1.enable \
-      output.HDMI-A-1.mode.2560x1440@144 \
-      output.HDMI-A-1.position.0,0 \
-      output.HDMI-A-2.disable 2>/dev/null || true
+      "output.${DESK_OUTPUT}.enable" \
+      "output.${DESK_OUTPUT}.mode.2560x1440@144" \
+      "output.${DESK_OUTPUT}.position.0,0" \
+      "output.${TV_OUTPUT}.disable" 2>/dev/null || true
   fi
   log "end: make_desk_primary"
 }
@@ -539,14 +554,14 @@ make_desk_primary() {
 make_tv_primary() {
   log "begin: make_tv_primary"
   if $DEBUG_MODE; then
-    note "🧪 DEBUG" "make_tv_primary (HDMI-A-2 primary; audio -> TV)"
+    note "🧪 DEBUG" "make_tv_primary ($TV_OUTPUT primary; audio -> TV)"
   else
-    # Enable A-2 first, then disable A-1 (helps ensure the HDMI audio device exists).
+    # Enable TV output first, then disable the other output (helps ensure the HDMI audio device exists).
     kscreen-doctor \
-      output.HDMI-A-2.enable \
-      output.HDMI-A-2.mode.3840x2160@60 \
-      output.HDMI-A-2.position.2560,0 \
-      output.HDMI-A-1.disable 2>/dev/null || true
+      "output.${TV_OUTPUT}.enable" \
+      "output.${TV_OUTPUT}.mode.3840x2160@60" \
+      "output.${TV_OUTPUT}.position.0,0" \
+      "output.${DESK_OUTPUT}.disable" 2>/dev/null || true
 
     # Now that the output is enabled, resolve the TV sink and switch audio (default + move streams).
     if tv_sink="$(resolve_tv_sink_with_wait)"; then
@@ -697,13 +712,16 @@ while IFS= read -r line; do
     add)
       cancel_pending_timer
       if acquire_lock "$DEV"; then
-        # 0) Switch to Couch Activity (per-wallpaper), if configured.
+        # 0) Enable Do Not Disturb to prevent focus-stealing notifications.
+        set_dnd true
+
+        # 1) Switch to Couch Activity (per-wallpaper), if configured.
         save_and_switch_to_couch_activity_best_effort
 
-        # 1) OPTIONAL isolation: jump to a dedicated couch desktop so your current work isn't shown.
+        # 2) OPTIONAL isolation: jump to a dedicated couch desktop so your current work isn't shown.
         save_and_switch_to_couch_desktop_best_effort
 
-        # 2/3) Hide cursor + start Steam (launcher keeps running until lock is removed).
+        # 3/4) Hide cursor + start Steam (launcher keeps running until lock is removed).
         start_steam_watcher
         if $DEBUG_MODE; then
           log "DEBUG: would launch Steam Big Picture"
@@ -713,10 +731,10 @@ while IFS= read -r line; do
             log "action: launch steam big picture ($LAUNCHER)"
             "$LAUNCHER" >/dev/null 2>&1 &
 
-            # 4) While Steam starts, wake TV + switch its input to this PC (CEC), in the background.
+            # 5) While Steam starts, wake TV + switch its input to this PC (CEC), in the background.
             ( cec_wake_and_select_input_best_effort ) >/dev/null 2>&1 &
 
-            # 5) Switch output/audio to the TV.
+            # 6) Switch output/audio to the TV.
             sleep 0.5
             make_tv_primary
 
@@ -751,7 +769,6 @@ while IFS= read -r line; do
         if is_steam_running; then
           log "remove: steam running -> scheduling grace teardown check (dev=$DEV owner=$owner_now)"
           schedule_disconnect_grace "$DEV"
-          note "🎮 Controller Disconnected" "$DEV (waiting ${DISCONNECT_GRACE}s)"
         else
           log "remove: steam not running -> immediate teardown (dev=$DEV owner=$owner_now)"
           teardown_couch_mode "controller_disconnect" "$DEV"

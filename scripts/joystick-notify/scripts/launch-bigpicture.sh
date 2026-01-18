@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# steam-bigpicture-primary.sh
+# launch-bigpicture.sh
 set -euo pipefail
 
 # ---- Cursor hiding (KDE Plasma / KWin, Wayland) ----
@@ -11,8 +11,8 @@ set -euo pipefail
 
 HIDE_CURSOR="${HIDE_CURSOR:-1}"
 HIDE_CURSOR_TIMEOUT="${HIDE_CURSOR_TIMEOUT:-1}"
-LOCKFILE="${LOCKFILE:-/tmp/joystick-owner.lock}"
-STATE_FILE="/tmp/kwin-hidecursor-state.$(id -u)"
+LOCKFILE="${LOCKFILE:-/tmp/launch-bigpicture.lock}"
+STATE_FILE="/tmp/launch-bigpicture-state.$(id -u)"
 
 have() { command -v "$1" >/dev/null 2>&1; }
 

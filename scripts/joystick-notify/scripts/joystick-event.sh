@@ -33,6 +33,3 @@ fi
   flock -n 9 || exit 0
   printf '%s %s %s\n' "$(date -Is)" "$ACT" "$DEV" >> "$LOG"
 } 9>"$LOCK"
-
-
-

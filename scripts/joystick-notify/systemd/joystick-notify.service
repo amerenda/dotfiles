@@ -22,7 +22,7 @@ RestartSec=1
 
 # On exit, revert audio/display and clean lockfile
 ExecStopPost=/usr/bin/bash -lc 'pactl set-default-sink alsa_output.usb-SteelSeries_Arctis_Nova_7X-00.iec958-stereo || true'
-ExecStopPost=/usr/bin/bash -lc 'kscreen-doctor output.HDMI-A-1.enable output.HDMI-A-1.mode.2560x1440@144 output.HDMI-A-1.position.0,0 output.HDMI-A-2.disable 2>/dev/null || true'
+ExecStopPost=/usr/bin/bash -lc 'kscreen-doctor output.HDMI-A-2.enable output.HDMI-A-2.mode.2560x1440@144 output.HDMI-A-2.position.0,0 output.HDMI-A-1.disable 2>/dev/null || true'
 ExecStopPost=/usr/bin/bash -lc 'rm -f /tmp/joystick-owner.lock || true'
 
 [Install]
