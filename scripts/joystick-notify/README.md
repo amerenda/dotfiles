@@ -75,6 +75,16 @@ Starts Steam Big Picture in a way that works well on Plasma Wayland and manages 
   - Otherwise: `steam -gamepadui`
 - Stays alive while `/tmp/joystick-owner.lock` exists so cursor hiding remains active
 
+### `scripts/game-wrapper.sh`
+A wrapper script that conditionally uses `gamescope` when the TV is active.
+- Detects if the TV output (`HDMI-A-1` by default) is enabled via `kscreen-doctor`.
+- If active, launches the command with `gamescope -f -r 60 --expose-wayland`.
+- Otherwise, executes the command normally.
+
+To use in Steam:
+1. Right-click a game → **Properties** → **General**.
+2. Set **Launch Options** to: `game-wrapper.sh %command%`
+
 ### `udev/99-joystick-notify.rules`
 Triggers `joystick-event.sh` on controller connect/disconnect.
 

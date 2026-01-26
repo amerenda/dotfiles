@@ -45,6 +45,7 @@ echo "[joystick-notify] Installing scripts to /usr/local/bin ..."
 sudo install -Dm0755 "$ROOT/scripts/monitor-switcher.sh" /usr/local/bin/monitor-switcher.sh
 sudo install -Dm0755 "$ROOT/scripts/joystick-event.sh" /usr/local/bin/joystick-event.sh
 sudo install -Dm0755 "$ROOT/scripts/launch-bigpicture.sh" /usr/local/bin/launch-bigpicture.sh
+sudo install -Dm0755 "$ROOT/scripts/game-wrapper.sh" /usr/local/bin/game-wrapper.sh
 sudo install -Dm0755 "$ROOT/system-tray/joystick-tray.py" /usr/local/bin/joystick-notify-tray
 
 # Optional legacy launcher (kept only if present in the repo)
