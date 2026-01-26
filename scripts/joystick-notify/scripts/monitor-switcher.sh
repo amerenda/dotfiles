@@ -721,35 +721,39 @@ while IFS= read -r line; do
         # 2) OPTIONAL isolation: jump to a dedicated couch desktop so your current work isn't shown.
         save_and_switch_to_couch_desktop_best_effort
 
-        # 3/4) Hide cursor + start Steam (launcher keeps running until lock is removed).
-        start_steam_watcher
-        if $DEBUG_MODE; then
-          log "DEBUG: would launch Steam Big Picture"
-          note "🧪 DEBUG" "Would launch Steam Big Picture"
-        else
-          if launcher_exists; then
-            log "action: launch steam big picture ($LAUNCHER)"
-            "$LAUNCHER" >/dev/null 2>&1 &
+            # 3/4) Hide cursor + start Steam (launcher keeps running until lock is removed).
+            start_steam_watcher
+            if $DEBUG_MODE; then
+              log "DEBUG: would launch Steam Big Picture"
+              note "🧪 DEBUG" "Would launch Steam Big Picture"
+            else
+              if launcher_exists; then
+                log "action: launch steam big picture ($LAUNCHER)"
+                LOCKFILE="$LOCK" "$LAUNCHER" >/dev/null 2>&1 &
 
-            # 5) While Steam starts, wake TV + switch its input to this PC (CEC), in the background.
-            ( cec_wake_and_select_input_best_effort ) >/dev/null 2>&1 &
+                # 5) While Steam starts, wake TV + switch its input to this PC (CEC), in the background.
+                ( cec_wake_and_select_input_best_effort ) >/dev/null 2>&1 &
 
-            # 6) Switch output/audio to the TV.
-            sleep 0.5
-            make_tv_primary
+                # 6) Switch output/audio to the TV.
+                sleep 0.5
+                make_tv_primary
 
-            # Steam/PipeWire can race and restore streams back to the old device;
-            # re-assert the TV sink after launch and move streams again.
-            (
-              sleep 2
-              tv_sink="$(tv_sink_name)"
-              [ -n "${tv_sink:-}" ] || exit 0
-              set_audio_to_sink "$tv_sink"
-            ) >/dev/null 2>&1 &
-          else
-            log "warn: launcher missing/not executable: $LAUNCHER"
-          fi
-        fi
+                # Steam/PipeWire can race and restore streams back to the old device;
+                # re-assert the TV sink after launch and move streams multiple times
+                # over the next 20s to ensure Steam (and game) audio lands on the TV.
+                (
+                  for i in {1..10}; do
+                    sleep 2
+                    tv_sink="$(tv_sink_name)"
+                    if [ -n "${tv_sink:-}" ]; then
+                      set_audio_to_sink "$tv_sink"
+                    fi
+                  done
+                ) >/dev/null 2>&1 &
+              else
+                log "warn: launcher missing/not executable: $LAUNCHER"
+              fi
+            fi
         note "🎮 Controller Connected" "$DEV (owner)"
       else
         log "info: add ignored (owner=$(lock_owner))"
