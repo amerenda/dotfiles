@@ -8,7 +8,7 @@ DEBUG_MODE="${DEBUG_MODE:-false}"
 
 # Disconnect grace period (seconds) before tearing down couch-mode on controller loss.
 # This protects against transient Bluetooth hiccups.
-DISCONNECT_GRACE="${DISCONNECT_GRACE:-15}"
+DISCONNECT_GRACE="${DISCONNECT_GRACE:-30}"
 
 # How often (seconds) to poll for Steam exiting while in couch-mode.
 STEAM_POLL="${STEAM_POLL:-2}"
@@ -126,6 +126,11 @@ emit_event() {
 
 is_steam_running() {
   pgrep -x steam >/dev/null 2>&1 || pgrep -f '/steam' >/dev/null 2>&1
+}
+
+is_game_running() {
+  # We check for gamescope which is used by our game-wrapper.sh
+  pgrep -x gamescope >/dev/null 2>&1
 }
 
 have() { command -v "$1" >/dev/null 2>&1; }
@@ -401,16 +406,31 @@ schedule_disconnect_grace() {
 start_steam_watcher() {
   # Watch Steam while in couch-mode. Only trigger once Steam has been observed running,
   # then later disappears for 2 consecutive polls (avoids startup races).
+  # Also monitors game exit: if game stops and no controller is present, start grace.
   if is_pid_alive "${STEAM_WATCHER_PID:-}"; then
     return 0
   fi
 
   (
-    local seen_running=0 misses=0
+    local seen_running=0 misses=0 seen_game=0
     while [ -e "$LOCK" ]; do
       if is_steam_running; then
         seen_running=1
         misses=0
+        
+        # Check game state
+        if is_game_running; then
+          seen_game=1
+        else
+          # Game is not running now. If we previously saw it running AND no controllers
+          # are connected, we should trigger the grace period teardown.
+          if [ "$seen_game" -eq 1 ] && ! any_controller_present; then
+            log "steam: game exited and no controllers present -> starting grace teardown"
+            emit_event "grace_timeout" "game_exit_timeout"
+            exit 0
+          fi
+          seen_game=0
+        fi
       else
         if [ "$seen_running" -eq 1 ]; then
           misses=$((misses + 1))
@@ -697,6 +717,11 @@ launcher_exists() { [ -x "$LAUNCHER" ]; }
 while [ ! -e "$LOG" ]; do log "waiting for $LOG to appear..."; sleep 0.5; done
 log "watcher started, tailing $LOG"
 
+# Enforce desk as primary on startup (only if not already in couch-mode)
+if [ ! -f "$LOCK" ]; then
+  make_desk_primary
+fi
+
 # Start at EOF; only new lines trigger
 # If we boot into an already-active couch-mode (lock exists), ensure the Steam watcher is running.
 [ -e "$LOCK" ] && start_steam_watcher || true
@@ -711,6 +736,15 @@ while IFS= read -r line; do
   case "$ACT" in
     add)
       cancel_pending_timer
+      if [ -e "$LOCK" ]; then
+        # Already in couch mode. Update owner ID but skip display/CEC setup.
+        echo -n "$DEV" > "$LOCK"
+        log "lock: updated owner to $DEV (resuming existing session)"
+        note "🎮 Controller Reconnected" "$DEV (new owner)"
+        start_steam_watcher # ensure watcher is running
+        continue
+      fi
+
       if acquire_lock "$DEV"; then
         # 0) Enable Do Not Disturb to prevent focus-stealing notifications.
         set_dnd true
@@ -728,17 +762,19 @@ while IFS= read -r line; do
               note "🧪 DEBUG" "Would launch Steam Big Picture"
             else
               if launcher_exists; then
+                # 1) Wake TV + switch its input to this PC (CEC), in the background.
+                ( cec_wake_and_select_input_best_effort ) >/dev/null 2>&1 &
+
+                # 2) Switch output/audio to the TV BEFORE launching Steam.
+                # This ensures Steam sees the TV as the primary display immediately.
+                make_tv_primary
+                sleep 1
+
+                # 3) Hide cursor + start Steam (launcher keeps running until lock is removed).
                 log "action: launch steam big picture ($LAUNCHER)"
                 LOCKFILE="$LOCK" "$LAUNCHER" >/dev/null 2>&1 &
 
-                # 5) While Steam starts, wake TV + switch its input to this PC (CEC), in the background.
-                ( cec_wake_and_select_input_best_effort ) >/dev/null 2>&1 &
-
-                # 6) Switch output/audio to the TV.
-                sleep 0.5
-                make_tv_primary
-
-                # Steam/PipeWire can race and restore streams back to the old device;
+                # 4) Steam/PipeWire can race and restore streams back to the old device;
                 # re-assert the TV sink after launch and move streams multiple times
                 # over the next 20s to ensure Steam (and game) audio lands on the TV.
                 (
@@ -766,11 +802,12 @@ while IFS= read -r line; do
         continue
       fi
 
-      # Do not teardown immediately on disconnect; schedule a grace window to ignore BT hiccups.
-      # We schedule if the owner disconnected, or if this removal leaves us with no controllers.
+      # Do not teardown immediately on disconnect.
       owner_now="$(lock_owner)"
       if [ "$owner_now" = "$DEV" ] || ! any_controller_present; then
-        if is_steam_running; then
+        if is_game_running; then
+          log "remove: game is running -> staying in couch mode (dev=$DEV owner=$owner_now)"
+        elif is_steam_running; then
           log "remove: steam running -> scheduling grace teardown check (dev=$DEV owner=$owner_now)"
           schedule_disconnect_grace "$DEV"
         else

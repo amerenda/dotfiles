@@ -46,6 +46,7 @@ sudo install -Dm0755 "$ROOT/scripts/monitor-switcher.sh" /usr/local/bin/monitor-
 sudo install -Dm0755 "$ROOT/scripts/joystick-event.sh" /usr/local/bin/joystick-event.sh
 sudo install -Dm0755 "$ROOT/scripts/launch-bigpicture.sh" /usr/local/bin/launch-bigpicture.sh
 sudo install -Dm0755 "$ROOT/scripts/game-wrapper.sh" /usr/local/bin/game-wrapper.sh
+sudo install -Dm0755 "$ROOT/scripts/force-desk-primary.sh" /usr/local/bin/force-desk-primary.sh
 sudo install -Dm0755 "$ROOT/system-tray/joystick-tray.py" /usr/local/bin/joystick-notify-tray
 
 # Optional legacy launcher (kept only if present in the repo)
@@ -55,6 +56,7 @@ fi
 
 echo "[joystick-notify] Installing udev rules ..."
 sudo install -Dm0644 "$ROOT/udev/99-joystick-notify.rules" /etc/udev/rules.d/99-joystick-notify.rules
+sudo install -Dm0644 "$ROOT/udev/98-monitor-hotplug.rules" /etc/udev/rules.d/98-monitor-hotplug.rules
 sudo udevadm control --reload-rules
 
 echo "[joystick-notify] Installing systemd user unit ..."
@@ -62,6 +64,7 @@ install -Dm0644 "$ROOT/systemd/joystick-notify.service" "$HOME/.config/systemd/u
 install -Dm0644 "$ROOT/systemd/joystick-notify-steam-shutdown.service" "$HOME/.config/systemd/user/joystick-notify-steam-shutdown.service"
 install -Dm0644 "$ROOT/systemd/joystick-notify-steam-shutdown.path" "$HOME/.config/systemd/user/joystick-notify-steam-shutdown.path"
 install -Dm0644 "$ROOT/systemd/joystick-notify-tray.service" "$HOME/.config/systemd/user/joystick-notify-tray.service"
+install -Dm0644 "$ROOT/systemd/force-desk-primary.service" "$HOME/.config/systemd/user/force-desk-primary.service"
 
 echo "[joystick-notify] Installing desktop entry (tray app id)..."
 install -Dm0644 "$ROOT/system-tray/joystick-notify-tray.desktop" "$HOME/.local/share/applications/joystick-notify-tray.desktop"

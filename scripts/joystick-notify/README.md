@@ -52,7 +52,12 @@ Long-running user service that tails `/tmp/joystick-events.log` and drives the w
 
 Key concepts:
 - **Owner lock**: `/tmp/joystick-owner.lock` contains the “owner” device id (first controller to connect).
-- **Grace period**: disconnects are debounced to avoid tearing down on brief Bluetooth hiccups.
+- **Persistence**: Couch Mode stays active even if the controller disconnects, as long as a game (detected via `gamescope`) is running.
+- **Grace period**: 
+  - If a controller disconnects while Steam is running but no game is active, a 30-second grace period starts.
+  - If the controller re-connects during this window, the session resumes without screen flickering or HDMI-CEC re-triggers.
+  - If the grace period expires without a controller, the mode tears down.
+- **Immediate Teardown**: If Steam is closed, Couch Mode ends immediately regardless of controller state.
 - **Synthetic events**: internal timers/watchers emit events back into the same log stream (e.g. `grace_timeout`, `steam_exit`) using a reliable append.
 - **KWin virtual desktop isolation**:
   - Saves current desktop to `/tmp/joystick-prev-desktop.$UID`
@@ -75,15 +80,36 @@ Starts Steam Big Picture in a way that works well on Plasma Wayland and manages 
   - Otherwise: `steam -gamepadui`
 - Stays alive while `/tmp/joystick-owner.lock` exists so cursor hiding remains active
 
+### `scripts/force-desk-primary.sh`
+Enforces the desk monitor as the primary display and **disables the TV** by default.
+- Triggered by `udev` on any display change.
+- Checks for `/tmp/joystick-owner.lock`; if it exists (Couch Mode), it exits without doing anything.
+- If no lock exists, it ensures `HDMI-A-2` is primary and `HDMI-A-1` is disabled.
+- This prevents the TV from stealing focus or being used as a secondary monitor when you just want to use your desk.
+
 ### `scripts/game-wrapper.sh`
 A wrapper script that conditionally uses `gamescope` when the TV is active.
 - Detects if the TV output (`HDMI-A-1` by default) is enabled via `kscreen-doctor`.
-- If active, launches the command with `gamescope -f -r 60 --expose-wayland`.
+- If active, launches the command with `gamescope` using optimized performance flags and explicit resolution settings.
 - Otherwise, executes the command normally.
 
 To use in Steam:
 1. Right-click a game → **Properties** → **General**.
-2. Set **Launch Options** to: `game-wrapper.sh %command%`
+2. Set **Launch Options** to exactly: `game-wrapper.sh %command%`
+
+#### Configuration (Environment Variables)
+You can customize the resolution by prefixing the launch option:
+- `OUT_W` / `OUT_H`: Output resolution (default: `3840x2160`).
+- `GAME_W` / `GAME_H`: Internal game resolution (default: matches `OUT_W/H`).
+- `WRAPPER_DEBUG`: Set to `true` to enable logging to `/tmp/game-wrapper.log`.
+
+Example for 1080p upscaling to 4K with debug logging:
+`WRAPPER_DEBUG=true GAME_W=1920 GAME_H=1080 game-wrapper.sh %command%`
+
+#### Troubleshooting Performance
+If you experience slowdowns over long sessions:
+- Ensure your user is in the `gamemode` or `realtime` group to allow `--rt` (real-time priority) to work effectively.
+- Check if your TV supports and has "Game Mode" or "Adaptive Sync/VRR" enabled.
 
 ### `udev/99-joystick-notify.rules`
 Triggers `joystick-event.sh` on controller connect/disconnect.
