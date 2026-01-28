@@ -106,6 +106,16 @@ You can customize the resolution by prefixing the launch option:
 Example for 1080p upscaling to 4K with debug logging:
 `WRAPPER_DEBUG=true GAME_W=1920 GAME_H=1080 game-wrapper.sh %command%`
 
+#### Global Wrapper (Proton Games)
+The `launch-bigpicture.sh` script automatically sets `STEAM_COMPAT_COMMAND_PREFIX="game-wrapper.sh"`. This means:
+- **All Proton games** will automatically use `gamescope` when playing on the TV.
+- No manual per-game setup is required for most titles.
+- Native Linux games still require manual setup (`game-wrapper.sh %command%`) or forcing Proton.
+
+**How to disable for a specific game:**
+If a game is incompatible with the global wrapper, you can disable it by setting a different prefix in the game's **Launch Options**:
+`STEAM_COMPAT_COMMAND_PREFIX="" %command%`
+
 #### Troubleshooting Performance
 If you experience slowdowns over long sessions:
 - Ensure your user is in the `gamemode` or `realtime` group to allow `--rt` (real-time priority) to work effectively.

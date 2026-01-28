@@ -49,6 +49,10 @@ sudo install -Dm0755 "$ROOT/scripts/game-wrapper.sh" /usr/local/bin/game-wrapper
 sudo install -Dm0755 "$ROOT/scripts/force-desk-primary.sh" /usr/local/bin/force-desk-primary.sh
 sudo install -Dm0755 "$ROOT/system-tray/joystick-tray.py" /usr/local/bin/joystick-notify-tray
 
+echo "[joystick-notify] Installing library components to /usr/local/lib/joystick-notify ..."
+sudo mkdir -p /usr/local/lib/joystick-notify
+sudo install -Dm0644 "$ROOT"/lib/*.sh /usr/local/lib/joystick-notify/
+
 # Optional legacy launcher (kept only if present in the repo)
 if [ -f "$ROOT/steam-bigpicture-primary.sh" ]; then
   sudo install -Dm0755 "$ROOT/steam-bigpicture-primary.sh" /usr/local/bin/steam-bigpicture-primary.sh

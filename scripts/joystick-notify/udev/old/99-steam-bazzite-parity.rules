@@ -1,2 +1,0 @@
-KERNEL=="hidraw*", SUBSYSTEM=="hidraw", TAG+="uaccess"
-KERNEL=="uinput", MODE="0660", TAG+="uaccess"

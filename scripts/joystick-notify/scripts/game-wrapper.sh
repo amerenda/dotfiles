@@ -7,6 +7,12 @@ TV_OUTPUT="${TV_OUTPUT:-HDMI-A-1}"
 LOG="/tmp/game-wrapper.log"
 WRAPPER_DEBUG="${WRAPPER_DEBUG:-false}"
 
+# Prevent recursion if the wrapper is called multiple times (global + local)
+if [ "${GAMESCOPE_RE_WRAPPED:-0}" = "1" ]; then
+    exec "$@"
+fi
+export GAMESCOPE_RE_WRAPPED=1
+
 # Configuration for resolution
 OUT_W="${OUT_W:-3840}"
 OUT_H="${OUT_H:-2160}"

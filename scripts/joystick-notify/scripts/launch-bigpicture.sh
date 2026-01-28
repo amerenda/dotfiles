@@ -109,6 +109,7 @@ export DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$(id -u)/bus"
 export SDL_VIDEODRIVER=wayland
 export QT_QPA_PLATFORM=wayland
 export STEAM_USE_WAYLAND=1
+export STEAM_COMPAT_COMMAND_PREFIX="game-wrapper.sh"
 
 # ---- Helpers ----
 is_steam_running() {
