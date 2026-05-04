@@ -26,3 +26,19 @@ Host rpi3-0
   HostName 10.100.20.13
   User alex
 
+Host murderbot
+  IdentityFile ~/.ssh/alex_id_ed25519
+  HostName 10.100.20.19
+  User alex
+
+Host mini
+  IdentityFile ~/.ssh/alex_id_ed25519
+  HostName 10.100.20.18
+  User alex
+
+Host mini-wifi
+  IdentityFile ~/.ssh/alex_id_ed25519
+  HostName 10.100.20.176
+  User alex
+
+
