@@ -10,7 +10,6 @@ Host rpi5-0
   HostName 10.100.20.10
   User alex
 
-
 Host rpi5-1
   IdentityFile ~/.ssh/alex_id_ed25519
   HostName 10.100.20.11
@@ -42,3 +41,23 @@ Host mini-wifi
   User alex
 
 
+
+Host lemurpro
+  HostName 100.76.249.102
+  User alex
+  IdentityFile ~/.ssh/alex_id_ed25519
+
+Host gmktec-1 
+  IdentityFile ~/.ssh/alex_id_ed25519
+  HostName 10.100.20.20
+  User alex
+
+Host gmktec-2 
+  IdentityFile ~/.ssh/alex_id_ed25519
+  HostName 10.100.20.21
+  User alex
+
+Host gmktec-3 
+  IdentityFile ~/.ssh/alex_id_ed25519
+  HostName 10.100.20.22
+  User alex
