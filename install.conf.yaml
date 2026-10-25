@@ -10,7 +10,10 @@
   - [chmod -R 0700 ~/.gnupg, setting permissions on gnupg folder]
 
 - link:
-    ~/.alacritty.yml: alacritty.yml
+    ~/.config/alacritty/alacritty.toml:
+      path: alacritty/alacritty.toml
+      create: true
+      force: true
     ~/.antigen.zsh: antigen/antigen.zsh
     ~/.antigen: antigen/
     ~/.bin: bin
